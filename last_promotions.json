@@ -1,0 +1,2088 @@
+{
+  "start_url": "https://www.coutumecafe.com",
+  "scraped_count": 124,
+  "products": [
+    {
+      "name": "Cold Brew Bio | Pack de 6 canettes",
+      "price": "27,50 €",
+      "image": "https://media3.coutumecafe.com/4154-home_default/xcold-brew-cubi-10-litres.jpg.pagespeed.ic.Prc3_U7z5o.webp",
+      "product_url": "https://www.coutumecafe.com/cold-brew-cubi-10-litres-1033.html"
+    },
+    {
+      "name": "Café en grains ou moulu Guatemala | Patzibir 1kg",
+      "price": "49,60 €",
+      "image": "https://media1.coutumecafe.com/4072-home_default/xcafe-en-grains-ou-moulu-guatemala-patzibir-1kg.jpg.pagespeed.ic.DKRh_k5B5h.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-guatemala-patzibir-1kg-1021.html"
+    },
+    {
+      "name": "Café en grains ou moulu Guatemala | Bendición 1kg",
+      "price": "43,20 €",
+      "image": "https://media2.coutumecafe.com/4052-home_default/xcafe-en-grains-ou-moulu-guatemala-bendicion-1kg.jpg.pagespeed.ic.YvSuaFAEI_.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-guatemala-bendicion-1kg-1019.html"
+    },
+    {
+      "name": "Café en grains ou moulu Guatemala | Patzibir 250g",
+      "price": "15,50 €",
+      "image": "https://media3.coutumecafe.com/4060-home_default/xcafe-en-grains-ou-moulu-guatemala-patzibir-250g.jpg.pagespeed.ic.IdiJ7-AYdZ.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-guatemala-patzibir-250g-1018.html"
+    },
+    {
+      "name": "Café en grains ou moulu Guatemala | Bendición 250g",
+      "price": "13,50 €",
+      "image": "https://media1.coutumecafe.com/4040-home_default/xcafe-en-grains-ou-moulu-guatemala-bendicion-250g.jpg.pagespeed.ic.O8bpExm9y-.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-guatemala-bendicion-250g-1017.html"
+    },
+    {
+      "name": "Café en grains ou moulu Éthiopie | Abbachebsa 1kg",
+      "price": "43,20 €",
+      "image": "https://media1.coutumecafe.com/4023-home_default/xcafe-en-grains-ou-moulu-ethiopie-abachebsa-1kg.jpg.pagespeed.ic.2DbDfQdzHT.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-ethiopie-abachebsa-1kg-1015.html"
+    },
+    {
+      "name": "Café en grains ou moulu Éthiopie | Abbachebsa 250g",
+      "price": "13,50 €",
+      "image": "https://media1.coutumecafe.com/4015-home_default/xcafe-en-grains-ou-moulu-ethiopie-abachebsa-250g.jpg.pagespeed.ic.xv6MvGPGfe.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-ethiopie-abachebsa-250g-1014.html"
+    },
+    {
+      "name": "Café en grain ou moulu | Gesha Maranatha 250g",
+      "price": "30,00 €",
+      "image": "https://media2.coutumecafe.com/4006-home_default/xcafe-en-grain-ou-moulu-gesha-maranatha-xg.jpg.pagespeed.ic.yMR2z0_a7l.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grain-ou-moulu-gesha-maranatha-xg-1013.html"
+    },
+    {
+      "name": "Préparation du café : recettes, tutos et astucesL'incontournable de l'été: le cold brew",
+      "price": "Prix non spécifié",
+      "image": "https://media1.coutumecafe.com/img/ybc_blog/post/thumb/260x180xservice-cold-brew.png.pagespeed.ic.8ygwZt49RI.webp",
+      "product_url": "https://www.coutumecafe.com"
+    },
+    {
+      "name": "Préparation du café : recettes, tutos et astucesÀ déguster tout l'été: infusion glacée de Cascara",
+      "price": "Prix non spécifié",
+      "image": "https://media3.coutumecafe.com/img/ybc_blog/post/thumb/260x180xcascara.png.pagespeed.ic.QheHrQA1GL.webp",
+      "product_url": "https://www.coutumecafe.com"
+    },
+    {
+      "name": "Café en grains ou moulu du Guatemala | San Juan Gascon 200g",
+      "price": "22,00 €",
+      "image": "https://media2.coutumecafe.com/3774-home_default/xcafe-en-grains-ou-moulu-du-guatemala-san-juan-gascon-200g.jpg.pagespeed.ic.hDOzMPrc8j.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-du-guatemala-san-juan-gascon-200g-969.html"
+    },
+    {
+      "name": "Café en grains ou moulu Éthiopie | Gushe Buna 250g",
+      "price": "15,50 €",
+      "image": "https://media2.coutumecafe.com/3603-home_default/xcafe-en-grains-ou-moulu-ethiopie-gushe-buna-250g.jpg.pagespeed.ic.hfApOg-Mkr.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-ethiopie-gushe-buna-250g-935.html"
+    },
+    {
+      "name": "Café en grains ou moulu Colombie | Filadelfia 1kg",
+      "price": "49,60 €",
+      "image": "https://media2.coutumecafe.com/1581-home_default/xfiladelfia-1kg.jpg.pagespeed.ic.hrBnRaBtKC.webp",
+      "product_url": "https://www.coutumecafe.com/filadelfia-1kg-244.html"
+    },
+    {
+      "name": "Abonnement sans engagement | Sélection de saison | 2 x 250g",
+      "price": "29,00 €",
+      "image": "https://media2.coutumecafe.com/3529-home_default/xabonnement-sans-engagement-2-x-250g.jpg.pagespeed.ic.9zkCny_xCu.webp",
+      "product_url": "https://www.coutumecafe.com/abonnement-sans-engagement-2-x-250g-741.html"
+    },
+    {
+      "name": "Abonnement sans engagement | Sélection de saison | 2 x 1kg",
+      "price": "85,00 €",
+      "image": "https://media1.coutumecafe.com/3534-home_default/xabonnement-sans-engagement-2-x-1kg.jpg.pagespeed.ic.VyEiMD5X1s.webp",
+      "product_url": "https://www.coutumecafe.com/abonnement-sans-engagement-2-x-1kg-740.html"
+    },
+    {
+      "name": "Abonnement sans engagement | Sélection de saison | 4 x 250g",
+      "price": "59,00 €",
+      "image": "https://media2.coutumecafe.com/3535-home_default/xabonnement-sans-engagement-4-x-250g.jpg.pagespeed.ic.B0bt2sN-gh.webp",
+      "product_url": "https://www.coutumecafe.com/abonnement-sans-engagement-4-x-250g-739.html"
+    },
+    {
+      "name": "Fetco CBS-1132-V+ | Station café filtre",
+      "price": "2 364,00 €",
+      "image": "https://media1.coutumecafe.com/3778-home_default/xfetco-cbs-1132-v.jpg.pagespeed.ic.eJ7F-7800v.webp",
+      "product_url": "https://www.coutumecafe.com/fetco-cbs-1132-v-971.html"
+    },
+    {
+      "name": "Machine à espresso Kees van der Westen Spiritello 1 groupe | PRÉCOMMANDE",
+      "price": "16 680,00 €",
+      "image": "https://media3.coutumecafe.com/3613-home_default/xspiritello-kees-van-der-western.jpg.pagespeed.ic.0YYNZnvZhX.webp",
+      "product_url": "https://www.coutumecafe.com/spiritello-kees-van-der-western-938.html"
+    },
+    {
+      "name": "Machine automatique à café JURA W8 Dark Inox",
+      "price": "2 316,00 €",
+      "image": "https://media1.coutumecafe.com/3187-home_default/xmachine-automatique-a-cafe-jura-w8-dark-inox.jpg.pagespeed.ic.nuFVC53Vlh.webp",
+      "product_url": "https://www.coutumecafe.com/machine-automatique-a-cafe-jura-w8-dark-inox-850.html"
+    },
+    {
+      "name": "Machine automatique à café JURA - X10 Dark Inox",
+      "price": "3 168,00 €",
+      "image": "https://media1.coutumecafe.com/3186-home_default/xmachine-automatique-a-cafe-jura-x10-dark-inox.jpg.pagespeed.ic.oczvJIPNTq.webp",
+      "product_url": "https://www.coutumecafe.com/machine-automatique-a-cafe-jura-x10-dark-inox-849.html"
+    },
+    {
+      "name": "Machine automatique à café JURA - X4 Dark Inox (EA)",
+      "price": "2 820,00 €",
+      "image": "https://media1.coutumecafe.com/3185-home_default/xmachine-automatique-a-cafe-jura-x4-dark-inox-ea.jpg.pagespeed.ic.yGiw0IQCah.webp",
+      "product_url": "https://www.coutumecafe.com/machine-automatique-a-cafe-jura-x4-dark-inox-ea-848.html"
+    },
+    {
+      "name": "Slim Jim - 2 Groupes - Kees Van Der Western",
+      "price": "17 280,00 €",
+      "image": "https://media3.coutumecafe.com/3063-home_default/xslim-jim-2-groupes-kees-van-der-western.jpg.pagespeed.ic.r_sv_IwIRU.webp",
+      "product_url": "https://www.coutumecafe.com/slim-jim-2-groupes-kees-van-der-western-822.html"
+    },
+    {
+      "name": "Boîte de 62 tablettes de nettoyage lait Eversys",
+      "price": "38,40 €",
+      "image": "https://media3.coutumecafe.com/3850-home_default/xboite-de-62-tablettes-de-nettoyage-lait-eversys.jpg.pagespeed.ic.EWrs6ARMWR.webp",
+      "product_url": "https://www.coutumecafe.com/boite-de-62-tablettes-de-nettoyage-lait-eversys-817.html"
+    },
+    {
+      "name": "Gb5 AV - 3 Groupes - La Marzocco",
+      "price": "20 220,00 €",
+      "image": "https://media1.coutumecafe.com/3016-home_default/xgb5-av-3-groupes-la-marzocco.jpg.pagespeed.ic.Tn4G5IQESa.webp",
+      "product_url": "https://www.coutumecafe.com/gb5-av-3-groupes-la-marzocco-814.html"
+    },
+    {
+      "name": "Linea PB S modèle AV 3 groupes| La Marzocco",
+      "price": "19 380,00 €",
+      "image": "https://media2.coutumecafe.com/3014-home_default/xlinea-pb-s-modele-av-3-groupes-la-marzocco.jpg.pagespeed.ic.gxN6_drSX4.webp",
+      "product_url": "https://www.coutumecafe.com/linea-pb-s-modele-av-3-groupes-la-marzocco-813.html"
+    },
+    {
+      "name": "Linea PB S modèle AV 2 groupes| La Marzocco",
+      "price": "16 500,00 €",
+      "image": "https://media1.coutumecafe.com/3012-home_default/xlinea-pb-s-modele-av-2-groupes-la-marzocco.jpg.pagespeed.ic.DnU4_ZF5By.webp",
+      "product_url": "https://www.coutumecafe.com/linea-pb-s-modele-av-2-groupes-la-marzocco-812.html"
+    },
+    {
+      "name": "Linea Classic S modèle AV 3 groupes| La Marzocco",
+      "price": "13 380,00 €",
+      "image": "https://media3.coutumecafe.com/3010-home_default/xlinea-classic-s-modele-av-3-groupes-la-marzocco.jpg.pagespeed.ic.BfZOInNVvh.webp",
+      "product_url": "https://www.coutumecafe.com/linea-classic-s-modele-av-3-groupes-la-marzocco-811.html"
+    },
+    {
+      "name": "Linea Classic S modèle AV 2 groupes| La Marzocco",
+      "price": "11 280,00 €",
+      "image": "https://media2.coutumecafe.com/3009-home_default/xlinea-classic-s-modele-av-2-groupes-la-marzocco.jpg.pagespeed.ic.RTJCfvjzKx.webp",
+      "product_url": "https://www.coutumecafe.com/linea-classic-s-modele-av-2-groupes-la-marzocco-810.html"
+    },
+    {
+      "name": "Moulin à café électrique | Mahlkönig E80S GbW",
+      "price": "3 778,80 €",
+      "image": "https://media1.coutumecafe.com/2507-home_default/xmoulin-a-cafe-electrique-mahlkoenig-e80s-gbw.jpg.pagespeed.ic.bAmIK41MJW.webp",
+      "product_url": "https://www.coutumecafe.com/moulin-a-cafe-electrique-mahlkoenig-e80s-gbw-721.html"
+    },
+    {
+      "name": "Moulin à café électrique | Mahlkönig E65S GbW",
+      "price": "2 578,80 €",
+      "image": "https://media3.coutumecafe.com/1920-home_default/xmoulin-a-cafe-electrique-mahlkoenig-e65s-gbw.jpg.pagespeed.ic.baPvx9DG8b.webp",
+      "product_url": "https://www.coutumecafe.com/moulin-a-cafe-electrique-mahlkoenig-e65s-gbw-580.html"
+    },
+    {
+      "name": "Nettoyant détergent pour système de lait avec bouchon doseur JURA",
+      "price": "27,60 €",
+      "image": "https://media1.coutumecafe.com/904-home_default/xnettoyant-detergent-pour-systeme-de-lait-avec-bouchon-doseur-jura.jpg.pagespeed.ic.u4hPxxgl1V.webp",
+      "product_url": "https://www.coutumecafe.com/nettoyant-detergent-pour-systeme-de-lait-avec-bouchon-doseur-jura-445.html"
+    },
+    {
+      "name": "Boîte de 25 pastilles de nettoyage JURA",
+      "price": "50,40 €",
+      "image": "https://media1.coutumecafe.com/2528-home_default/xboite-de-25-pastilles-de-nettoyage-jura.jpg.pagespeed.ic.n3PQMOPTUt.webp",
+      "product_url": "https://www.coutumecafe.com/boite-de-25-pastilles-de-nettoyage-jura-443.html"
+    },
+    {
+      "name": "Détartrant machine à café JURA - Boîte de 36 pastilles",
+      "price": "60,00 €",
+      "image": "https://media2.coutumecafe.com/898-home_default/xboite-de-36-pastilles-de-detartrage-jura.jpg.pagespeed.ic._FInfJ-fZW.webp",
+      "product_url": "https://www.coutumecafe.com/boite-de-36-pastilles-de-detartrage-jura-442.html"
+    },
+    {
+      "name": "Machine automatique à café JURA WE8 Dark Inox (EA)",
+      "price": "2 100,00 €",
+      "image": "https://media1.coutumecafe.com/893-home_default/xmachine-automatique-a-cafe-we8-jura.jpg.pagespeed.ic.4v3LuRzOur.webp",
+      "product_url": "https://www.coutumecafe.com/machine-automatique-a-cafe-we8-jura-439.html"
+    },
+    {
+      "name": "Machine automatique à café JURA X6 Dark inox (EA)",
+      "price": "2 640,00 €",
+      "image": "https://media2.coutumecafe.com/891-home_default/xmachine-automatique-a-cafe-x6-jura.jpg.pagespeed.ic.K6T-3zJ8S6.webp",
+      "product_url": "https://www.coutumecafe.com/machine-automatique-a-cafe-x6-jura-438.html"
+    },
+    {
+      "name": "Machine automatique à café JURA X8 Platinum (EA)",
+      "price": "3 084,00 €",
+      "image": "https://media2.coutumecafe.com/889-home_default/xmachine-automatique-a-cafe-x8-jura.jpg.pagespeed.ic.9bLiv3MKzW.webp",
+      "product_url": "https://www.coutumecafe.com/machine-automatique-a-cafe-x8-jura-437.html"
+    },
+    {
+      "name": "Machine automatique à café JURA GIGA X3 Aluminium (EA)",
+      "price": "5 628,00 €",
+      "image": "https://media1.coutumecafe.com/885-home_default/xmachine-automatique-a-cafe-giga-x3-jura.jpg.pagespeed.ic.ztZYvTMVPD.webp",
+      "product_url": "https://www.coutumecafe.com/machine-automatique-a-cafe-giga-x3-jura-435.html"
+    },
+    {
+      "name": "Machine automatique à café JURA GIGA X3c Aluminium EA",
+      "price": "5 304,00 €",
+      "image": "https://media2.coutumecafe.com/884-home_default/xmachine-automatique-a-cafe-giga-x3c-jura.jpg.pagespeed.ic.ztZYvTMVPD.webp",
+      "product_url": "https://www.coutumecafe.com/machine-automatique-a-cafe-giga-x3c-jura-434.html"
+    },
+    {
+      "name": "Machine automatique à café JURA GIGA X8 Alu Black EA",
+      "price": "7 392,00 €",
+      "image": "https://media2.coutumecafe.com/881-home_default/xmachine-automatique-a-cafe-giga-x8-jura.jpg.pagespeed.ic.ErNNgVxVw6.webp",
+      "product_url": "https://www.coutumecafe.com/machine-automatique-a-cafe-giga-x8-jura-433.html"
+    },
+    {
+      "name": "Machine automatique à café JURA GIGA X8c Alu Black EA",
+      "price": "7 668,00 €",
+      "image": "https://media2.coutumecafe.com/882-home_default/xmachine-automatique-a-cafe-giga-x8c-jura.jpg.pagespeed.ic.6FEqA998fM.webp",
+      "product_url": "https://www.coutumecafe.com/machine-automatique-a-cafe-giga-x8c-jura-432.html"
+    },
+    {
+      "name": "Synesso MVP - 3 Groupes",
+      "price": "23 988,00 €",
+      "image": "https://media2.coutumecafe.com/3024-home_default/xsynesso-mvp-3-groupes.jpg.pagespeed.ic.H3xLUpEny_.webp",
+      "product_url": "https://www.coutumecafe.com/synesso-mvp-3-groupes-192.html"
+    },
+    {
+      "name": "Synesso MVP - 2 groupes",
+      "price": "20 700,00 €",
+      "image": "https://media2.coutumecafe.com/3023-home_default/xsynesso-mvp-2-groupes.jpg.pagespeed.ic.YFVUWlXMoD.webp",
+      "product_url": "https://www.coutumecafe.com/synesso-mvp-2-groupes-191.html"
+    },
+    {
+      "name": "Synesso S300 - 3 Groupes",
+      "price": "19 620,00 €",
+      "image": "https://media3.coutumecafe.com/3020-home_default/xsynesso-s300-3-groupes.jpg.pagespeed.ic.D6vA_TAvak.webp",
+      "product_url": "https://www.coutumecafe.com/synesso-s300-3-groupes-190.html"
+    },
+    {
+      "name": "Synesso S200 - 2 Groupes",
+      "price": "16 320,00 €",
+      "image": "https://media2.coutumecafe.com/3019-home_default/xsynesso-s200-2-groupes.jpg.pagespeed.ic.awZ4knSbSQ.webp",
+      "product_url": "https://www.coutumecafe.com/synesso-s200-2-groupes-189.html"
+    },
+    {
+      "name": "Gb5 AV - 2 Groupes - La Marzocco",
+      "price": "17 460,00 €",
+      "image": "https://media2.coutumecafe.com/1869-home_default/xgb5-av-2-groupes-la-marzocco.jpg.pagespeed.ic.bQr5RKWCYH.webp",
+      "product_url": "https://www.coutumecafe.com/gb5-av-2-groupes-la-marzocco-177.html"
+    },
+    {
+      "name": "KB90 modèle AV 3 groupes | La Marzocco",
+      "price": "25 680,00 €",
+      "image": "https://media2.coutumecafe.com/3018-home_default/xkb90-modele-av-3-groupes-la-marzocco.jpg.pagespeed.ic.IZGIGn3lVA.webp",
+      "product_url": "https://www.coutumecafe.com/kb90-modele-av-3-groupes-la-marzocco-148.html"
+    },
+    {
+      "name": "KB90 modèle AV 2 groupes | La Marzocco",
+      "price": "22 380,00 €",
+      "image": "https://media1.coutumecafe.com/3017-home_default/xkb90-2-groupes.jpg.pagespeed.ic.1go4e0fWIK.webp",
+      "product_url": "https://www.coutumecafe.com/kb90-2-groupes-147.html"
+    },
+    {
+      "name": "Machine espresso | Linea Mini Noir - La Marzocco",
+      "price": "5 556,00 €",
+      "image": "https://media2.coutumecafe.com/384-home_default/xmachine-espresso-la-marzocco-linea-mini-noir-buse-cool-touch.jpg.pagespeed.ic.TsFusWGb_O.webp",
+      "product_url": "https://www.coutumecafe.com/machine-espresso-la-marzocco-linea-mini-noir-buse-cool-touch-122.html"
+    },
+    {
+      "name": "GS3 1 groupe Inox | La Marzocco",
+      "price": "7 740,00 €",
+      "image": "https://media1.coutumecafe.com/286-home_default/xgs3-1-groupe-inox-la-marzocco-.jpg.pagespeed.ic.jAL0RE2o9I.webp",
+      "product_url": "https://www.coutumecafe.com/gs3-1-groupe-inox-la-marzocco--96.html"
+    },
+    {
+      "name": "Café BIO en grains ou moulu Honduras | Ceiba 1kg",
+      "price": "49,60 €",
+      "image": "https://media1.coutumecafe.com/4207-home_default/xcafe-bio-en-grains-ou-moulu-honduras-ceiba-1kg.jpg.pagespeed.ic.US6lH81YwV.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-bio-en-grains-ou-moulu-honduras-ceiba-1kg-1037.html"
+    },
+    {
+      "name": "Café BIO en grains ou moulu Honduras | Ceiba 250g",
+      "price": "15,50 €",
+      "image": "https://media3.coutumecafe.com/4201-home_default/xcafe-bio-en-grains-ou-moulu-honduras-ceiba-250g.jpg.pagespeed.ic.VLDWwNiCpO.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-bio-en-grains-ou-moulu-honduras-ceiba-250g-1024.html"
+    },
+    {
+      "name": "Café en grains ou moulu Éthiopie | Abbachebsa 1kg",
+      "price": "43,20 €",
+      "image": "https://media1.coutumecafe.com/4023-home_default/xcafe-en-grains-ou-moulu-ethiopie-abachebsa-1kg.jpg.pagespeed.ic.2DbDfQdzHT.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-ethiopie-abachebsa-1kg-1015.html"
+    },
+    {
+      "name": "Café en grains ou moulu Éthiopie | Abbachebsa 250g",
+      "price": "13,50 €",
+      "image": "https://media1.coutumecafe.com/4015-home_default/xcafe-en-grains-ou-moulu-ethiopie-abachebsa-250g.jpg.pagespeed.ic.xv6MvGPGfe.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-ethiopie-abachebsa-250g-1014.html"
+    },
+    {
+      "name": "Café en grain ou moulu | Gesha Maranatha 250g",
+      "price": "30,00 €",
+      "image": "https://media2.coutumecafe.com/4006-home_default/xcafe-en-grain-ou-moulu-gesha-maranatha-xg.jpg.pagespeed.ic.yMR2z0_a7l.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grain-ou-moulu-gesha-maranatha-xg-1013.html"
+    },
+    {
+      "name": "Café en grains ou moulu du Guatemala | San Juan Gascon 200g",
+      "price": "22,00 €",
+      "image": "https://media2.coutumecafe.com/3774-home_default/xcafe-en-grains-ou-moulu-du-guatemala-san-juan-gascon-200g.jpg.pagespeed.ic.hDOzMPrc8j.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-du-guatemala-san-juan-gascon-200g-969.html"
+    },
+    {
+      "name": "Café en grains ou moulu Éthiopie | Gushe Buna 1kg",
+      "price": "49,60 €",
+      "image": "https://media1.coutumecafe.com/3607-home_default/xcafe-en-grains-ou-moulu-ethiopie-gushe-buna-1kg.jpg.pagespeed.ic.JqKKNx_snN.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-ethiopie-gushe-buna-1kg-937.html"
+    },
+    {
+      "name": "Café en grains ou moulu Éthiopie | Gushe Buna 250g",
+      "price": "15,50 €",
+      "image": "https://media2.coutumecafe.com/3603-home_default/xcafe-en-grains-ou-moulu-ethiopie-gushe-buna-250g.jpg.pagespeed.ic.hfApOg-Mkr.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-ethiopie-gushe-buna-250g-935.html"
+    },
+    {
+      "name": "Café Décaféiné Colombie | Nasa Wesx 1kg",
+      "price": "43,20 €",
+      "image": "https://media3.coutumecafe.com/3341-home_default/xcafe-decafeine-colombie-nasa-wesx-250g.jpg.pagespeed.ic.voqXzVSzYH.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-decafeine-colombie-nasa-wesx-250g-892.html"
+    },
+    {
+      "name": "Café Décaféiné Colombie | Nasa Wesx 250g",
+      "price": "13,50 €",
+      "image": "https://media3.coutumecafe.com/3340-home_default/xcafe-decafeine-colombie-nasa-wesx-250g.jpg.pagespeed.ic.ImbrJI9oK6.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-decafeine-colombie-nasa-wesx-250g-889.html"
+    },
+    {
+      "name": "Café BIO en grains ou moulu Éthiopie | Chelbesa 1kg",
+      "price": "62,40 €",
+      "image": "https://media3.coutumecafe.com/2629-home_default/xcafe-en-grains-ou-moulu-ethiopie-chelbesa-1kg.jpg.pagespeed.ic.Z40qcApRtn.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-ethiopie-chelbesa-1kg-737.html"
+    },
+    {
+      "name": "Café BIO en grains ou moulu Éthiopie | Chelbesa 250g",
+      "price": "19,50 €",
+      "image": "https://media1.coutumecafe.com/2628-home_default/xcafe-en-grains-ou-moulu-ethiopie-chelbesa-250g.jpg.pagespeed.ic.w51RUtSXb9.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-ethiopie-chelbesa-250g-736.html"
+    },
+    {
+      "name": "Café en grains ou moulu Colombie | Filadelfia 1kg",
+      "price": "49,60 €",
+      "image": "https://media2.coutumecafe.com/1581-home_default/xfiladelfia-1kg.jpg.pagespeed.ic.hrBnRaBtKC.webp",
+      "product_url": "https://www.coutumecafe.com/filadelfia-1kg-244.html"
+    },
+    {
+      "name": "Café en grains ou moulu Colombie | Filadelfia 250g",
+      "price": "15,50 €",
+      "image": "https://media1.coutumecafe.com/1540-home_default/xcafe-en-grains-ou-moulu-colombie-filadelfia-250g.jpg.pagespeed.ic.EYLLb1J5no.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-colombie-filadelfia-250g-243.html"
+    },
+    {
+      "name": "Café en grains ou moulu Colombie | La Cristalina 1kg",
+      "price": "62,40 €",
+      "image": "https://media1.coutumecafe.com/3191-home_default/xcafe-en-grains-ou-moulu-colombie-tabi-la-cristalina-1kg.jpg.pagespeed.ic.fSvdXqAzGu.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-colombie-tabi-la-cristalina-1kg-232.html"
+    },
+    {
+      "name": "Café en grains ou moulu Colombie | La Cristalina 250g",
+      "price": "19,50 €",
+      "image": "https://media2.coutumecafe.com/3190-home_default/xcafe-en-grains-ou-moulu-colombie-la-cristalina-250g.jpg.pagespeed.ic.kLMIzR84LG.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-colombie-la-cristalina-250g-231.html"
+    },
+    {
+      "name": "Plan du site",
+      "price": "49€",
+      "image": "",
+      "product_url": "https://www.coutumecafe.com/plan-du-site"
+    },
+    {
+      "name": "La Maison",
+      "price": "2",
+      "image": "",
+      "product_url": "https://www.coutumecafe.com/content/7-coutume"
+    },
+    {
+      "name": "Politique de confidentialité",
+      "price": "Prix non spécifié",
+      "image": "",
+      "product_url": "https://www.coutumecafe.com/content/15-politique-de-confidentialite"
+    },
+    {
+      "name": "Machine espresso | Sage Bambino™ Plus",
+      "price": "529,90 €",
+      "image": "https://media3.coutumecafe.com/159-home_default/xmachine-a-espresso-sage-bambino-plus.jpg.pagespeed.ic.IGhzF7g4yM.webp",
+      "product_url": "https://www.coutumecafe.com/machine-a-espresso-sage-bambino-plus-59.html"
+    },
+    {
+      "name": "La tasse Topl, la tasse zéro stress | Gris perle 236 ml",
+      "price": "35,00 €",
+      "image": "https://media2.coutumecafe.com/2458-home_default/xtasse-topl-gris-perle-236-ml.jpg.pagespeed.ic.96NGm3Jm4A.webp",
+      "product_url": "https://www.coutumecafe.com/tasse-topl-gris-perle-236-ml-705.html"
+    },
+    {
+      "name": "Aeropress Clear transparent | Cafetière à piston nomade",
+      "price": "54,90 €",
+      "image": "https://media3.coutumecafe.com/2955-home_default/xaeropress-clear-transparent.jpg.pagespeed.ic.qNOPE5yv4T.webp",
+      "product_url": "https://www.coutumecafe.com/aeropress-clear-transparent-797.html"
+    },
+    {
+      "name": "Café en grains ou moulu Colombie | Filadelfia 250g",
+      "price": "15,50 €",
+      "image": "https://media1.coutumecafe.com/1540-home_default/xcafe-en-grains-ou-moulu-colombie-filadelfia-250g.jpg.pagespeed.ic.EYLLb1J5no.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-colombie-filadelfia-250g-243.html"
+    },
+    {
+      "name": "Café en grains ou moulu Colombie | Filadelfia 1kg",
+      "price": "49,60 €",
+      "image": "https://media2.coutumecafe.com/1581-home_default/xfiladelfia-1kg.jpg.pagespeed.ic.hrBnRaBtKC.webp",
+      "product_url": "https://www.coutumecafe.com/filadelfia-1kg-244.html"
+    },
+    {
+      "name": "Café en grains ou moulu Colombie | La Cristalina 250g",
+      "price": "19,50 €",
+      "image": "https://media2.coutumecafe.com/3190-home_default/xcafe-en-grains-ou-moulu-colombie-la-cristalina-250g.jpg.pagespeed.ic.kLMIzR84LG.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-colombie-la-cristalina-250g-231.html"
+    },
+    {
+      "name": "Café en grains ou moulu Colombie | La Cristalina 1kg",
+      "price": "62,40 €",
+      "image": "https://media1.coutumecafe.com/3191-home_default/xcafe-en-grains-ou-moulu-colombie-tabi-la-cristalina-1kg.jpg.pagespeed.ic.fSvdXqAzGu.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-colombie-tabi-la-cristalina-1kg-232.html"
+    },
+    {
+      "name": "Café BIO en grains ou moulu Éthiopie | Chelbesa 250g",
+      "price": "19,50 €",
+      "image": "https://media1.coutumecafe.com/2628-home_default/xcafe-en-grains-ou-moulu-ethiopie-chelbesa-250g.jpg.pagespeed.ic.w51RUtSXb9.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-ethiopie-chelbesa-250g-736.html"
+    },
+    {
+      "name": "Cold Brew Bio | Canette de 25 cl",
+      "price": "5,50 €",
+      "image": "https://media2.coutumecafe.com/3210-home_default/xcold-brew-cafe-ethiopien-anfilloo-canette.jpg.pagespeed.ic.-om0_O-gJI.webp",
+      "product_url": "https://www.coutumecafe.com/cold-brew-cafe-ethiopien-anfilloo-canette-863.html"
+    },
+    {
+      "name": "Cold Brew Bio | Format 3 litres",
+      "price": "38,61 €",
+      "image": "https://media2.coutumecafe.com/3207-home_default/xcold-brew-3-litres.jpg.pagespeed.ic.GeUpw3TWX-.webp",
+      "product_url": "https://www.coutumecafe.com/cold-brew-3-litres-854.html"
+    },
+    {
+      "name": "Café Décaféiné Colombie | Nasa Wesx 250g",
+      "price": "13,50 €",
+      "image": "https://media3.coutumecafe.com/3340-home_default/xcafe-decafeine-colombie-nasa-wesx-250g.jpg.pagespeed.ic.ImbrJI9oK6.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-decafeine-colombie-nasa-wesx-250g-889.html"
+    },
+    {
+      "name": "Café Décaféiné Colombie | Nasa Wesx 1kg",
+      "price": "43,20 €",
+      "image": "https://media3.coutumecafe.com/3341-home_default/xcafe-decafeine-colombie-nasa-wesx-250g.jpg.pagespeed.ic.voqXzVSzYH.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-decafeine-colombie-nasa-wesx-250g-892.html"
+    },
+    {
+      "name": "Café en grains ou moulu Éthiopie | Gushe Buna 250g",
+      "price": "15,50 €",
+      "image": "https://media2.coutumecafe.com/3603-home_default/xcafe-en-grains-ou-moulu-ethiopie-gushe-buna-250g.jpg.pagespeed.ic.hfApOg-Mkr.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-ethiopie-gushe-buna-250g-935.html"
+    },
+    {
+      "name": "Café en grains ou moulu Éthiopie | Gushe Buna 1kg",
+      "price": "49,60 €",
+      "image": "https://media1.coutumecafe.com/3607-home_default/xcafe-en-grains-ou-moulu-ethiopie-gushe-buna-1kg.jpg.pagespeed.ic.JqKKNx_snN.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-ethiopie-gushe-buna-1kg-937.html"
+    },
+    {
+      "name": "Café en grains ou moulu du Guatemala | San Juan Gascon 200g",
+      "price": "22,00 €",
+      "image": "https://media2.coutumecafe.com/3774-home_default/xcafe-en-grains-ou-moulu-du-guatemala-san-juan-gascon-200g.jpg.pagespeed.ic.hDOzMPrc8j.webp",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-du-guatemala-san-juan-gascon-200g-969.html"
+    },
+    {
+      "name": "RéférenceC-2GBENL-250167 ProduitsDisponible",
+      "price": "2",
+      "image": "",
+      "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-guatemala-bendicion-250g-1017.html"
+    },
+    {
+      "name": "Coffee shop Coutume Galeries Lafayette Haussmann Paris",
+      "price": "49€",
+      "image": "https://media1.coutumecafe.com/img/cms/Coffee%20shops/GL/x3.jpg.pagespeed.ic.gEwr1G4o-S.webp",
+      "product_url": "https://www.coutumecafe.com/content/20-coffee-shop-coutume-galeries-lafayette-haussmann-paris"
+    },
+    {
+      "name": "Coutume x François Daubinet",
+      "price": "40",
+      "image": "https://media1.coutumecafe.com/img/cms/Coffee%20shops/GL/x3.jpg.pagespeed.ic.gEwr1G4o-S.webp",
+      "product_url": "https://francois-daubinet.com/fr?host=francois-daubinet.com"
+    },
+    {
+      "name": "Ouvrage Paris",
+      "price": "40",
+      "image": "https://www.coutumecafe.com/pagespeed_static/1.JiBnMqyl6S.gif",
+      "product_url": "https://ouvrage.paris"
+    },
+    {
+      "name": "Magasin Coupole,",
+      "price": "40",
+      "image": "https://media1.coutumecafe.com/img/cms/Etablissements/Métro/metro-7-coutume-galerie-lafayette.png",
+      "product_url": "https://www.google.com/maps/place//data=!4m2!3m1!1s0x47e66fb902d1639d:0x3d6cb3bdb777faa5?sa=X&ved=1t:8290&ictx=111"
+    },
+    {
+      "name": "La Maison",
+      "price": "2",
+      "image": "https://www.coutumecafe.com/pagespeed_static/1.JiBnMqyl6S.gif",
+      "product_url": "https://www.coutumecafe.com/content/7-coutume"
+    },
+    {
+      "name": "Politique de confidentialité",
+      "price": "Prix non spécifié",
+      "image": "https://www.coutumecafe.com/pagespeed_static/1.JiBnMqyl6S.gif",
+      "product_url": "https://www.coutumecafe.com/content/15-politique-de-confidentialite"
+    },
+    {
+      "name": "Café arôme Épicé",
+      "price": "49€",
+      "image": "https://media3.coutumecafe.com/c/44-category_default/xcafe-arome-epice.jpg.pagespeed.ic.P9CVV2SbPY.webp",
+      "product_url": "https://www.coutumecafe.com/44-cafe-arome-epice"
+    },
+    {
+      "name": "Café arôme Épicé",
+      "price": "Prix non spécifié",
+      "image": "https://media3.coutumecafe.com/c/44-category_default/xcafe-arome-epice.jpg.pagespeed.ic.P9CVV2SbPY.webp",
+      "product_url": "https://www.coutumecafe.com/"
+    },
+    {
+      "name": "Café bio",
+      "price": "1",
+      "image": "",
+      "product_url": "https://www.coutumecafe.com/31-cafe-bio "
+    },
+    {
+      "name": "Café filtre",
+      "price": "Prix non spécifié",
+      "image": "",
+      "product_url": "https://www.coutumecafe.com/34-cafe-filtre "
+    },
+    {
+      "name": "Café espresso",
+      "price": "Prix non spécifié",
+      "image": "",
+      "product_url": "https://www.coutumecafe.com/35-cafe-espresso "
+    },
+    {
+      "name": "Café décaféiné",
+      "price": "Prix non spécifié",
+      "image": "",
+      "product_url": "https://www.coutumecafe.com/32-cafe-decafeine "
+    },
+    {
+      "name": "Coffret découverte",
+      "price": "Prix non spécifié",
+      "image": "",
+      "product_url": "https://www.coutumecafe.com/33-coffret-decouverte "
+    },
+    {
+      "name": "Café Guatemala",
+      "price": "Prix non spécifié",
+      "image": "https://media2.coutumecafe.com/modules/axacf/file/x12-40--1.jpeg.pagespeed.ic.Cr6xdnPjla.webp",
+      "product_url": "https://www.coutumecafe.com/40-cafe-guatemala "
+    },
+    {
+      "name": "Café Colombie",
+      "price": "Prix non spécifié",
+      "image": "https://media1.coutumecafe.com/modules/axacf/file/x12-41--1.jpeg.pagespeed.ic.p5-U-Lposa.webp",
+      "product_url": "https://www.coutumecafe.com/41-cafe-colombie "
+    },
+    {
+      "name": "Café Ethiopie",
+      "price": "Prix non spécifié",
+      "image": "https://media3.coutumecafe.com/modules/axacf/file/x12-39--1.jpeg.pagespeed.ic.8bpkIJTHdq.webp",
+      "product_url": "https://www.coutumecafe.com/39-cafe-ethiopie "
+    },
+    {
+      "name": "Café Brésil",
+      "price": "Prix non spécifié",
+      "image": "https://media2.coutumecafe.com/modules/axacf/file/x12-42--1.jpeg.pagespeed.ic.Eu1fsd3Im5.webp",
+      "product_url": "https://www.coutumecafe.com/42-cafe-bresil "
+    },
+    {
+      "name": "Café Indonésie",
+      "price": "Prix non spécifié",
+      "image": "https://media3.coutumecafe.com/modules/axacf/file/x12-137--1.png.pagespeed.ic.lZF3pA-Qfm.webp",
+      "product_url": "https://www.coutumecafe.com/137-cafe-indonesie "
+    },
+    {
+      "name": "Café Pérou",
+      "price": "Prix non spécifié",
+      "image": "https://media2.coutumecafe.com/modules/axacf/file/x12-169--1.jpeg.pagespeed.ic.CNAo128O4b.webp",
+      "product_url": "https://www.coutumecafe.com/169-cafe-perou "
+    },
+    {
+      "name": "Café Burundi",
+      "price": "Prix non spécifié",
+      "image": "https://media1.coutumecafe.com/modules/axacf/file/x12-38--1.jpeg.pagespeed.ic.Q7ZuHs4yBH.webp",
+      "product_url": "https://www.coutumecafe.com/38-cafe-burundi "
+    },
+    {
+      "name": "Café Chine",
+      "price": "Prix non spécifié",
+      "image": "https://media3.coutumecafe.com/modules/axacf/file/x12-268--1.jpeg.pagespeed.ic.CfSnCy7tsd.webp",
+      "product_url": "https://www.coutumecafe.com/268-cafe-chine "
+    },
+    {
+      "name": "Café République Démocratique du Congo",
+      "price": "Prix non spécifié",
+      "image": "https://media1.coutumecafe.com/modules/axacf/file/x12-238--1.jpeg.pagespeed.ic.5ki_etuL2R.webp",
+      "product_url": "https://www.coutumecafe.com/238-cafe-republique-democratique-du-congo "
+    },
+    {
+      "name": "Café Rwanda",
+      "price": "Prix non spécifié",
+      "image": "https://media3.coutumecafe.com/modules/axacf/file/x12-250--1.jpeg.pagespeed.ic.WBpuPOfKyr.webp",
+      "product_url": "https://www.coutumecafe.com/250-cafe-rwanda "
+    },
+    {
+      "name": "Café arôme Fruité",
+      "price": "Prix non spécifié",
+      "image": "https://media2.coutumecafe.com/modules/axacf/file/x12-45--1.jpeg.pagespeed.ic.Yni-ztAHBR.webp",
+      "product_url": "https://www.coutumecafe.com/45-cafe-arome-fruite "
+    },
+    {
+      "name": "Café arôme Cacao",
+      "price": "Prix non spécifié",
+      "image": "https://media1.coutumecafe.com/modules/axacf/file/x12-46--1.jpeg.pagespeed.ic.JZkDK_8T1o.webp",
+      "product_url": "https://www.coutumecafe.com/46-cafe-arome-cacao "
+    },
+    {
+      "name": "Café arôme Floral",
+      "price": "Prix non spécifié",
+      "image": "https://media2.coutumecafe.com/modules/axacf/file/x12-47--1.jpeg.pagespeed.ic.kUy7yD3wS0.webp",
+      "product_url": "https://www.coutumecafe.com/47-cafe-arome-floral "
+    },
+    {
+      "name": "Café arôme Sucré",
+      "price": "Prix non spécifié",
+      "image": "https://media3.coutumecafe.com/modules/axacf/file/x12-48--1.jpeg.pagespeed.ic.K1OONwfgjk.webp",
+      "product_url": "https://www.coutumecafe.com/48-cafe-arome-sucre "
+    },
+    {
+      "name": "Apprécier des cafés accessibles",
+      "price": "Prix non spécifié",
+      "image": "https://media3.coutumecafe.com/modules/axacf/file/x12-50--1.jpeg.pagespeed.ic.Og--hPBWmf.webp",
+      "product_url": "https://www.coutumecafe.com/50-apprecier-des-cafes-accessibles "
+    },
+    {
+      "name": "Explorer des cafés singuliers",
+      "price": "Prix non spécifié",
+      "image": "https://media2.coutumecafe.com/modules/axacf/file/x12-51--1.jpeg.pagespeed.ic.Ph62Ww7kUH.webp",
+      "product_url": "https://www.coutumecafe.com/51-explorer-des-cafes-singuliers "
+    },
+    {
+      "name": "Déguster des cafés rares",
+      "price": "Prix non spécifié",
+      "image": "https://media2.coutumecafe.com/modules/axacf/file/x12-52--1.jpeg.pagespeed.ic.TiQLxnYq8j.webp",
+      "product_url": "https://www.coutumecafe.com/52-deguster-des-cafes-rares "
+    },
+    {
+      "name": "Café Geisha",
+      "price": "Prix non spécifié",
+      "image": "https://media3.coutumecafe.com/modules/axacf/file/x12-53--1.jpeg.pagespeed.ic.hzvyWuUgZn.webp",
+      "product_url": "https://www.coutumecafe.com/53-cafe-geisha "
+    },
+    {
+      "name": "Café Pink Bourbon",
+      "price": "Prix non spécifié",
+      "image": "https://media1.coutumecafe.com/modules/axacf/file/x12-54--1.jpeg.pagespeed.ic.u_27qZ8stb.webp",
+      "product_url": "https://www.coutumecafe.com/54-cafe-pink-bourbon "
+    },
+    {
+      "name": "Café Naturel",
+      "price": "Prix non spécifié",
+      "image": "https://media1.coutumecafe.com/modules/axacf/file/x12-55--1.jpeg.pagespeed.ic.TRldXc-HVL.webp",
+      "product_url": "https://www.coutumecafe.com/55-cafe-naturel "
+    },
+    {
+      "name": "Black Friday Café",
+      "price": "Prix non spécifié",
+      "image": "https://media1.coutumecafe.com/modules/axacf/file/x12-215--1.jpeg.pagespeed.ic.eavx9ayxcd.webp",
+      "product_url": "https://www.coutumecafe.com/215-black-friday-cafe "
+    },
+    {
+      "name": "La Maison",
+      "price": "2",
+      "image": "https://www.coutumecafe.com/pagespeed_static/1.JiBnMqyl6S.gif",
+      "product_url": "https://www.coutumecafe.com/content/7-coutume"
+    },
+    {
+      "name": "Politique de confidentialité",
+      "price": "Prix non spécifié",
+      "image": "https://www.coutumecafe.com/pagespeed_static/1.JiBnMqyl6S.gif",
+      "product_url": "https://www.coutumecafe.com/content/15-politique-de-confidentialite"
+    },
+    {
+      "name": "Offres d'emploi",
+      "price": "49€",
+      "image": "https://media1.coutumecafe.com/modules/axacf/file/22-9--1.jpeg",
+      "product_url": "https://www.coutumecafe.com/content/9-offres-d-emploi"
+    },
+    {
+      "name": "Offres d'emploi",
+      "price": "Prix non spécifié",
+      "image": "https://media1.coutumecafe.com/modules/axacf/file/22-9--1.jpeg",
+      "product_url": "https://www.coutumecafe.com/"
+    },
+    {
+      "name": "La Maison",
+      "price": "2",
+      "image": "https://www.coutumecafe.com/pagespeed_static/1.JiBnMqyl6S.gif",
+      "product_url": "https://www.coutumecafe.com/content/7-coutume"
+    },
+    {
+      "name": "Politique de confidentialité",
+      "price": "Prix non spécifié",
+      "image": "https://www.coutumecafe.com/pagespeed_static/1.JiBnMqyl6S.gif",
+      "product_url": "https://www.coutumecafe.com/content/15-politique-de-confidentialite"
+    }
+  ],
+  "fetched_at": "2025-10-06 12:07:49",
+  "471592cc": {
+    "site_id": "471592cc",
+    "start_url": "https://www.handmadetunisia.com/",
+    "scraped_count": 2,
+    "results": [
+      {
+        "url": "https://www.handmadetunisia.com/",
+        "title": "Produits extraits",
+        "products": [
+          {
+            "name": "Bonbonnière avec couvercle en cuivre martelé",
+            "price": "95DT",
+            "image": "https://www.handmadetunisia.com/wp-content/uploads/2022/03/Bonbonniere-avec-couvercle-en-cuivre-martele-2-10x10.jpg",
+            "product_url": "https://www.handmadetunisia.com/produit/bonbonniere-avec-couvercle-en-cuivre-martele/"
+          },
+          {
+            "name": "Grand planche à découper",
+            "price": "30DT",
+            "image": "https://www.handmadetunisia.com/wp-content/uploads/2021/05/Planch-ceramique-houta-marron-10x10.jpg",
+            "product_url": "https://www.handmadetunisia.com/produit/grand-planche-a-decouper-handmade/"
+          },
+          {
+            "name": "Grand planche à découper",
+            "price": "25DT",
+            "image": "https://www.handmadetunisia.com/wp-content/uploads/woocommerce-placeholder-10x10.png",
+            "product_url": "https://www.handmadetunisia.com/produit/grand-planche-a-decouper/"
+          },
+          {
+            "name": "Planche à découper Mosaic",
+            "price": "30DT",
+            "image": "https://www.handmadetunisia.com/wp-content/uploads/2022/03/mozaic-cutting-board-10x10.jpg",
+            "product_url": "https://www.handmadetunisia.com/produit/grand-planche-a-decouper-mosaic/"
+          },
+          {
+            "name": "Planche à servir et à découper ronde",
+            "price": "25DT",
+            "image": "https://www.handmadetunisia.com/wp-content/uploads/2021/05/Planch-ceramique-houta-10x10.jpg",
+            "product_url": "https://www.handmadetunisia.com/produit/planche-a-decouper-ronde/"
+          },
+          {
+            "name": "Mortier lisse en bois",
+            "price": "20DT",
+            "image": "https://www.handmadetunisia.com/wp-content/uploads/2022/03/mortier-10x10.jpg",
+            "product_url": "https://www.handmadetunisia.com/produit/mortier-lisse-bois-dolivier/"
+          },
+          {
+            "name": "Savon argile verte",
+            "price": "7DT",
+            "image": "https://www.handmadetunisia.com/wp-content/uploads/2021/06/191234645_115837357337646_2948048110742158731_n-1-10x10.jpg",
+            "product_url": "https://www.handmadetunisia.com/produit/savon-argile-verte/"
+          },
+          {
+            "name": "Savon argile rose",
+            "price": "7DT",
+            "image": "https://www.handmadetunisia.com/wp-content/uploads/2021/06/186518965_112220721032643_6540820341865823251_n-10x10.jpg",
+            "product_url": "https://www.handmadetunisia.com/produit/savon-argile-rose/"
+          },
+          {
+            "name": "VÊTEMENTS(8)",
+            "price": "8",
+            "image": "",
+            "product_url": "https://www.handmadetunisia.com/categorie-produit/mode-vetements-homme-femme/"
+          },
+          {
+            "name": "PRODUIT DE TERROIR(36)",
+            "price": "36",
+            "image": "",
+            "product_url": "https://www.handmadetunisia.com/categorie-produit/produit-de-terroir/"
+          },
+          {
+            "name": "MAISON & DÉCORATION(72)",
+            "price": "72",
+            "image": "https://www.handmadetunisia.com/wp-content/uploads/2020/05/Décoration-handmade-Tunisia-10x10.jpg",
+            "product_url": "https://www.handmadetunisia.com/categorie-produit/maison-decoration-handmade-tunisia/"
+          },
+          {
+            "name": "JOUETS(12)",
+            "price": "12",
+            "image": "https://www.handmadetunisia.com/wp-content/uploads/2020/05/jouets-handmade-Tunisia-10x10.jpg",
+            "product_url": "https://www.handmadetunisia.com/categorie-produit/vente-jouets-filles-garcons/"
+          },
+          {
+            "name": "BIJOUX & ACCESSOIRES(26)",
+            "price": "26",
+            "image": "https://www.handmadetunisia.com/wp-content/uploads/2020/05/Accessoires-handmade-Tunisia-10x10.jpg",
+            "product_url": "https://www.handmadetunisia.com/categorie-produit/vente-bijoux-accessoires-handmade/"
+          },
+          {
+            "name": "ART DE LA TABLE(40)",
+            "price": "40",
+            "image": "",
+            "product_url": "https://www.handmadetunisia.com/categorie-produit/art_de_la_table-handmade-tunisia/"
+          }
+        ],
+        "error": null,
+        "fetched_at": "2025-10-06 12:41:06"
+      },
+      {
+        "url": "https://www.handmadetunisia.com/",
+        "title": "Produits extraits",
+        "products": [
+          {
+            "name": "Bonbonnière avec couvercle en cuivre martelé",
+            "price": "95DT",
+            "image": "https://www.handmadetunisia.com/wp-content/uploads/2022/03/Bonbonniere-avec-couvercle-en-cuivre-martele-2-10x10.jpg",
+            "product_url": "https://www.handmadetunisia.com/produit/bonbonniere-avec-couvercle-en-cuivre-martele/"
+          },
+          {
+            "name": "Grand planche à découper",
+            "price": "30DT",
+            "image": "https://www.handmadetunisia.com/wp-content/uploads/2021/05/Planch-ceramique-houta-marron-10x10.jpg",
+            "product_url": "https://www.handmadetunisia.com/produit/grand-planche-a-decouper-handmade/"
+          },
+          {
+            "name": "Grand planche à découper",
+            "price": "25DT",
+            "image": "https://www.handmadetunisia.com/wp-content/uploads/woocommerce-placeholder-10x10.png",
+            "product_url": "https://www.handmadetunisia.com/produit/grand-planche-a-decouper/"
+          },
+          {
+            "name": "Planche à découper Mosaic",
+            "price": "30DT",
+            "image": "https://www.handmadetunisia.com/wp-content/uploads/2022/03/mozaic-cutting-board-10x10.jpg",
+            "product_url": "https://www.handmadetunisia.com/produit/grand-planche-a-decouper-mosaic/"
+          },
+          {
+            "name": "Planche à servir et à découper ronde",
+            "price": "25DT",
+            "image": "https://www.handmadetunisia.com/wp-content/uploads/2021/05/Planch-ceramique-houta-10x10.jpg",
+            "product_url": "https://www.handmadetunisia.com/produit/planche-a-decouper-ronde/"
+          },
+          {
+            "name": "Mortier lisse en bois",
+            "price": "20DT",
+            "image": "https://www.handmadetunisia.com/wp-content/uploads/2022/03/mortier-10x10.jpg",
+            "product_url": "https://www.handmadetunisia.com/produit/mortier-lisse-bois-dolivier/"
+          },
+          {
+            "name": "Savon argile verte",
+            "price": "7DT",
+            "image": "https://www.handmadetunisia.com/wp-content/uploads/2021/06/191234645_115837357337646_2948048110742158731_n-1-10x10.jpg",
+            "product_url": "https://www.handmadetunisia.com/produit/savon-argile-verte/"
+          },
+          {
+            "name": "Savon argile rose",
+            "price": "7DT",
+            "image": "https://www.handmadetunisia.com/wp-content/uploads/2021/06/186518965_112220721032643_6540820341865823251_n-10x10.jpg",
+            "product_url": "https://www.handmadetunisia.com/produit/savon-argile-rose/"
+          },
+          {
+            "name": "VÊTEMENTS(8)",
+            "price": "8",
+            "image": "",
+            "product_url": "https://www.handmadetunisia.com/categorie-produit/mode-vetements-homme-femme/"
+          },
+          {
+            "name": "PRODUIT DE TERROIR(36)",
+            "price": "36",
+            "image": "",
+            "product_url": "https://www.handmadetunisia.com/categorie-produit/produit-de-terroir/"
+          },
+          {
+            "name": "MAISON & DÉCORATION(72)",
+            "price": "72",
+            "image": "https://www.handmadetunisia.com/wp-content/uploads/2020/05/Décoration-handmade-Tunisia-10x10.jpg",
+            "product_url": "https://www.handmadetunisia.com/categorie-produit/maison-decoration-handmade-tunisia/"
+          },
+          {
+            "name": "JOUETS(12)",
+            "price": "12",
+            "image": "https://www.handmadetunisia.com/wp-content/uploads/2020/05/jouets-handmade-Tunisia-10x10.jpg",
+            "product_url": "https://www.handmadetunisia.com/categorie-produit/vente-jouets-filles-garcons/"
+          },
+          {
+            "name": "BIJOUX & ACCESSOIRES(26)",
+            "price": "26",
+            "image": "https://www.handmadetunisia.com/wp-content/uploads/2020/05/Accessoires-handmade-Tunisia-10x10.jpg",
+            "product_url": "https://www.handmadetunisia.com/categorie-produit/vente-bijoux-accessoires-handmade/"
+          },
+          {
+            "name": "ART DE LA TABLE(40)",
+            "price": "40",
+            "image": "",
+            "product_url": "https://www.handmadetunisia.com/categorie-produit/art_de_la_table-handmade-tunisia/"
+          }
+        ],
+        "error": null,
+        "fetched_at": "2025-10-06 13:10:21"
+      }
+    ]
+  },
+  "f3362679": {
+    "site_id": "f3362679",
+    "start_url": "https://cluizel.com/fr",
+    "scraped_count": 1,
+    "results": [
+      {
+        "url": "https://cluizel.com/fr",
+        "title": "Produits extraits",
+        "products": [
+          {
+            "name": "Sous-total0,00 €",
+            "price": "0,00 €",
+            "image": "",
+            "product_url": "https://cluizel.com/fr"
+          },
+          {
+            "name": "Lire la politique de confidentialité",
+            "price": "Prix non spécifié",
+            "image": "https://axeptio.imgix.net/2021/11/c3860f08-f5cb-4a30-b857-e5d56ea670bd.png?auto=format&fit=crop&w=170&h=auto&dpr=1",
+            "product_url": "https://cluizel.com/fr/nos-politique-de-protection-des-donnees-personnelles"
+          },
+          {
+            "name": "poursuivre mes achats",
+            "price": "0",
+            "image": "https://cluizel.com/img/cms/panier/image.png",
+            "product_url": "https://cluizel.com/fr"
+          },
+          {
+            "name": "Nouveautés",
+            "price": "Prix non spécifié",
+            "image": "https://cluizel.com/img/cms/Menu photo de droite/OURSONS photo droite du menu.png",
+            "product_url": "https://cluizel.com/fr/109-nouveautes"
+          },
+          {
+            "name": "COFFRET OURSONS",
+            "price": "Prix non spécifié",
+            "image": "https://cluizel.com/img/cms/Menu photo de droite/OURSONS photo droite du menu.png",
+            "product_url": "https://cluizel.com/fr/coffrets-de-chocolats/2142-coffret-oursons-guimauve-noir-lait.html"
+          },
+          {
+            "name": "Boîtes & Coffrets",
+            "price": "Prix non spécifié",
+            "image": "https://cluizel.com/img/cms/Menu/les exclusifs.jpg",
+            "product_url": "https://cluizel.com/fr/20-coffrets-de-chocolats"
+          },
+          {
+            "name": "LES EXCLUSIFS",
+            "price": "Prix non spécifié",
+            "image": "https://cluizel.com/img/cms/Menu/les exclusifs.jpg",
+            "product_url": "https://cluizel.com/fr/content/23-les-exclusifs"
+          },
+          {
+            "name": "LES PLANTATIONS",
+            "price": "Prix non spécifié",
+            "image": "https://cluizel.com/img/cms/Menu/les plantation.jpg",
+            "product_url": "https://cluizel.com/fr/content/22-les-plantations"
+          },
+          {
+            "name": "Tablettes",
+            "price": "Prix non spécifié",
+            "image": "https://cluizel.com/img/cms/Rectangle 1172.png",
+            "product_url": "https://cluizel.com/fr/37-les-tablettes"
+          },
+          {
+            "name": "Tablettes de chocolat",
+            "price": "Prix non spécifié",
+            "image": "https://cluizel.com/img/cms/Rectangle 1172.png",
+            "product_url": "https://cluizel.com/fr/37-les-tablettes"
+          },
+          {
+            "name": "Gourmandises",
+            "price": "Prix non spécifié",
+            "image": "https://cluizel.com/img/cms/Menu photo de droite/Cuilleres photo droite du menu.png",
+            "product_url": "https://cluizel.com/fr/18-les-gourmandises"
+          },
+          {
+            "name": "Cuillère Chocolat Chaud",
+            "price": "Prix non spécifié",
+            "image": "https://cluizel.com/img/cms/Menu photo de droite/Cuilleres photo droite du menu.png",
+            "product_url": "https://cluizel.com/fr/133-cuillere-chocolat-chaud"
+          },
+          {
+            "name": "Chocolat pour pâtisser",
+            "price": "Prix non spécifié",
+            "image": "https://cluizel.com/img/cms/Rectangle 1181.png",
+            "product_url": "https://cluizel.com/fr/29-pour-patisser"
+          },
+          {
+            "name": "Atelier secret des pros",
+            "price": "Prix non spécifié",
+            "image": "https://cluizel.com/img/cms/Rectangle 1181.png",
+            "product_url": "https://cluizel.com/fr/content/33-atelier-secrets-des-pros"
+          },
+          {
+            "name": "Atelier dégustation",
+            "price": "Prix non spécifié",
+            "image": "https://cluizel.com/img/cms/Rectangle 1182.png",
+            "product_url": "https://cluizel.com/fr/content/32-atelier-de-degustation"
+          },
+          {
+            "name": "La manufacture",
+            "price": "Prix non spécifié",
+            "image": "https://cluizel.com/img/cms/Rectangle 1186.png",
+            "product_url": "https://cluizel.com/fr"
+          },
+          {
+            "name": "Notre histoireNos valeursNos métiersLe Musée du chocolatLe musée du chocolatEn savoir plus",
+            "price": "Prix non spécifié",
+            "image": "https://cluizel.com/img/cms/Rectangle 1186.png",
+            "product_url": "https://cluizel.com/fr"
+          },
+          {
+            "name": "En savoir plus",
+            "price": "Prix non spécifié",
+            "image": "https://cluizel.com/img/cms/Rectangle 1186.png",
+            "product_url": "https://cluizel.com/fr/content/8-le-muse"
+          },
+          {
+            "name": "OURSONS GUIMAUVE",
+            "price": "39",
+            "image": "https://cluizel.com/img/SLIDER-COFFRET-OURSONS-mobile.jpg",
+            "product_url": "https://cluizel.com/fr/22-gourmands"
+          },
+          {
+            "name": "NOUVEAUTÉ",
+            "price": "39",
+            "image": "https://cluizel.com/img/SLIDER-COFFRET-OURSONS-mobile.jpg",
+            "product_url": "https://cluizel.com/fr/22-gourmands"
+          },
+          {
+            "name": "Livraison gratuite",
+            "price": "201",
+            "image": "https://cluizel.com/img/cms/mus%C3%A9e/ingredients-noble.png",
+            "product_url": "https://cluizel.com/fr/37-les-tablettes"
+          },
+          {
+            "name": "Les produits du moment",
+            "price": "10,80 €",
+            "image": "https://cluizel.com/img/cms/07_03_Coffret%20noir%20et%20lait%20n%C2%B015-RVB%20(1).jpg",
+            "product_url": "https://cluizel.com/fr/37-les-tablettes"
+          },
+          {
+            "name": "Sachet Oursons guimauve lait",
+            "price": "10,80 €",
+            "image": "https://cluizel.com/img/cms/07_03_Coffret%20noir%20et%20lait%20n%C2%B015-RVB%20(1).jpg",
+            "product_url": "https://cluizel.com/fr/37-les-tablettes"
+          },
+          {
+            "name": "UNE SÉLECTION QUI RAVIRA VOS PAPILLES",
+            "price": "Prix non spécifié",
+            "image": "https://cluizel.com/img/cms/07_03_Coffret%20noir%20et%20lait%20n%C2%B015-RVB%20(1).jpg",
+            "product_url": "https://cluizel.com/fr/37-les-tablettes"
+          },
+          {
+            "name": "Sachet Oursons guimauve lait",
+            "price": "10,80 €",
+            "image": "https://cluizel.com/1205-large_default/sachet-oursons-guimauve-lait.jpg",
+            "product_url": "https://cluizel.com/fr/module/blockwishlist/action"
+          },
+          {
+            "name": "Poche oursons noir & lait 160 g",
+            "price": "160",
+            "image": "https://cluizel.com/924-large_default/poche-oursons-noir-lait-160-g.jpg",
+            "product_url": "https://cluizel.com/fr/module/blockwishlist/action"
+          },
+          {
+            "name": "Barre Éclat d'Orient",
+            "price": "9,00 €",
+            "image": "https://cluizel.com/1090-large_default/barre_chocolat_praline_pur_pistache_Eclat_d_Orient.jpg",
+            "product_url": "https://cluizel.com/fr/module/blockwishlist/action"
+          },
+          {
+            "name": "Coffret Oursons Guimauve Noir & Lait",
+            "price": "22,10 €",
+            "image": "https://cluizel.com/1203-large_default/coffret-oursons-guimauve-noir-lait.jpg",
+            "product_url": "https://cluizel.com/fr/module/blockwishlist/action"
+          },
+          {
+            "name": "Sachet Oursons guimauve noir",
+            "price": "10,80 €",
+            "image": "https://cluizel.com/1204-large_default/sachet-oursons-guimauve-noir.jpg",
+            "product_url": "https://cluizel.com/fr/module/blockwishlist/action"
+          },
+          {
+            "name": "Les Coffrets",
+            "price": "50",
+            "image": "https://cluizel.com/1126-large_default/coffret-carres-chocolats-de-plantation-n50.jpg",
+            "product_url": "https://cluizel.com/fr"
+          },
+          {
+            "name": "Coffret Carrés Chocolats de Plantation N°50",
+            "price": "50",
+            "image": "https://cluizel.com/1126-large_default/coffret-carres-chocolats-de-plantation-n50.jpg",
+            "product_url": "https://cluizel.com/fr"
+          },
+          {
+            "name": "Coffret Carrés Chocolats de Plantation N°50",
+            "price": "50",
+            "image": "https://cluizel.com/1126-large_default/coffret-carres-chocolats-de-plantation-n50.jpg",
+            "product_url": "https://cluizel.com/fr/module/blockwishlist/action"
+          },
+          {
+            "name": "CLUIZEL' Box",
+            "price": "31,90 €",
+            "image": "https://cluizel.com/421-large_default/cluizel-box.jpg",
+            "product_url": "https://cluizel.com/fr/module/blockwishlist/action"
+          },
+          {
+            "name": "Coffret Initiation Les Sens du Chocolat",
+            "price": "63,00 €",
+            "image": "https://cluizel.com/926-large_default/coffret-initiation-les-sens-du-chocolat.jpg",
+            "product_url": "https://cluizel.com/fr/module/blockwishlist/action"
+          },
+          {
+            "name": "Coffret noir et lait N°70",
+            "price": "70",
+            "image": "https://cluizel.com/1054-large_default/coffret-noir-et-lait-n70.jpg",
+            "product_url": "https://cluizel.com/fr/module/blockwishlist/action"
+          },
+          {
+            "name": "Coffret Pause Chocolat à Paris",
+            "price": "29,50 €",
+            "image": "https://cluizel.com/541-large_default/coffret-pause-chocolat-a-paris.jpg",
+            "product_url": "https://cluizel.com/fr/module/blockwishlist/action"
+          },
+          {
+            "name": "Coffret Tiroir 1/2 Rondelles d'Oranges Confites",
+            "price": "1",
+            "image": "https://cluizel.com/700-large_default/coffret-tiroir-1-2-rondelles-doranges-confites.jpg",
+            "product_url": "https://cluizel.com/fr/module/blockwishlist/action"
+          },
+          {
+            "name": "Coffret Cappuccino",
+            "price": "25,00 €",
+            "image": "https://cluizel.com/1039-large_default/coffret-cappuccino.jpg",
+            "product_url": "https://cluizel.com/fr/module/blockwishlist/action"
+          },
+          {
+            "name": "Coffret Champignons caramel",
+            "price": "26,00 €",
+            "image": "https://cluizel.com/1042-large_default/coffret-champignons-caramel.jpg",
+            "product_url": "https://cluizel.com/fr/module/blockwishlist/action"
+          },
+          {
+            "name": "NewsletterABONNEZ-VOUS &",
+            "price": "10",
+            "image": "https://cluizel.com/img/logo-1716388464.svg",
+            "product_url": "https://cluizel.com/fr/"
+          },
+          {
+            "name": "FacebookInstagramPin-interest",
+            "price": "Prix non spécifié",
+            "image": "https://cluizel.com/img/logo-1716388464.svg",
+            "product_url": "https://cluizel.com/fr/"
+          }
+        ],
+        "error": null,
+        "fetched_at": "2025-10-06 12:41:49"
+      }
+    ]
+  },
+  "8a613717": {
+    "site_id": "8a613717",
+    "start_url": "https://www.jeanpaulhevin.com/fr",
+    "scraped_count": 1,
+    "results": [
+      {
+        "url": "https://www.jeanpaulhevin.com/fr",
+        "title": "Produits extraits",
+        "promoted_products": [
+          {
+            "name": "Coffret découverte Cameroun...",
+            "price": "32,00 €",
+            "image": "https://www.jeanpaulhevin.com/10221-home_default/coffret-decouverte-yaounde-cacao-grand-cru-70.jpg",
+            "product_url": "https://www.jeanpaulhevin.com/fr/chocolats/995-coffret-decouverte-yaounde-cacao-grand-cru-70.html"
+          },
+          {
+            "name": "Gâteau d'anniversaire au...",
+            "price": "56,00 €",
+            "image": "https://www.jeanpaulhevin.com/8290-home_default/gateau-d-anniversaire-au-chocolat-happy.jpg",
+            "product_url": "https://www.jeanpaulhevin.com/fr/patisseries/330-gateau-d-anniversaire-au-chocolat-happy.html"
+          },
+          {
+            "name": "Coffret 20 carrés sablés...",
+            "price": "34,00 €",
+            "image": "https://www.jeanpaulhevin.com/10235-home_default/coffret-20-carres-sables-assortis.jpg",
+            "product_url": "https://www.jeanpaulhevin.com/fr/gouter/1260-coffret-20-carres-sables-assortis.html"
+          },
+          {
+            "name": "Gâteau chocolat violette",
+            "price": "45,00 €",
+            "image": "https://www.jeanpaulhevin.com/10267-home_default/gateau-chocolat-violette.jpg",
+            "product_url": "https://www.jeanpaulhevin.com/fr/patisseries/1262-gateau-chocolat-violette.html"
+          },
+          {
+            "name": "C'EST L'AUTOMNE",
+            "price": "Prix non spécifié",
+            "image": "https://www.jeanpaulhevin.com/c/34-category_default/c-est-l-automne.jpg",
+            "product_url": "https://www.jeanpaulhevin.com/fr/34-c-est-l-automne"
+          },
+          {
+            "name": "Livraison 1h!",
+            "price": "1",
+            "image": "https://www.jeanpaulhevin.com/c/26-category_default/livraison-1h.jpg",
+            "product_url": "https://www.jeanpaulhevin.com/fr/26-livraison-1h"
+          },
+          {
+            "name": "Chocolats",
+            "price": "Prix non spécifié",
+            "image": "https://www.jeanpaulhevin.com/c/15-category_default/chocolats.jpg",
+            "product_url": "https://www.jeanpaulhevin.com/fr/15-chocolats"
+          },
+          {
+            "name": "Tablettes",
+            "price": "Prix non spécifié",
+            "image": "https://www.jeanpaulhevin.com/c/13-category_default/tablettes.jpg",
+            "product_url": "https://www.jeanpaulhevin.com/fr/13-tablettes"
+          }
+        ],
+        "error": null,
+        "fetched_at": "2025-10-06 13:50:09"
+      }
+    ]
+  },
+  "7a5bde62": {
+    "site_id": "7a5bde62",
+    "start_url": "https://www.coutumecafe.com/",
+    "scraped_count": 1,
+    "results": [
+      {
+        "url": "https://www.coutumecafe.com/",
+        "title": "Produits extraits",
+        "promoted_products": [
+          {
+            "name": "Cold Brew Bio | Pack de 6 canettes",
+            "price": "27,50 €",
+            "image": "https://media3.coutumecafe.com/4154-home_default/xcold-brew-cubi-10-litres.jpg.pagespeed.ic.Prc3_U7z5o.webp",
+            "product_url": "https://www.coutumecafe.com/cold-brew-cubi-10-litres-1033.html"
+          },
+          {
+            "name": "Café en grains ou moulu Guatemala | Patzibir 1kg",
+            "price": "49,60 €",
+            "image": "https://media1.coutumecafe.com/4072-home_default/xcafe-en-grains-ou-moulu-guatemala-patzibir-1kg.jpg.pagespeed.ic.DKRh_k5B5h.webp",
+            "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-guatemala-patzibir-1kg-1021.html"
+          },
+          {
+            "name": "Café en grains ou moulu Guatemala | Bendición 1kg",
+            "price": "43,20 €",
+            "image": "https://media2.coutumecafe.com/4052-home_default/xcafe-en-grains-ou-moulu-guatemala-bendicion-1kg.jpg.pagespeed.ic.YvSuaFAEI_.webp",
+            "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-guatemala-bendicion-1kg-1019.html"
+          },
+          {
+            "name": "Café en grains ou moulu Guatemala | Patzibir 250g",
+            "price": "15,50 €",
+            "image": "https://media3.coutumecafe.com/4060-home_default/xcafe-en-grains-ou-moulu-guatemala-patzibir-250g.jpg.pagespeed.ic.IdiJ7-AYdZ.webp",
+            "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-guatemala-patzibir-250g-1018.html"
+          },
+          {
+            "name": "Café en grains ou moulu Guatemala | Bendición 250g",
+            "price": "13,50 €",
+            "image": "https://media1.coutumecafe.com/4040-home_default/xcafe-en-grains-ou-moulu-guatemala-bendicion-250g.jpg.pagespeed.ic.O8bpExm9y-.webp",
+            "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-guatemala-bendicion-250g-1017.html"
+          },
+          {
+            "name": "Café en grains ou moulu Éthiopie | Abbachebsa 1kg",
+            "price": "43,20 €",
+            "image": "https://media1.coutumecafe.com/4023-home_default/xcafe-en-grains-ou-moulu-ethiopie-abachebsa-1kg.jpg.pagespeed.ic.2DbDfQdzHT.webp",
+            "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-ethiopie-abachebsa-1kg-1015.html"
+          },
+          {
+            "name": "Café en grains ou moulu Éthiopie | Abbachebsa 250g",
+            "price": "13,50 €",
+            "image": "https://media1.coutumecafe.com/4015-home_default/xcafe-en-grains-ou-moulu-ethiopie-abachebsa-250g.jpg.pagespeed.ic.xv6MvGPGfe.webp",
+            "product_url": "https://www.coutumecafe.com/cafe-en-grains-ou-moulu-ethiopie-abachebsa-250g-1014.html"
+          },
+          {
+            "name": "Café en grain ou moulu | Gesha Maranatha 250g",
+            "price": "30,00 €",
+            "image": "https://media2.coutumecafe.com/4006-home_default/xcafe-en-grain-ou-moulu-gesha-maranatha-xg.jpg.pagespeed.ic.yMR2z0_a7l.webp",
+            "product_url": "https://www.coutumecafe.com/cafe-en-grain-ou-moulu-gesha-maranatha-xg-1013.html"
+          },
+          {
+            "name": "Préparation du café : recettes, tutos et astucesL'incontournable de l'été: le cold brew",
+            "price": "Prix non spécifié",
+            "image": "https://media1.coutumecafe.com/img/ybc_blog/post/thumb/260x180xservice-cold-brew.png.pagespeed.ic.8ygwZt49RI.webp",
+            "product_url": "https://www.coutumecafe.com/"
+          },
+          {
+            "name": "Préparation du café : recettes, tutos et astucesÀ déguster tout l'été: infusion glacée de Cascara",
+            "price": "Prix non spécifié",
+            "image": "https://media3.coutumecafe.com/img/ybc_blog/post/thumb/260x180xcascara.png.pagespeed.ic.QheHrQA1GL.webp",
+            "product_url": "https://www.coutumecafe.com/"
+          }
+        ],
+        "error": null,
+        "fetched_at": "2025-10-06 13:52:53"
+      }
+    ]
+  },
+  "3707c98d": {
+    "site_id": "3707c98d",
+    "start_url": "http://senteursdefrance.fr/",
+    "scraped_count": 3,
+    "results": [
+      {
+        "url": "http://senteursdefrance.fr/",
+        "title": "Produits extraits",
+        "promoted_products": [
+          {
+            "name": "Bougie parfumée muguet cire végétale22,50€Ajouter au panier",
+            "price": "22,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2024/03/bougie-muguet-sans-coffret-fond-vert-illustration-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/bougies-parfumees-cire-vegetale/bougie-parfumee-muguet-cire-vegetale-2/"
+          },
+          {
+            "name": "Bougie parfumée muguet « porte-bonheur » cire végétale22,50€Ajouter au panier",
+            "price": "22,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2022/03/porte-bonheur-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/bougies-parfumees-cire-vegetale/bougie-parfumee-muguet-porte-bonheur/"
+          },
+          {
+            "name": "Savonnette cœur muguet Jardin à la française3,50€Ajouter au panier",
+            "price": "3,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2020/07/coeur-muguet-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/souvenirs-de-france/savonnette-coeur-muguet-jardin-a-la-francaise/"
+          },
+          {
+            "name": "Savonnette cœur lavande « Royale »3,50€Ajouter au panier",
+            "price": "3,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2020/07/mini-savon-coeur-lavande-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/souvenirs-de-france/savonnette-coeur-lavande-royale/"
+          },
+          {
+            "name": "Guimauves thème royal6,50€Ajouter au panier",
+            "price": "6,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2018/01/confiserie-princesse-guimauve.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/confiseries-traditionnelles/guimauves-theme-royal/"
+          },
+          {
+            "name": "Quartiers de fruits « Marquise »6,50€Ajouter au panier",
+            "price": "6,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2024/04/confiserie-marquise-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/confiseries-traditionnelles/quartiers-de-fruits-marquise/"
+          },
+          {
+            "name": "Violettes thème royal6,50€Ajouter au panier",
+            "price": "6,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2018/01/confiserie-chaise-a-porteur-violettes.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/confiseries-traditionnelles/violettes-royales/"
+          },
+          {
+            "name": "Bougie parfumée lavande cire végétale motifs royaux22,50€Ajouter au panier",
+            "price": "22,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2023/03/bougie-versailles-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/bougies-parfumees-cire-vegetale/bougie-parfumee-lavande-cire-vegetale-motifs-royaux/"
+          },
+          {
+            "name": "Roules Roules « Bal masqué »6,50€Ajouter au panier",
+            "price": "6,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2023/01/roules-roules-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/confiseries-traditionnelles/roules-roules-bal-masque/"
+          },
+          {
+            "name": "Savonnette parfumée figue Marquise7,30€Ajouter au panier",
+            "price": "7,30€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2024/04/Design-sans-titre55.png",
+            "product_url": "https://www.senteursdefrance.fr/boutique/souvenirs-de-france/savonnette-parfumee-figue-marquise/"
+          },
+          {
+            "name": "Bougie parfumée violette thème bal masqué dans coffret29,50€Ajouter au panier",
+            "price": "29,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2024/10/IMG_3287-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/bougies-parfumees-cire-vegetale/bougie-parfumee-violette-theme-bal-masque-dans-son-coffret/"
+          },
+          {
+            "name": "Bougie parfumée violette thème bal masqué cire végétale22,50€Ajouter au panier",
+            "price": "22,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2020/05/bougie-bal-masque-nue-1-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/bougies-parfumees-cire-vegetale/bougie-parfumee-violette-bal-masque-cire-vegetale/"
+          },
+          {
+            "name": "Bougie parfumée figue « La Marquise » cire végétale sans coffret22,50€Ajouter au panier",
+            "price": "22,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2024/10/Design-sans-titre22-600x600.png",
+            "product_url": "https://www.senteursdefrance.fr/boutique/bougies-parfumees-cire-vegetale/bougie-parfumee-figue-la-marquise-cire-vegetale-sans-coffret/"
+          },
+          {
+            "name": "Savonnette cœur chèvrefeuille Royale3,50€Ajouter au panier",
+            "price": "3,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2020/07/mini-savon-coeur-chevrefeuille-1-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/souvenirs-de-france/savonnette-coeur-chevrefeuille-royale/"
+          },
+          {
+            "name": "Savonnette cœur parfumée fruits rouges Bal masqué3,50€Ajouter au panier",
+            "price": "3,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2023/01/bal-masque-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/souvenirs-de-france/savonnette-coeur-parfumee-fruits-des-bois-bal-masque/"
+          }
+        ],
+        "error": null,
+        "fetched_at": "2025-10-06 13:57:33"
+      },
+      {
+        "url": "http://senteursdefrance.fr/",
+        "title": "Produits extraits",
+        "promoted_products": [
+          {
+            "name": "Bougie parfumée muguet « porte-bonheur » cire végétale22,50€Ajouter au panier",
+            "price": "22,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2022/03/porte-bonheur-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/bougies-parfumees-cire-vegetale/bougie-parfumee-muguet-porte-bonheur/"
+          },
+          {
+            "name": "Savonnette cœur muguet Jardin à la française3,50€Ajouter au panier",
+            "price": "3,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2020/07/coeur-muguet-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/souvenirs-de-france/savonnette-coeur-muguet-jardin-a-la-francaise/"
+          },
+          {
+            "name": "Savonnette cœur lavande « Royale »3,50€Ajouter au panier",
+            "price": "3,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2020/07/mini-savon-coeur-lavande-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/souvenirs-de-france/savonnette-coeur-lavande-royale/"
+          },
+          {
+            "name": "Guimauves thème royal6,50€Ajouter au panier",
+            "price": "6,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2018/01/confiserie-princesse-guimauve.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/confiseries-traditionnelles/guimauves-theme-royal/"
+          },
+          {
+            "name": "Bougie parfumée muguet cire végétale22,50€Ajouter au panier",
+            "price": "22,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2024/03/bougie-muguet-sans-coffret-fond-vert-illustration-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/bougies-parfumees-cire-vegetale/bougie-parfumee-muguet-cire-vegetale-2/"
+          },
+          {
+            "name": "Bougie parfumée violette thème bal masqué cire végétale22,50€Ajouter au panier",
+            "price": "22,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2020/05/bougie-bal-masque-nue-1-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/bougies-parfumees-cire-vegetale/bougie-parfumee-violette-bal-masque-cire-vegetale/"
+          },
+          {
+            "name": "Savonnette parfumée figue Marquise7,30€Ajouter au panier",
+            "price": "7,30€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2024/04/Design-sans-titre55.png",
+            "product_url": "https://www.senteursdefrance.fr/boutique/souvenirs-de-france/savonnette-parfumee-figue-marquise/"
+          },
+          {
+            "name": "Savonnette parfumée thé précieux « Marie-Antoinette »7,30€Ajouter au panier",
+            "price": "7,30€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2023/03/savon-chaise-porteur-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/souvenirs-de-france/savonnette-parfumee-the-precieux-marie-antoinette/"
+          },
+          {
+            "name": "Roules Roules « Bal masqué »6,50€Ajouter au panier",
+            "price": "6,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2023/01/roules-roules-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/confiseries-traditionnelles/roules-roules-bal-masque/"
+          },
+          {
+            "name": "Bougie parfumée lavande cire végétale motifs royaux22,50€Ajouter au panier",
+            "price": "22,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2023/03/bougie-versailles-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/bougies-parfumees-cire-vegetale/bougie-parfumee-lavande-cire-vegetale-motifs-royaux/"
+          },
+          {
+            "name": "Quartiers de fruits « Marquise »6,50€Ajouter au panier",
+            "price": "6,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2024/04/confiserie-marquise-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/confiseries-traditionnelles/quartiers-de-fruits-marquise/"
+          },
+          {
+            "name": "Savonnette cœur chèvrefeuille Royale3,50€Ajouter au panier",
+            "price": "3,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2020/07/mini-savon-coeur-chevrefeuille-1-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/souvenirs-de-france/savonnette-coeur-chevrefeuille-royale/"
+          },
+          {
+            "name": "Bougie parfumée violette thème bal masqué dans coffret29,50€Ajouter au panier",
+            "price": "29,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2024/10/IMG_3287-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/bougies-parfumees-cire-vegetale/bougie-parfumee-violette-theme-bal-masque-dans-son-coffret/"
+          },
+          {
+            "name": "Bougie parfumée figue « La Marquise » cire végétale sans coffret22,50€Ajouter au panier",
+            "price": "22,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2024/10/Design-sans-titre22-600x600.png",
+            "product_url": "https://www.senteursdefrance.fr/boutique/bougies-parfumees-cire-vegetale/bougie-parfumee-figue-la-marquise-cire-vegetale-sans-coffret/"
+          },
+          {
+            "name": "Violettes thème royal6,50€Ajouter au panier",
+            "price": "6,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2018/01/confiserie-chaise-a-porteur-violettes.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/confiseries-traditionnelles/violettes-royales/"
+          }
+        ],
+        "error": null,
+        "fetched_at": "2025-10-06 15:10:42"
+      },
+      {
+        "url": "http://senteursdefrance.fr/",
+        "title": "Produits extraits",
+        "promoted_products": [
+          {
+            "name": "Bougie parfumée muguet « porte-bonheur » cire végétale22,50€Ajouter au panier",
+            "price": "22,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2022/03/porte-bonheur-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/bougies-parfumees-cire-vegetale/bougie-parfumee-muguet-porte-bonheur/"
+          },
+          {
+            "name": "Savonnette cœur muguet Jardin à la française3,50€Ajouter au panier",
+            "price": "3,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2020/07/coeur-muguet-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/souvenirs-de-france/savonnette-coeur-muguet-jardin-a-la-francaise/"
+          },
+          {
+            "name": "Savonnette cœur lavande « Royale »3,50€Ajouter au panier",
+            "price": "3,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2020/07/mini-savon-coeur-lavande-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/souvenirs-de-france/savonnette-coeur-lavande-royale/"
+          },
+          {
+            "name": "Guimauves thème royal6,50€Ajouter au panier",
+            "price": "6,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2018/01/confiserie-princesse-guimauve.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/confiseries-traditionnelles/guimauves-theme-royal/"
+          },
+          {
+            "name": "Bougie parfumée muguet cire végétale22,50€Ajouter au panier",
+            "price": "22,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2024/03/bougie-muguet-sans-coffret-fond-vert-illustration-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/bougies-parfumees-cire-vegetale/bougie-parfumee-muguet-cire-vegetale-2/"
+          },
+          {
+            "name": "Savonnette parfumée figue Marquise7,30€Ajouter au panier",
+            "price": "7,30€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2024/04/Design-sans-titre55.png",
+            "product_url": "https://www.senteursdefrance.fr/boutique/souvenirs-de-france/savonnette-parfumee-figue-marquise/"
+          },
+          {
+            "name": "Savonnette parfumée violette Bal masqué7,30€Ajouter au panier",
+            "price": "7,30€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2023/03/savon-bal-masque-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/souvenirs-de-france/savonnette-parfumee-violette-bal-masque/"
+          },
+          {
+            "name": "Quartiers de fruits « Marquise »6,50€Ajouter au panier",
+            "price": "6,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2024/04/confiserie-marquise-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/confiseries-traditionnelles/quartiers-de-fruits-marquise/"
+          },
+          {
+            "name": "Bougie parfumée violette thème bal masqué dans coffret29,50€Ajouter au panier",
+            "price": "29,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2024/10/IMG_3287-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/bougies-parfumees-cire-vegetale/bougie-parfumee-violette-theme-bal-masque-dans-son-coffret/"
+          },
+          {
+            "name": "Savonnette parfumée thé précieux « Marie-Antoinette »7,30€Ajouter au panier",
+            "price": "7,30€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2023/03/savon-chaise-porteur-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/souvenirs-de-france/savonnette-parfumee-the-precieux-marie-antoinette/"
+          },
+          {
+            "name": "Bougie parfumée figue « La Marquise » cire végétale sans coffret22,50€Ajouter au panier",
+            "price": "22,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2024/10/Design-sans-titre22-600x600.png",
+            "product_url": "https://www.senteursdefrance.fr/boutique/bougies-parfumees-cire-vegetale/bougie-parfumee-figue-la-marquise-cire-vegetale-sans-coffret/"
+          },
+          {
+            "name": "Savonnette cœur parfumée fruits rouges Bal masqué3,50€Ajouter au panier",
+            "price": "3,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2023/01/bal-masque-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/souvenirs-de-france/savonnette-coeur-parfumee-fruits-des-bois-bal-masque/"
+          },
+          {
+            "name": "Roules Roules « Bal masqué »6,50€Ajouter au panier",
+            "price": "6,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2023/01/roules-roules-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/confiseries-traditionnelles/roules-roules-bal-masque/"
+          },
+          {
+            "name": "Bougie Royale parfumée lavande dans ravissant coffret29,50€Ajouter au panier",
+            "price": "29,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2024/10/IMG_3290-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/bougies-parfumees-cire-vegetale/bougie-royale-parfumee-lavande-dans-ravissant-coffret/"
+          },
+          {
+            "name": "Violettes thème royal6,50€Ajouter au panier",
+            "price": "6,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2018/01/confiserie-chaise-a-porteur-violettes.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/confiseries-traditionnelles/violettes-royales/"
+          },
+          {
+            "name": "Bougie parfumée violette thème bal masqué cire végétale22,50€Ajouter au panier",
+            "price": "22,50€",
+            "image": "https://www.senteursdefrance.fr/wp-content/uploads/2020/05/bougie-bal-masque-nue-1-600x600.jpg",
+            "product_url": "https://www.senteursdefrance.fr/boutique/bougies-parfumees-cire-vegetale/bougie-parfumee-violette-bal-masque-cire-vegetale/"
+          }
+        ],
+        "error": null,
+        "fetched_at": "2025-10-06 16:00:19"
+      }
+    ]
+  },
+  "a8760bc8": {
+    "site_id": "a8760bc8",
+    "start_url": "https://www.auxmilleetunsavons.fr/",
+    "scraped_count": 1,
+    "results": [
+      {
+        "url": "https://www.auxmilleetunsavons.fr/",
+        "title": "Produits extraits",
+        "promoted_products": [
+          {
+            "name": "Votre Spécialiste en Savon Artisanal",
+            "price": "0",
+            "image": "https://static.wixstatic.com/media/7873e8_1ced0022a82f4ead8e2805e566c06a9a~mv2.jpg/v1/fill/w_732,h_399,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/7873e8_1ced0022a82f4ead8e2805e566c06a9a~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/cart-page"
+          },
+          {
+            "name": "Produits Populaires",
+            "price": "6,50 €",
+            "image": "https://static.wixstatic.com/media/7873e8_813814ec6d15455896ed8839c64faa07~mv2.jpg/v1/fill/w_373,h_280,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_813814ec6d15455896ed8839c64faa07~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/chantilly-gelato-de-douche-musc-blanc"
+          },
+          {
+            "name": "Meilleures ventes",
+            "price": "6,50 €",
+            "image": "https://static.wixstatic.com/media/7873e8_813814ec6d15455896ed8839c64faa07~mv2.jpg/v1/fill/w_373,h_280,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_813814ec6d15455896ed8839c64faa07~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/chantilly-gelato-de-douche-musc-blanc"
+          },
+          {
+            "name": "Chantilly Gelato de Douche Musc BlancPrix6,50 €Taxe Incluse",
+            "price": "6,50 €",
+            "image": "https://static.wixstatic.com/media/7873e8_813814ec6d15455896ed8839c64faa07~mv2.jpg/v1/fill/w_373,h_280,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_813814ec6d15455896ed8839c64faa07~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/chantilly-gelato-de-douche-musc-blanc"
+          },
+          {
+            "name": "Savon Bio au Lait de ChèvrePrix3,90 €Taxe Incluse",
+            "price": "3,90 €",
+            "image": "https://static.wixstatic.com/media/7873e8_2ea9377b746b45429cc2657d48eba4a0~mv2.jpg/v1/fill/w_373,h_280,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_2ea9377b746b45429cc2657d48eba4a0~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/savon-bio-au-lait-de-chèvre"
+          },
+          {
+            "name": "Savon Macaron VanillePrix2,50 €Taxe Incluse",
+            "price": "2,50 €",
+            "image": "https://static.wixstatic.com/media/7873e8_fbe0b7546cdb4ef18d75d86286eecfe5~mv2.jpg/v1/fill/w_373,h_280,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_fbe0b7546cdb4ef18d75d86286eecfe5~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/savon-macaron-vanille"
+          },
+          {
+            "name": "Bougie Tasse MadeleinePrix17,90 €Taxe Incluse",
+            "price": "17,90 €",
+            "image": "https://static.wixstatic.com/media/7873e8_37b8be7048994901b01487aa0433091e~mv2.jpg/v1/fill/w_980,h_927,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_37b8be7048994901b01487aa0433091e~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/bougie-madeleine"
+          },
+          {
+            "name": "Savon Délice d'AnessePrix5,90 €Taxe Incluse",
+            "price": "5,90 €",
+            "image": "https://static.wixstatic.com/media/7873e8_509c578723bd4c6298d8ea0bd329723e~mv2.jpg/v1/fill/w_980,h_849,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_509c578723bd4c6298d8ea0bd329723e~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/savon-délice-d-anesse"
+          },
+          {
+            "name": "Savon Douceur Bio à l'Huile d'ArganPrix3,90 €Taxe Incluse",
+            "price": "3,90 €",
+            "image": "https://static.wixstatic.com/media/7873e8_6101f7c6c8384bf5a3ffb682b72cb1f4~mv2.jpg/v1/fill/w_980,h_653,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_6101f7c6c8384bf5a3ffb682b72cb1f4~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/savon-douceur-bio-huile-d-argan"
+          },
+          {
+            "name": "Savon Macaron CocoPrix2,50 €Taxe Incluse",
+            "price": "2,50 €",
+            "image": "https://static.wixstatic.com/media/7873e8_c700fe70c4ff468c9f691e76750c104b~mv2.jpg/v1/fill/w_980,h_549,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_c700fe70c4ff468c9f691e76750c104b~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/savon-macaron-coco"
+          },
+          {
+            "name": "Bougie Mini Verrine Pomme d'AmourPrix9,90 €Taxe Incluse",
+            "price": "9,90 €",
+            "image": "https://static.wixstatic.com/media/7873e8_8cc397f97dbe4c1eaf31c87971eb1f3c~mv2.jpg/v1/fill/w_980,h_916,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_8cc397f97dbe4c1eaf31c87971eb1f3c~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/bougie-mini-verrine-pomme-d-amour"
+          },
+          {
+            "name": "Meilleures Ventes",
+            "price": "3,90 €",
+            "image": "https://static.wixstatic.com/media/7873e8_1da15487661f45f2b612471493312f30~mv2.jpg/v1/fill/w_980,h_636,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_1da15487661f45f2b612471493312f30~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/savon-douceur-bio-au-lait-d-anesse"
+          },
+          {
+            "name": "Chantilly Gelato de Douche Fruit de la PassionPrix6,50 €Taxe Incluse",
+            "price": "6,50 €",
+            "image": "https://static.wixstatic.com/media/7873e8_5f9e3d9b16c24d0d85b1c5bff8966703~mv2.jpg/v1/fill/w_980,h_855,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_5f9e3d9b16c24d0d85b1c5bff8966703~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/chantilly-gelato-de-douche-fruit-de-la-passion"
+          },
+          {
+            "name": "Explorez la collection",
+            "price": "9,90 €",
+            "image": "https://static.wixstatic.com/media/7873e8_c66afe0de59e4d558ead883d009c18e3~mv2.jpg/v1/fill/w_273,h_273,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_c66afe0de59e4d558ead883d009c18e3~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/bougie-mini-verrine-amour"
+          },
+          {
+            "name": "Bougie Mini Verrine AmourPrix9,90 €Taxe Incluse",
+            "price": "9,90 €",
+            "image": "https://static.wixstatic.com/media/7873e8_c66afe0de59e4d558ead883d009c18e3~mv2.jpg/v1/fill/w_273,h_273,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_c66afe0de59e4d558ead883d009c18e3~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/bougie-mini-verrine-amour"
+          },
+          {
+            "name": "Bougie Mini Verrine Soirée au Coin du FeuPrix9,90 €Taxe Incluse",
+            "price": "9,90 €",
+            "image": "https://static.wixstatic.com/media/7873e8_69e3d3ad45f6429db43831e0a6d4f333~mv2.jpg/v1/fill/w_273,h_273,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_69e3d3ad45f6429db43831e0a6d4f333~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/bougie-mini-verrine-au-coin-du-feu"
+          },
+          {
+            "name": "Bougie Tasse Sucre d'OrgePrix13,90 €Taxe Incluse",
+            "price": "13,90 €",
+            "image": "https://static.wixstatic.com/media/7873e8_22d1a7e1d5934f51b139856e32ee0e3b~mv2.jpg/v1/fill/w_273,h_273,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_22d1a7e1d5934f51b139856e32ee0e3b~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/bougie-tasse-sucre-d-orge"
+          },
+          {
+            "name": "Bougie Mini Verrine Soirée RomantiquePrix9,90 €Taxe Incluse",
+            "price": "9,90 €",
+            "image": "https://static.wixstatic.com/media/7873e8_1446c58e8e0d405bb870f3a1804e22c6~mv2.jpg/v1/fill/w_273,h_273,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_1446c58e8e0d405bb870f3a1804e22c6~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/bougie-mini-verrine-buche-glacée"
+          },
+          {
+            "name": "Bougie Tasse Pomme au FourPrix13,90 €Taxe Incluse",
+            "price": "13,90 €",
+            "image": "https://static.wixstatic.com/media/7873e8_2170a5490d304b46afffe3b7b2636221~mv2.jpg/v1/fill/w_980,h_946,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_2170a5490d304b46afffe3b7b2636221~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/bougie-tasse-pomme-au-four"
+          },
+          {
+            "name": "Savon Part de Tarte Pomme d'AmourPrix6,90 €Taxe Incluse",
+            "price": "6,90 €",
+            "image": "https://static.wixstatic.com/media/7873e8_d7fdc859423f4191ad1f717ad2d60a44~mv2.jpg/v1/fill/w_980,h_634,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_d7fdc859423f4191ad1f717ad2d60a44~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/savon-part-de-tarte-pomme-d-amour"
+          },
+          {
+            "name": "Savon Part de Tarte crème CocoPrix6,90 €Taxe Incluse",
+            "price": "6,90 €",
+            "image": "https://static.wixstatic.com/media/7873e8_89fea7f7173b4223b5e74259c67bf5f7~mv2.jpg/v1/fill/w_980,h_646,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_89fea7f7173b4223b5e74259c67bf5f7~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/savon-part-de-tarte-crème-coco"
+          },
+          {
+            "name": "Savon Douceur Bio au Lait d'AnessePrix3,90 €Taxe Incluse",
+            "price": "3,90 €",
+            "image": "https://static.wixstatic.com/media/7873e8_1da15487661f45f2b612471493312f30~mv2.jpg/v1/fill/w_980,h_636,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_1da15487661f45f2b612471493312f30~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/savon-douceur-bio-au-lait-d-anesse"
+          },
+          {
+            "name": "Savon ChèvrissimePrix5,40 €Taxe Incluse",
+            "price": "5,40 €",
+            "image": "https://static.wixstatic.com/media/7873e8_cf9304c7e58f498f8895361f025545e8~mv2.jpg/v1/fill/w_980,h_857,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_cf9304c7e58f498f8895361f025545e8~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/savon-chèvrissime"
+          },
+          {
+            "name": "Savon de Marseille aux Huiles Végétales Cube Nu 300 gr.Prix4,80 €Taxe Incluse",
+            "price": "300",
+            "image": "https://static.wixstatic.com/media/7873e8_ddab57abd338424b9303dc0e47ae5496~mv2.jpg/v1/fill/w_980,h_733,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_ddab57abd338424b9303dc0e47ae5496~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/savon-de-marseille-aux-huiles-végétales-cube-nu-300-gr"
+          },
+          {
+            "name": "Savon de Marseille à l'Huile d'Olive Cube Nu 300 gr.Prix4,90 €Taxe Incluse",
+            "price": "300",
+            "image": "https://static.wixstatic.com/media/7873e8_f99d82d08f664af2acc5e5c61cebbb28~mv2.jpg/v1/fill/w_980,h_746,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_f99d82d08f664af2acc5e5c61cebbb28~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/savon-de-marseille-à-l-huile-d-olive-cube-nu-300-gr"
+          },
+          {
+            "name": "Shampoing Solide Le NaturePrix8,70 €Taxe Incluse",
+            "price": "8,70 €",
+            "image": "https://static.wixstatic.com/media/7873e8_18e05d7aaa7541e09eb6a11351ba6502~mv2.jpg/v1/fill/w_980,h_673,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_18e05d7aaa7541e09eb6a11351ba6502~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/shampoing-solide-le-nature"
+          },
+          {
+            "name": "Shampoing Solide AlexandrinPrix8,70 €Taxe Incluse",
+            "price": "8,70 €",
+            "image": "https://static.wixstatic.com/media/7873e8_4f55199064d744f9bbc7fbfe55a3f7ea~mv2.jpg/v1/fill/w_980,h_701,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_4f55199064d744f9bbc7fbfe55a3f7ea~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/shampoing-solide-alexandrin"
+          },
+          {
+            "name": "Shampoing Solide EquilibrantPrix8,70 €Taxe Incluse",
+            "price": "8,70 €",
+            "image": "https://static.wixstatic.com/media/7873e8_538e7015e3ea4388a442ad4451c2574b~mv2.jpg/v1/fill/w_980,h_696,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_538e7015e3ea4388a442ad4451c2574b~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/shampoing-solide-equilibrant"
+          },
+          {
+            "name": "Bougie Mini Verrine Biscuit Cannelle OrangePrix9,90 €Taxe Incluse",
+            "price": "9,90 €",
+            "image": "https://static.wixstatic.com/media/7873e8_2c17abe44a214982aeb56a3b35940539~mv2.jpg/v1/fill/w_980,h_905,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_2c17abe44a214982aeb56a3b35940539~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/bougie-mini-verrine-biscuit-cannelle-orange"
+          },
+          {
+            "name": "Bougie Mini Verrine Cannelle OrangePrix9,90 €Taxe Incluse",
+            "price": "9,90 €",
+            "image": "https://static.wixstatic.com/media/7873e8_577ad58d43374527a64a2b20d8bec2c9~mv2.jpg/v1/fill/w_980,h_889,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_577ad58d43374527a64a2b20d8bec2c9~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/bougie-mini-verrine-cannelle-orange"
+          },
+          {
+            "name": "Savon Part de Tarte Biscuit d'HiverPrix6,90 €Taxe Incluse",
+            "price": "6,90 €",
+            "image": "https://static.wixstatic.com/media/7873e8_43992f0acf92482683f13fa79158b68d~mv2.jpg/v1/fill/w_980,h_671,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_43992f0acf92482683f13fa79158b68d~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/savon-part-de-tarte-biscuit-d-hiver"
+          },
+          {
+            "name": "Savon Esquimaux Bonhomme de NeigePrix4,90 €Taxe Incluse",
+            "price": "4,90 €",
+            "image": "https://static.wixstatic.com/media/7873e8_333fb42992a444f2a560c4c131873f7c~mv2.jpg/v1/fill/w_980,h_779,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_333fb42992a444f2a560c4c131873f7c~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/savon-esquimaux-bonhomme-de-neige"
+          },
+          {
+            "name": "Savon Sapin Pomme au FourPrix4,90 €Taxe Incluse",
+            "price": "4,90 €",
+            "image": "https://static.wixstatic.com/media/7873e8_f4938b4edd6744ddac714f209d20cab6~mv2.jpg/v1/fill/w_980,h_686,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_f4938b4edd6744ddac714f209d20cab6~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/savon-sapin-pomme-au-four"
+          },
+          {
+            "name": "Savon CannePrix3,50 €Taxe Incluse",
+            "price": "3,50 €",
+            "image": "https://static.wixstatic.com/media/7873e8_ec6c4b17aa54497bafce1f028016a05d~mv2.jpg/v1/fill/w_980,h_762,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_ec6c4b17aa54497bafce1f028016a05d~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/savon-canne"
+          },
+          {
+            "name": "Savon Bonhomme Pain d'EpicesPrix4,50 €Taxe Incluse",
+            "price": "4,50 €",
+            "image": "https://static.wixstatic.com/media/7873e8_31adc1187d514bc79f36160bcd57768c~mv2.jpg/v1/fill/w_980,h_799,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_31adc1187d514bc79f36160bcd57768c~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/savon-bonhomme-pain-d-epices"
+          },
+          {
+            "name": "Savon Sucette Etoile Menthe FraîchePrix3,90 €Taxe Incluse",
+            "price": "3,90 €",
+            "image": "https://static.wixstatic.com/media/7873e8_c2cb9077ac8a452dacc4f1a4cd9a3864~mv2.jpg/v1/fill/w_980,h_629,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/7873e8_c2cb9077ac8a452dacc4f1a4cd9a3864~mv2.jpg",
+            "product_url": "https://www.auxmilleetunsavons.fr/product-page/savon-sucette-etoile-menthe-fraîche"
+          },
+          {
+            "name": "Notre Histoire",
+            "price": "350",
+            "image": "https://static.wixstatic.com/media/7873e8_eb828a77a2b8468eb3d73f97001be37a~mv2.jpg/v1/crop/x_0,y_231,w_2400,h_2736/fill/w_478,h_545,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/IMG-20231202-WA0000.jpg",
+            "product_url": "mailto:auxmilleetunsavons.shop@gmail.com"
+          },
+          {
+            "name": "Nous contacter",
+            "price": "350",
+            "image": "https://static.wixstatic.com/media/7873e8_eb828a77a2b8468eb3d73f97001be37a~mv2.jpg/v1/crop/x_0,y_231,w_2400,h_2736/fill/w_478,h_545,al_c,q_80,usm_0.66_1.00_0.01,enc_auto/IMG-20231202-WA0000.jpg",
+            "product_url": "mailto:auxmilleetunsavons.shop@gmail.com"
+          },
+          {
+            "name": "Politique de confidentialité",
+            "price": "Prix non spécifié",
+            "image": "",
+            "product_url": "https://www.auxmilleetunsavons.fr/checkout"
+          }
+        ],
+        "error": null,
+        "fetched_at": "2025-10-06 14:06:53"
+      }
+    ]
+  },
+  "7f46ce5b": {
+    "site_id": "7f46ce5b",
+    "start_url": "https://www.lameredefamille.com/",
+    "scraped_count": 2,
+    "results": [
+      {
+        "url": "https://www.lameredefamille.com/",
+        "title": "Produits extraits",
+        "promoted_products": [
+          {
+            "name": "Coffret de 32 toucans assortis",
+            "price": "38,00€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/coffret-toucans-assortis-310g-24.jpg?v=1727865031&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/coffret-de-32-toucans-assortis"
+          },
+          {
+            "name": "Carrousel de coquin",
+            "price": "38,50€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/carrousel-de-coquin-25.jpg?v=1751621948&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/carrousel-de-coquin"
+          },
+          {
+            "name": "Assortiment de spécialités 225 g - heaume vert",
+            "price": "28,50€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/assortiment-de-specialites-225g-vert-25.jpg?v=1756387362&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/assortiment-de-specialites-225-g-heaume-vert"
+          },
+          {
+            "name": "Châtaignes T2",
+            "price": "41,00€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/barquette-chataignes-T2-25.jpg?v=1759141840&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/chataignes-t2"
+          },
+          {
+            "name": "Bogue d'automne",
+            "price": "9,00€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/bogue-automne1.jpg?v=1725623808&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/bogue-d-automne"
+          },
+          {
+            "name": "Assortiment de spécialités 225 g",
+            "price": "28,50€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/assortiment-de-specialites-225g-orange-25.jpg?v=1756387826&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/assortiment-de-specialites-225-g"
+          },
+          {
+            "name": "Les craques – Coffret de 350 g",
+            "price": "48,00€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/coffret-craques-365g.jpg?v=1730217047&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/les-craques-coffret-de-350-g"
+          },
+          {
+            "name": "Nos guimauves aux fleurs",
+            "price": "12,50€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/sachet-guimauves-fleurs-25.jpg?v=1750836400&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/nos-guimauves-aux-fleurs"
+          },
+          {
+            "name": "Carte cadeau (en ligne)",
+            "price": "50,00€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/carte-cadeau-almdf.jpg?v=1733418384&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/carte-cadeau"
+          },
+          {
+            "name": "Nos guimauves enrobées de chocolat",
+            "price": "21,50€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/guimauves-enrobees-chocolat-25.jpg?v=1745412220&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/nos-guimauves-enrobees-de-chocolat"
+          },
+          {
+            "name": "Assortiment de spécialités - heaume vert",
+            "price": "44,00€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/assortiment-de-specialites-verte-heaume.jpg?v=1725619595&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/assortiment-de-specialites-heaume-vert"
+          },
+          {
+            "name": "Bandana x GiftShop",
+            "price": "25,00€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/bandana-almdf-x-giftshop-1.jpg?v=1750177031&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/bandana-x-giftshop"
+          },
+          {
+            "name": "Cabas d'été À la Mère de Famille",
+            "price": "15,00€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/cabas-vert-a-la-mere-de-famille-2024.jpg?v=1725620845&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/cabas-dete-a-la-mere-de-famille"
+          },
+          {
+            "name": "Tartineur x GiftShop",
+            "price": "10,00€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/tartineur-almdf-x-giftshop.jpg?v=1750177030&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/tartineur-x-giftshop"
+          }
+        ],
+        "error": null,
+        "fetched_at": "2025-10-06 14:33:32"
+      },
+      {
+        "url": "https://www.lameredefamille.com/",
+        "title": "Produits extraits",
+        "promoted_products": [
+          {
+            "name": "Coffret de 32 toucans assortis",
+            "price": "38,00€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/coffret-toucans-assortis-310g-24.jpg?v=1727865031&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/coffret-de-32-toucans-assortis"
+          },
+          {
+            "name": "Carrousel de coquin",
+            "price": "38,50€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/carrousel-de-coquin-25.jpg?v=1751621948&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/carrousel-de-coquin"
+          },
+          {
+            "name": "Assortiment de spécialités 225 g - heaume vert",
+            "price": "28,50€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/assortiment-de-specialites-225g-vert-25.jpg?v=1756387362&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/assortiment-de-specialites-225-g-heaume-vert"
+          },
+          {
+            "name": "Châtaignes T2",
+            "price": "41,00€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/barquette-chataignes-T2-25.jpg?v=1759141840&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/chataignes-t2"
+          },
+          {
+            "name": "Bogue d'automne",
+            "price": "9,00€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/bogue-automne1.jpg?v=1725623808&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/bogue-d-automne"
+          },
+          {
+            "name": "Assortiment de spécialités 225 g",
+            "price": "28,50€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/assortiment-de-specialites-225g-orange-25.jpg?v=1756387826&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/assortiment-de-specialites-225-g"
+          },
+          {
+            "name": "Les craques – Coffret de 350 g",
+            "price": "48,00€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/coffret-craques-365g.jpg?v=1730217047&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/les-craques-coffret-de-350-g"
+          },
+          {
+            "name": "Nos guimauves aux fleurs",
+            "price": "12,50€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/sachet-guimauves-fleurs-25.jpg?v=1750836400&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/nos-guimauves-aux-fleurs"
+          },
+          {
+            "name": "Carte cadeau (en ligne)",
+            "price": "50,00€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/carte-cadeau-almdf.jpg?v=1733418384&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/carte-cadeau"
+          },
+          {
+            "name": "Nos guimauves enrobées de chocolat",
+            "price": "21,50€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/guimauves-enrobees-chocolat-25.jpg?v=1745412220&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/nos-guimauves-enrobees-de-chocolat"
+          },
+          {
+            "name": "Assortiment de spécialités - heaume vert",
+            "price": "44,00€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/assortiment-de-specialites-verte-heaume.jpg?v=1725619595&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/assortiment-de-specialites-heaume-vert"
+          },
+          {
+            "name": "Bandana x GiftShop",
+            "price": "25,00€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/bandana-almdf-x-giftshop-1.jpg?v=1750177031&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/bandana-x-giftshop"
+          },
+          {
+            "name": "Cabas d'été À la Mère de Famille",
+            "price": "15,00€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/cabas-vert-a-la-mere-de-famille-2024.jpg?v=1725620845&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/cabas-dete-a-la-mere-de-famille"
+          },
+          {
+            "name": "Tartineur x GiftShop",
+            "price": "10,00€",
+            "image": "https://www.lameredefamille.com/cdn/shop/files/tartineur-almdf-x-giftshop.jpg?v=1750177030&width=2000",
+            "product_url": "https://www.lameredefamille.com/products/tartineur-x-giftshop"
+          }
+        ],
+        "error": null,
+        "fetched_at": "2025-10-06 14:33:33"
+      }
+    ]
+  }
+}

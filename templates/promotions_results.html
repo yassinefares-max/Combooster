@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scraping Promotions - Produits en Vedette</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+        }
+        .product-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            height: 100%;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        .product-image {
+            height: 200px;
+            object-fit: contain;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px 10px 0 0;
+        }
+        .price-tag {
+            background: #28a745;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-robot me-2"></i>
+                Scraper Promotions
+            </a>
+            <div class="navbar-nav">
+                <a class="nav-link" href="/">Scraping Complet</a>
+                <a class="nav-link active" href="/promotions">Promotions</a>
+                <a class="nav-link" href="/rag">Assistant RAG</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero-section text-center">
+        <div class="container">
+            <h1 class="display-5 fw-bold mb-3">
+                <i class="fas fa-tag me-3"></i>
+                Détection des Promotions
+            </h1>
+            <p class="lead mb-4">
+                Extraction rapide des produits en vedette et promotions sur les sites e-commerce
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Scraping Form -->
+        <div class="card shadow-lg mb-5">
+            <div class="card-header bg-white py-3">
+                <h4 class="mb-0">
+                    <i class="fas fa-bolt me-2 text-warning"></i>
+                    Configuration du Scraping Promotions
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/promotions">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="start_url" class="form-label fw-bold">
+                                    <i class="fas fa-link me-2"></i>URL de la page d'accueil
+                                </label>
+                                <input type="url" class="form-control form-control-lg" id="start_url" 
+                                       name="start_url" placeholder="https://example.com" required>
+                                <div class="form-text">
+                                    Entrez l'URL de la page d'accueil du site e-commerce
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="max_pages" class="form-label fw-bold">
+                                    <i class="fas fa-file me-2"></i>Pages maximum
+                                </label>
+                                <input type="number" class="form-control" id="max_pages" 
+                                       name="max_pages" value="10" min="1" max="50">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="render_js" name="render_js">
+                                <label class="form-check-label" for="render_js">
+                                    Rendu JavaScript (Playwright) 
+                                    {% if playwright_available %}
+                                        <span class="badge bg-success">Disponible</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Non disponible</span>
+                                    {% endif %}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="/" class="btn btn-outline-secondary me-md-2">
+                            <i class="fas fa-arrow-left me-2"></i>Retour
+                        </a>
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-bolt me-2"></i>Lancer la Détection des Promotions
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="row mb-5">
+            <div class="col-md-4">
+                <div class="card h-100 text-center border-0">
+                    <div class="card-body">
+                        <i class="fas fa-rocket fa-2x text-primary mb-3"></i>
+                        <h5 class="card-title">Extraction Rapide</h5>
+                        <p class="card-text">Détection optimisée des produits en vedette sur la homepage</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center border-0">
+                    <div class="card-body">
+                        <i class="fas fa-tags fa-2x text-success mb-3"></i>
+                        <h5 class="card-title">Produits Promus</h5>
+                        <p class="card-text">Identification des produits en promotion et soldes</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center border-0">
+                    <div class="card-body">
+                        <i class="fas fa-chart-line fa-2x text-info mb-3"></i>
+                        <h5 class="card-title">Analyse Concurrentielle</h5>
+                        <p class="card-text">Surveillance des stratégies marketing des concurrents</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2 text-info"></i>
+                    Comment ça marche ?
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>🚀 Processus de détection :</h6>
+                        <ul>
+                            <li>Analyse de la page d'accueil et des pages principales</li>
+                            <li>Détection des carrousels de produits</li>
+                            <li>Identification des sections "Nouveautés" et "Promotions"</li>
+                            <li>Extraction des produits avec images et prix</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>🎯 Résultats attendus :</h6>
+                        <ul>
+                            <li>Liste des produits mis en avant</li>
+                            <li>Prix et descriptions</li>
+                            <li>Images des produits</li>
+                            <li>Liens vers les pages produits</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    <strong>Astuce :</strong> Utilisez le rendu JavaScript pour les sites modernes (React, Vue.js, Angular)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light mt-5 py-4">
+        <div class="container text-center">
+            <p class="mb-0">
+                <i class="fas fa-tag me-2"></i>
+                Scraper Promotions - Outil de veille concurrentielle
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
