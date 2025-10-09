@@ -13,6 +13,7 @@ import requests
 from rag_system import initialize_rag_system, get_rag_system,initialize_rag
 from extra_routes import extra_routes
 import hashlib
+from pymongo import MongoClient
 
 
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
@@ -26,8 +27,15 @@ except Exception:
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET", "change_this_secret_please_change")
-
 app.register_blueprint(extra_routes)
+
+# Connexion MongoDB
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
+mongo_client = MongoClient(MONGO_URI)
+mongo_db = mongo_client["scraping_db"]
+scrapes_collection = mongo_db["scraped_sites"]
+
+
 
 # CONFIG par défaut
 DEFAULT_MAX_PAGES = 50
@@ -1276,34 +1284,23 @@ def scrape():
             q.append((link.rstrip("/"), depth + 1))
 
 
-    # Charger ancien contenu s'il existe
-    temp_path = "last_scrape.json"
-    data_all = {}
-    if os.path.exists(temp_path):
-        try:
-            with open(temp_path, "r", encoding="utf-8") as f:
-                data_all = json.load(f)
-        except Exception as e:
-            print("⚠️ Erreur de lecture du fichier JSON :", e)
-            data_all = {}
-
-    # Ajouter ou mettre à jour ce site
-    data_all[site_id] = {
+    # À la fin du scraping, sauvegarder dans MongoDB
+    scrape_data = {
         "site_id": site_id,
         "start_url": start_url,
-        "render_js_requested": render_js,
-        "scrape_products": scrape_products,
-        "scrape_promoted_products": scrape_promoted_products,  # ← AJOUTÉ
-        "scrape_footer": scrape_footer,
+        "results": results,
+        "scraped_count": len(results),
         "max_pages": max_pages,
         "max_depth": max_depth,
-        "scraped_count": len(results),
-        "results": results
+        "scraped_at": time.strftime("%Y-%m-%d %H:%M:%S")
     }
 
-    # Réécrire tout le fichier
-    with open(temp_path, "w", encoding="utf-8") as f:
-        json.dump(data_all, f, ensure_ascii=False, indent=2)
+    # Supprimer les anciennes données du même site avant d’insérer
+    scrapes_collection.delete_one({"site_id": site_id})
+    scrapes_collection.insert_one(scrape_data)
+
+    print(f"✅ Données du site {site_id} sauvegardées dans MongoDB.")
+
 
     # Calculer les statistiques pour CE SITE uniquement
     stats = calculate_statistics(results)
@@ -1314,7 +1311,7 @@ def scrape():
                          stats=stats,
                          playwright_available=PLAYWRIGHT_AVAILABLE,
                          current_site_id=site_id,
-                         all_sites=data_all)
+                         all_sites=scrape_data)
     
 @app.route("/merge_data", methods=["POST"])
 def merge_data():

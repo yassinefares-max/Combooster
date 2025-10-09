@@ -7,6 +7,7 @@ import faiss
 from sentence_transformers import SentenceTransformer
 import re
 import hashlib
+from pymongo import MongoClient
 
 class RAGSystem:
     def __init__(self, mistral_api_key: str):
@@ -64,100 +65,72 @@ class RAGSystem:
             'reason': 'not_initialized' if not self.is_initialized else 'data_changed' if self.data_hash != new_hash else 'no_changes'
         }
         
-    def load_scraped_data(self, file_path: str = "last_scrape.json"):
-        """Charge TOUTES les données du fichier last_scrape.json"""
-        if not os.path.exists(file_path):
-            raise FileNotFoundError(f"Fichier {file_path} non trouvé")
-        
-        print("📥 Chargement des données depuis last_scrape.json...")
-        
-        # Charger le modèle d'embeddings AVANT de traiter les données
+    def load_scraped_data(self, file_path: str = None):
+        """Charge toutes les données depuis MongoDB"""
+        print("📥 Chargement des données depuis MongoDB...")
+
+        # Connexion à MongoDB
+        MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
+        mongo_client = MongoClient(MONGO_URI)
+        db = mongo_client["scraping_db"]
+        collection = db["scraped_sites"]
+
+        all_sites = list(collection.find())
+        if not all_sites:
+            raise ValueError("❌ Aucune donnée trouvée dans MongoDB")
+
+        # Charger le modèle d'embeddings avant le traitement
         self._load_embedding_model()
-        
-        with open(file_path, 'r', encoding='utf-8') as f:
-            self.raw_data = json.load(f)
-        
+
+        self.raw_data = {}
         self.documents = []
         self.metadata = []
-        
-        # Gérer le format avec site_id comme clé
+
         total_products = 0
         total_pages = 0
         total_promoted_products = 0
-        
-        for site_id, site_data in self.raw_data.items():
-            if not isinstance(site_data, dict):
-                continue
-                
-            # 1. Informations générales du site
-            start_url = site_data.get('start_url', 'Inconnu')
-            scraped_count = site_data.get('scraped_count', 0)
-            
-            general_info = f"SITE_{site_id}: URL={start_url} | Pages={scraped_count}"
-            self.documents.append(general_info)
-            self.metadata.append({
-                'type': 'site_info',
-                'site_id': site_id,
-                'category': 'metadata'
-            })
-            
-            # 2. Traiter chaque page avec TOUTES ses données
-            results = site_data.get('results', [])
-            if not isinstance(results, list):
-                continue
-                
+
+        for site_doc in all_sites:
+            site_id = site_doc["site_id"]
+            self.raw_data[site_id] = site_doc
+
+            results = site_doc.get("results", [])
             for i, page in enumerate(results):
-                if not isinstance(page, dict):
-                    continue
-                    
-                total_pages += 1
-                
-                # A. Métadonnées complètes de la page
                 page_documents = self._create_page_documents(page, i, site_id)
                 for doc in page_documents:
                     self.documents.append(doc['content'])
                     self.metadata.append(doc['metadata'])
-                
-                # B. PRODUITS NORMAUX de la page
-                normal_products = page.get('products', [])
+
+                normal_products = page.get("products", [])
                 for j, product in enumerate(normal_products):
-                    if isinstance(product, dict):
-                        product_data = self._create_product_document(
-                            product, page.get('url', ''), site_id, i, j, "normal"
-                        )
-                        if product_data:
-                            self.documents.append(product_data['content'])
-                            self.metadata.append(product_data['metadata'])
-                            total_products += 1
-                
-                # C. PRODUITS PROMUS de la page
-                promoted_products = page.get('promoted_products', [])
+                    product_data = self._create_product_document(
+                        product, page.get("url", ""), site_id, i, j, "normal"
+                    )
+                    if product_data:
+                        self.documents.append(product_data['content'])
+                        self.metadata.append(product_data['metadata'])
+                        total_products += 1
+
+                promoted_products = page.get("promoted_products", [])
                 for j, product in enumerate(promoted_products):
-                    if isinstance(product, dict):
-                        product_data = self._create_product_document(
-                            product, page.get('url', ''), site_id, i, j, "promoted"
-                        )
-                        if product_data:
-                            self.documents.append(product_data['content'])
-                            self.metadata.append(product_data['metadata'])
-                            total_promoted_products += 1
-                
-                # D. Footer de la page
-                footer_documents = self._create_footer_documents(page, i, site_id)
-                for doc in footer_documents:
-                    self.documents.append(doc['content'])
-                    self.metadata.append(doc['metadata'])
-        
-        print(f"✅ {len(self.documents)} documents chargés")
-        print(f"📊 Statistiques: {total_products} produits normaux, {total_promoted_products} produits promus, {total_pages} pages")
-        
+                    product_data = self._create_product_document(
+                        product, page.get("url", ""), site_id, i, j, "promoted"
+                    )
+                    if product_data:
+                        self.documents.append(product_data['content'])
+                        self.metadata.append(product_data['metadata'])
+                        total_promoted_products += 1
+
+        print(f"✅ {len(self.documents)} documents chargés depuis MongoDB")
+        print(f"📊 {total_products} produits normaux, {total_promoted_products} produits promus, {len(all_sites)} sites")
+
         # Construire l'index FAISS
         if self.documents:
             self._build_faiss_index()
             self.is_initialized = True
         else:
-            print("⚠️ Aucun document à indexer")
             self.is_initialized = False
+
         
     def _calculate_data_hash(self, data_content: str) -> str:
         """Calcule un hash MD5 du contenu des données"""
