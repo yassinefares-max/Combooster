@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historique des Générations</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">📊 Historique des Générations</h1>
+
+        <!-- Statistiques -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">📈 Statistiques</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h4>{{ stats.total_generations }}</h4>
+                                <small>Total générations</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h4>{{ stats.calendar_generations }}</h4>
+                                <small>Calendriers</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h4>{{ stats.marketing_generations }}</h4>
+                                <small>Analyses marketing</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6>{{ stats.last_generation or 'Aucune' }}</h6>
+                                <small>Dernière génération</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Liste des générations -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">🕐 Dernières Générations</h5>
+            </div>
+            <div class="card-body">
+                {% if generations %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Question</th>
+                                <th>Aperçu</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for gen in generations %}
+                            <tr>
+                                <td>{{ gen.date }}</td>
+                                <td>
+                                    <span class="badge {% if gen.category == 'calendar' %}bg-warning{% elif gen.category == 'marketing' %}bg-success{% else %}bg-info{% endif %}">
+                                        {{ gen.category }}
+                                    </span>
+                                </td>
+                                <td>{{ gen.query[:50] }}{% if gen.query|length > 50 %}...{% endif %}</td>
+                                <td>{{ gen.response_preview[:100] }}{% if gen.response_preview|length > 100 %}...{% endif %}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    Aucune génération enregistrée dans l'historique.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">🏠 Retour à l'accueil</a>
+        </div>
+    </div>
+</body>
+</html>

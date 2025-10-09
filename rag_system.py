@@ -8,11 +8,21 @@ from sentence_transformers import SentenceTransformer
 import re
 import hashlib
 from pymongo import MongoClient
+import time
+from collections import deque
+
+# Connexion MongoDB
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
+mongo_client = MongoClient(MONGO_URI)
+mongo_db = mongo_client["scraping_db"]
+scrapes_collection = mongo_db["scraped_sites"]
+
 
 class RAGSystem:
-    def __init__(self, mistral_api_key: str):
+    def __init__(self, mistral_api_key: str, mongo_client=None):
         self.mistral_api_key = mistral_api_key
         self.mistral_api_url = "https://api.mistral.ai/v1/chat/completions"
+        self.history_manager = GenerationHistory(mongo_client)
         
          # Modèle d'embeddings - chargement différé
         self.embedding_model = None
@@ -42,28 +52,65 @@ class RAGSystem:
                 print(f"❌ Erreur lors du chargement du modèle d'embeddings: {e}")
                 raise e
         
-    def check_data_changes(self, file_path: str = "last_scrape.json") -> Dict:
-        """Vérifie si les données ont changé sans les charger"""
-        if not os.path.exists(file_path):
-            return {'has_changes': True, 'reason': 'file_not_found'}
-        
-        with open(file_path, 'r', encoding='utf-8') as f:
-            file_content = f.read()
-            new_hash = self._calculate_data_hash(file_content)
-        
-        changes_detected = (
-            not self.is_initialized or 
-            self.data_hash != new_hash or 
-            self.last_loaded_file != file_path
-        )
-        
-        return {
-            'has_changes': changes_detected,
-            'current_hash': self.data_hash,
-            'new_hash': new_hash,
-            'is_initialized': self.is_initialized,
-            'reason': 'not_initialized' if not self.is_initialized else 'data_changed' if self.data_hash != new_hash else 'no_changes'
-        }
+    def check_data_changes(self, file_path: str = None) -> Dict:
+        """Vérifie si les données ont changé en utilisant MongoDB"""
+        try:
+            # Vérifications de base
+            if not hasattr(self, 'is_initialized'):
+                return {'has_changes': True, 'reason': 'system_not_initialized'}
+                
+            if not self.is_initialized:
+                return {'has_changes': True, 'reason': 'not_initialized'}
+            
+            # Vérifier si on a accès à MongoDB via l'historique
+            if not hasattr(self, 'history_manager') or not self.history_manager.collection:
+                return {'has_changes': True, 'reason': 'mongo_not_available'}
+            
+            # Vérifier s'il y a des données dans MongoDB
+            try:
+                from pymongo import MongoClient
+                MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
+                mongo_client = MongoClient(MONGO_URI)
+                db = mongo_client["scraping_db"]
+                scrapes_collection = db["scraped_sites"]
+                
+                # Compter les documents dans la collection
+                total_sites = scrapes_collection.count_documents({})
+                
+                # Calculer un hash basé sur le contenu de la collection
+                # Pour simplifier, on utilise le count et le timestamp du dernier document
+                latest_site = scrapes_collection.find_one(sort=[('_id', -1)])
+                latest_timestamp = latest_site.get('scraped_at', '') if latest_site else ''
+                
+                # Créer un hash basé sur le count et le dernier timestamp
+                mongo_hash_content = f"{total_sites}_{latest_timestamp}"
+                new_hash = self._calculate_data_hash(mongo_hash_content)
+                
+                # Récupérer le hash précédent
+                current_hash = getattr(self, 'data_hash', None)
+                current_sites_count = getattr(self, 'last_sites_count', 0)
+                
+                changes_detected = (
+                    not self.is_initialized or 
+                    current_hash != new_hash or
+                    current_sites_count != total_sites
+                )
+                
+                return {
+                    'has_changes': changes_detected,
+                    'current_hash': current_hash,
+                    'new_hash': new_hash,
+                    'current_sites_count': current_sites_count,
+                    'new_sites_count': total_sites,
+                    'is_initialized': self.is_initialized,
+                    'reason': 'not_initialized' if not self.is_initialized else 'data_changed' if current_hash != new_hash else 'no_changes'
+                }
+                
+            except Exception as e:
+                return {'has_changes': True, 'reason': f'mongo_error: {str(e)}'}
+            
+        except Exception as e:
+            return {'has_changes': True, 'reason': f'error: {str(e)}'}
         
     def load_scraped_data(self, file_path: str = None):
         """Charge toutes les données depuis MongoDB"""
@@ -418,18 +465,27 @@ class RAGSystem:
         
         context_text = self._format_context(context)
         
-        system_prompt = """TU ES UN EXPERT EN MARKETING DIGITAL.
+        system_prompt = """TU ES UN EXPERT EN MARKETING DIGITAL ET COMMUNITY MANAGEMENT.
 
 TU ES UN EXPERT SENIOR EN DIGITAL MARKETING & E-COMMERCE avec 15 ans d'expérience.
 
 # DOMAINES D'EXPERTISE
-- Analyse de sites e-commerce
-- Optimisation du taux de conversion (CRO)
-- Stratégies de contenu et SEO
+- Stratégie de contenu et calendrier éditorial
+- Analyse de sites e-commerce et optimisation CRO
+- Community Management et gestion des réseaux sociaux
+- Stratégies de contenu viral et engagement
 - Analyse des produits et pricing
-- Marketing des promotions
-- Expérience utilisateur (UX)
-- Analytics et performance
+- Marketing des promotions et campagnes
+- Expérience utilisateur (UX) et fidélisation
+- Analytics et performance marketing
+
+# COMPÉTENCES SPÉCIFIQUES COMMUNITY MANAGEMENT
+- Création de calendriers de publication uniques
+- Stratégie de contenu par plateforme (Instagram, Facebook, Twitter, LinkedIn, TikTok)
+- Techniques d'engagement et de croissance communautaire
+- Analyse du sentiment et gestion de réputation
+- Création de campagnes virales
+- Gestion des influenceurs et partenariats
 
 # CONTEXTE DES DONNÉES
 Tu as accès à des données scrapées de sites e-commerce contenant :
@@ -438,15 +494,22 @@ Tu as accès à des données scrapées de sites e-commerce contenant :
 • MÉTADONNÉES → Titres, descriptions, prix, images
 • STRUCTURE SITE → Pages, navigation, contenu
 
-Réponds toujours en français, sois exhaustif et précis."""
+# DIRECTIVES DE RÉPONSE
+- Réponds toujours en français
+- Sois exhaustif, précis et actionnable
+- Propose des stratégies concrètes et mesurables
+- Différencie clairement produits normaux et promus
+- Organise les réponses par site et par pertinence
+- Pour les calendriers de publication, propose des créneaux optimaux et variés"""
 
         user_prompt = f"""QUESTION: {query}
 
 CONTEXTE COMPLET (toutes les données scrapées de tous les sites):
 {context_text}
 
-En tant qu'expert en marketing digital, analyse toutes les données ci-dessus et fournis une réponse COMPLÈTE, STRUCTURÉE et PRÉCISE. 
-Organise les produits par site, différencie clairement produits normaux et promus, donne tous les détails importants.
+En tant qu'expert en marketing digital et community management, analyse toutes les données ci-dessus et fournis une réponse COMPLÈTE, STRUCTURÉE et ACTIONNABLE. 
+
+Si la question concerne un calendrier de publication, assure-toi de proposer des créneaux variés et une stratégie de contenu différenciée.
 
 RÉPONSE DÉTAILLÉE:"""
         
@@ -658,11 +721,220 @@ RÉPONSE DÉTAILLÉE:"""
                 })
         
         return sites_list
+    
+    def generate_marketing_response(self, query: str, context: List[Dict] = None) -> str:
+        """Génère une réponse spécialisée marketing avec contrôle d'historique"""
+        if context is None:
+            context = self.search(query)
+        
+        # Vérifier si c'est une demande de calendrier
+        is_calendar_request = any(keyword in query.lower() for keyword in 
+                                ['calendrier', 'publication', 'programmation', 'éditorial', 'planning'])
+        
+        if is_calendar_request:
+            return self._generate_unique_calendar(query, context)
+        else:
+            response = self.generate_response(query, context)
+            self.history_manager.add_generation(query, response, "marketing")
+            return response
+
+    def _generate_unique_calendar(self, query: str, context: List[Dict], max_attempts: int = 3) -> str:
+        """Génère un calendrier de publication unique"""
+        for attempt in range(max_attempts):
+            response = self.generate_response(query, context)
+            
+            # Vérifier l'unicité du calendrier
+            if not self.history_manager.is_similar_calendar(response):
+                self.history_manager.add_generation(query, response, "calendar")
+                return response
+            
+            # Si trop similaire, ajouter une variation dans le prompt
+            variation_prompt = f"{query} - IMPORTANT: Propose un calendrier COMPLÈTEMENT DIFFÉRENT des précédents, avec des créneaux horaires variés et des types de contenu innovants."
+            response = self.generate_response(variation_prompt, context)
+        
+        # Fallback après plusieurs tentatives
+        self.history_manager.add_generation(query, response, "calendar")
+        return response
+    
 
 # Singleton pour le système RAG
 _rag_instance = None
 
-def get_rag_system(api_key: str = None):
+class GenerationHistory:
+    """Gère l'historique des générations dans MongoDB"""
+    
+    def __init__(self, mongo_client: str = None, max_history: int = 100):
+        self.max_history = max_history
+        
+        # Connexion MongoDB
+        if mongo_client is None:
+            MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
+        
+        try:
+            self.mongo_client = MongoClient(MONGO_URI)
+            self.db = self.mongo_client["scraping_db"]
+            self.collection = self.db["generation_history"]
+            
+            # Créer un index TTL pour expiration automatique après 30 jours
+            self.collection.create_index("timestamp", expireAfterSeconds=2592000)  # 30 jours
+            print("✅ Connexion MongoDB établie pour l'historique des générations")
+            
+        except Exception as e:
+            print(f"❌ Erreur connexion MongoDB pour l'historique: {e}")
+            self.collection = None
+    
+    def add_generation(self, query: str, response: str, category: str = "general"):
+        """Ajoute une génération à l'historique MongoDB"""
+        if self.collection is None:
+            print("⚠️ Collection MongoDB non disponible - historique non sauvegardé")
+            return
+            
+        try:
+            entry = {
+                'timestamp': time.time(),
+                'query': query,
+                'response_hash': hashlib.md5(response.encode()).hexdigest(),
+                'category': category,
+                'date': time.strftime("%Y-%m-%d %H:%M:%S"),
+                'response_preview': response[:200] + "..." if len(response) > 200 else response
+            }
+            
+            # Insérer dans MongoDB
+            self.collection.insert_one(entry)
+            
+            # Maintenir la limite d'historique
+            self._enforce_history_limit()
+            
+        except Exception as e:
+            print(f"❌ Erreur sauvegarde historique MongoDB: {e}")
+    
+    def _enforce_history_limit(self):
+        """Supprime les entrées les plus anciennes si on dépasse la limite"""
+        if self.collection is None:
+            return
+            
+        try:
+            count = self.collection.count_documents({})
+            if count > self.max_history:
+                # Trouver les documents les plus anciens à supprimer
+                oldest_entries = self.collection.find().sort("timestamp", 1).limit(count - self.max_history)
+                ids_to_delete = [entry['_id'] for entry in oldest_entries]
+                
+                if ids_to_delete:
+                    self.collection.delete_many({"_id": {"$in": ids_to_delete}})
+                    print(f"🗑️ {len(ids_to_delete)} anciennes entrées supprimées de l'historique")
+                    
+        except Exception as e:
+            print(f"❌ Erreur limitation historique: {e}")
+    
+    def is_similar_calendar(self, new_response: str, threshold: float = 0.8) -> bool:
+        """Vérifie si un calendrier est trop similaire à un précédent dans MongoDB"""
+        if self.collection is None:
+            return False
+            
+        try:
+            new_hash = hashlib.md5(new_response.encode()).hexdigest()
+            
+            # Rechercher les calendriers récents (7 derniers jours)
+            cutoff_time = time.time() - (7 * 24 * 60 * 60)
+            
+            recent_calendars = self.collection.find({
+                'category': 'calendar',
+                'timestamp': {'$gte': cutoff_time}
+            }).sort('timestamp', -1)
+            
+            for entry in recent_calendars:
+                similarity = self._calculate_similarity(new_response, entry['response_hash'])
+                if similarity > threshold:
+                    return True
+                    
+            return False
+            
+        except Exception as e:
+            print(f"❌ Erreur vérification similarité: {e}")
+            return False
+    
+    def _calculate_similarity(self, response1: str, hash2: str) -> float:
+        """Calcule la similarité entre deux réponses"""
+        if self.collection is None:
+            return 0.0
+            
+        try:
+            # Récupérer la réponse originale depuis MongoDB
+            original_entry = self.collection.find_one({'response_hash': hash2})
+            if not original_entry:
+                return 0.0
+                
+            response2 = original_entry.get('response_preview', '')
+            
+            # Similarité basée sur les mots-clés des calendriers
+            calendar_keywords = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche',
+                               'matin', 'midi', 'après-midi', 'soir', 'publication', 'post', 'contenu',
+                               'instagram', 'facebook', 'twitter', 'tiktok', 'linkedin']
+            
+            response1_lower = response1.lower()
+            response2_lower = response2.lower()
+            
+            matching_keywords = 0
+            for keyword in calendar_keywords:
+                if keyword in response1_lower and keyword in response2_lower:
+                    matching_keywords += 1
+            
+            return matching_keywords / len(calendar_keywords)
+            
+        except Exception as e:
+            print(f"❌ Erreur calcul similarité: {e}")
+            return 0.0
+    
+    def get_recent_calendars(self, days: int = 7) -> List[Dict]:
+        """Récupère les calendriers récents depuis MongoDB"""
+        if self.collection is None:
+            return []
+            
+        try:
+            cutoff_time = time.time() - (days * 24 * 60 * 60)
+            
+            calendars = self.collection.find({
+                'category': 'calendar',
+                'timestamp': {'$gte': cutoff_time}
+            }).sort('timestamp', -1)
+            
+            return list(calendars)
+            
+        except Exception as e:
+            print(f"❌ Erreur récupération calendriers: {e}")
+            return []
+    
+    def get_generation_stats(self) -> Dict:
+        """Retourne les statistiques de génération"""
+        if self.collection is None:
+            return {
+                'total_generations': 0,
+                'calendar_generations': 0,
+                'marketing_generations': 0,
+                'last_generation': None
+            }
+            
+        try:
+            total_count = self.collection.count_documents({})
+            calendar_count = self.collection.count_documents({'category': 'calendar'})
+            marketing_count = self.collection.count_documents({'category': 'marketing'})
+            
+            # Dernière génération
+            last_generation = self.collection.find_one(sort=[('timestamp', -1)])
+            
+            return {
+                'total_generations': total_count,
+                'calendar_generations': calendar_count,
+                'marketing_generations': marketing_count,
+                'last_generation': last_generation.get('date') if last_generation else None
+            }
+            
+        except Exception as e:
+            print(f"❌ Erreur statistiques génération: {e}")
+            return {}
+
+def get_rag_system(api_key: str = None,mongo_client =None):
     """
     Récupère ou initialise une instance du système RAG.
     """
@@ -675,10 +947,13 @@ def get_rag_system(api_key: str = None):
             print("⚠️ Aucune clé MISTRAL_API_KEY détectée — le RAG fonctionnera en mode local sans LLM.")
             api_key = "LOCAL_MODE"
 
+       
         try:
-            _rag_instance = RAGSystem(api_key)
+            _rag_instance = RAGSystem(api_key,mongo_client)
         except Exception as e:
             print(f"❌ Erreur lors de la création du RAGSystem : {e}")
+            import traceback
+            print(f"🔍 Détails: {traceback.format_exc()}")
             _rag_instance = None
 
     return _rag_instance

@@ -116,7 +116,64 @@
                 </form>
             </div>
         </div>
-
+         <!-- AJOUTEZ ICI LA NOUVELLE SECTION MARKETING -->
+        <!-- Section Marketing Digital & Community Management -->
+        <div class="card mt-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">🎯 Marketing Digital & Community Management</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5>📊 Analyse Marketing</h5>
+                                <p class="text-muted">Analyse approfondie des données pour des insights marketing</p>
+                                <a href="/marketing_analysis" class="btn btn-primary">
+                                    🚀 Lancer l'analyse
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5>📅 Calendrier de Contenu</h5>
+                                <p class="text-muted">Génère un calendrier éditorial unique pour les réseaux sociaux</p>
+                                <a href="/content_calendar" class="btn btn-success">
+                                    🗓️ Créer un calendrier
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-4 mb-2">
+                        <a href="/ask" class="btn btn-outline-primary w-100">
+                            🤖 Assistant RAG
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <a href="/rag_debug" class="btn btn-outline-secondary w-100">
+                            🔧 Debug RAG
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <form action="/init_rag_manual" method="POST" class="d-inline w-100">
+                            <button type="submit" class="btn btn-outline-info w-100">
+                                🔄 Initialiser RAG
+                            </button>
+                        </form>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <a href="/generation_history" class="btn btn-outline-dark w-100">
+                            📊 Historique
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Résultats -->
         {% if results %}
         <div class="card mt-4">

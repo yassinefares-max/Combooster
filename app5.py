@@ -10,10 +10,11 @@ from flask import Flask, render_template, request, redirect, url_for, flash, sen
 from bs4 import BeautifulSoup
 import tldextract
 import requests
-from rag_system import initialize_rag_system, get_rag_system,initialize_rag
+from rag_system import initialize_rag_system, get_rag_system,initialize_rag,GenerationHistory
 from extra_routes import extra_routes
 import hashlib
 from pymongo import MongoClient
+from community_manager_agent import CommunityManagerAgent
 
 
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
@@ -1340,7 +1341,7 @@ def init_rag_manual():
         return redirect(url_for("ask_question"))
     
     try:
-        rag_system = get_rag_system(MISTRAL_API_KEY)
+        rag_system = get_rag_system(MISTRAL_API_KEY,mongo_client)
         
         # Vérifier d'abord s'il y a des changements
         changes = rag_system.check_data_changes()
@@ -1567,7 +1568,7 @@ def ask_question():
     
     try:
         if MISTRAL_API_KEY:
-            rag_system = get_rag_system(MISTRAL_API_KEY)
+            rag_system = get_rag_system(MISTRAL_API_KEY,mongo_client)
             rag_stats = rag_system.get_stats()
             rag_initialized = rag_stats.get('initialized', False)
     except Exception as e:
@@ -1613,7 +1614,7 @@ def rag_search():
         return {"error": "Clé API Mistral non configurée"}, 400
     
     try:
-        rag_system = get_rag_system(MISTRAL_API_KEY)
+        rag_system = get_rag_system(MISTRAL_API_KEY,mongo_client)
         stats = rag_system.get_stats()
         
         if not stats.get('initialized', False):
@@ -1682,7 +1683,7 @@ def rebuild_index():
         return redirect(url_for("index"))
     
     try:
-        rag_system = get_rag_system(MISTRAL_API_KEY)
+        rag_system = get_rag_system(MISTRAL_API_KEY,mongo_client)
         
         # Recharger les données et reconstruire l'index
         rag_system.load_scraped_data()
@@ -1732,7 +1733,7 @@ def rag_debug():
         return redirect(url_for("ask_question"))
     
     try:
-        rag_system = get_rag_system(MISTRAL_API_KEY)
+        rag_system = get_rag_system(MISTRAL_API_KEY,mongo_client)
         
         # Vérifier si la méthode debug_indexation existe
         if hasattr(rag_system, 'debug_indexation'):
@@ -1785,6 +1786,153 @@ def load_index():
     
     return redirect(url_for("ask_question"))
 
+ 
+#Route pour l'agent de community management
+
+@app.route("/marketing_analysis", methods=["GET", "POST"])
+def marketing_analysis():
+    """Analyse marketing approfondie"""
+    if request.method == "GET":
+        # Afficher le formulaire d'analyse
+        return render_template("marketing_analysis.html")
+    
+    # POST - Traiter l'analyse
+    question = request.form.get("question", "").strip()
+    
+    if not question:
+        flash("Veuillez poser une question marketing.", "warning")
+        return redirect(url_for("marketing_analysis"))
+    
+    if not MISTRAL_API_KEY:
+        flash("Clé API Mistral non configurée.", "danger")
+        return redirect(url_for("marketing_analysis"))
+    
+    try:
+        rag_system = get_rag_system(MISTRAL_API_KEY,mongo_client)
+        
+        # Utiliser la méthode spécialisée marketing
+        if hasattr(rag_system, 'generate_marketing_response'):
+            response = rag_system.generate_marketing_response(question)
+        else:
+            # Fallback vers la méthode standard
+            response = rag_system.ask_question(question)
+        
+        return render_template("marketing_analysis.html", 
+                            question=question, 
+                            response=response,
+                            rag_initialized=True)
+        
+    except Exception as e:
+        flash(f"Erreur lors de l'analyse marketing: {str(e)}", "danger")
+        return redirect(url_for("marketing_analysis"))
+
+@app.route("/content_calendar", methods=["GET", "POST"])
+def content_calendar():
+    """Génère un calendrier de contenu unique"""
+    if request.method == "GET":
+        return render_template("content_calendar_form.html")
+    
+    if not MISTRAL_API_KEY:
+        flash("Clé API Mistral non configurée.", "danger")
+        return redirect(url_for("content_calendar"))
+    
+    try:
+        rag_system = get_rag_system(MISTRAL_API_KEY,mongo_client)
+        duration = int(request.form.get("duration", 7))
+        
+        if not hasattr(rag_system, 'cm_agent') or rag_system.cm_agent is None:
+            rag_system.cm_agent = CommunityManagerAgent(rag_system)
+        
+        products_data = []
+        
+        # Chargement des données avec logging
+        try:
+            all_sites = list(scrapes_collection.find())
+            print(f"📊 Sites trouvés dans MongoDB: {len(all_sites)}")
+            
+            for site_doc in all_sites:
+                results = site_doc.get("results", [])
+                print(f"📄 Pages dans le site: {len(results)}")
+                
+                for page in results:
+                    # Produits normaux
+                    for product in page.get('products', []):
+                        if isinstance(product, dict):
+                            product['is_promoted'] = False
+                            products_data.append(product)
+                    # Produits promus
+                    for product in page.get('promoted_products', []):
+                        if isinstance(product, dict):
+                            product['is_promoted'] = True
+                            products_data.append(product)
+                            
+            print(f"✅ Produits chargés depuis MongoDB: {len(products_data)}")
+            
+        except Exception as e:
+            print(f"❌ Erreur MongoDB: {e}")
+        
+        # Fallback
+        if not products_data and os.path.exists("last_scrape.json"):
+            try:
+                with open("last_scrape.json", "r", encoding="utf-8") as f:
+                    raw_data = json.load(f)
+                    print(f"📁 Fichier last_scrape.json chargé: {len(raw_data)} sites")
+                    
+                    for site_id, site_data in raw_data.items():
+                        if isinstance(site_data, dict):
+                            results = site_data.get('results', [])
+                            for page in results:
+                                if isinstance(page, dict):
+                                    for product in page.get('products', []):
+                                        if isinstance(product, dict):
+                                            product['is_promoted'] = False
+                                            products_data.append(product)
+                                    for product in page.get('promoted_products', []):
+                                        if isinstance(product, dict):
+                                            product['is_promoted'] = True
+                                            products_data.append(product)
+                print(f"✅ Produits chargés depuis JSON: {len(products_data)}")
+            except Exception as e:
+                print(f"❌ Erreur JSON: {e}")
+        
+        if not products_data:
+            flash("❌ Aucune donnée produit trouvée. Effectuez d'abord un scraping.", "warning")
+            return redirect(url_for("content_calendar"))
+        
+        print(f"🎯 Génération calendrier avec {len(products_data)} produits...")
+        calendar = rag_system.cm_agent.generate_content_calendar(products_data, duration)
+        
+        flash(f"✅ Calendrier généré! {duration} jours, {len(products_data)} produits", "success")
+        return render_template("content_calendar.html", 
+                            calendar=calendar,
+                            duration=duration)
+        
+    except Exception as e:
+        print(f"❌ Erreur génération calendrier: {e}")
+        import traceback
+        print(f"🔍 Détails: {traceback.format_exc()}")
+        flash(f"Erreur lors de la génération du calendrier: {str(e)}", "danger")
+        return redirect(url_for("content_calendar"))
+
+@app.route("/generation_history")
+def generation_history():
+    """Affiche l'historique des générations depuis MongoDB"""
+    try:
+        rag_system = get_rag_system(MISTRAL_API_KEY, mongo_client)
+        stats = rag_system.history_manager.get_generation_stats()
+        
+        # Récupérer les dernières générations
+        recent_generations = list(mongo_db.generation_history.find()
+                                 .sort('timestamp', -1)
+                                 .limit(20))
+        
+        return render_template("generation_history.html",
+                             stats=stats,
+                             generations=recent_generations)
+        
+    except Exception as e:
+        flash(f"Erreur lors de la récupération de l'historique: {str(e)}", "danger")
+        return redirect(url_for("index"))
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
