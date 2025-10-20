@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse Marketing - Assistant Expert</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .analysis-result {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        .question-box {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">🎯 Analyse Marketing Expert</h1>
+
+        <!-- Messages Flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">📊 Posez votre question marketing</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/marketing_analysis">
+                    <div class="mb-3">
+                        <label for="question" class="form-label">Votre question :</label>
+                        <textarea class="form-control" id="question" name="question" rows="4" 
+                                  placeholder="Exemple: Quelle stratégie marketing recommanderiez-vous pour les produits promus ? Quels sont les insights clients à partir des données collectées ?"
+                                  required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-lg">
+                        🚀 Analyser avec l'expert marketing
+                    </button>
+                </form>
+
+                <!-- Questions prédéfinies -->
+                <div class="mt-4">
+                    <h6>💡 Questions suggérées :</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-outline-primary btn-sm" onclick="setQuestion(this)">
+                            Analysez les produits les plus prometteurs
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" onclick="setQuestion(this)">
+                            Stratégie de contenu pour les réseaux sociaux
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" onclick="setQuestion(this)">
+                            Recommandations pricing et promotions
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" onclick="setQuestion(this)">
+                            Analyse concurrentielle basée sur les données
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Résultat de l'analyse -->
+        {% if question and response %}
+        <div class="card mt-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">📈 Résultat de l'analyse</h5>
+            </div>
+            <div class="card-body">
+                <div class="question-box">
+                    <strong>Question :</strong> {{ question }}
+                </div>
+                <div class="analysis-result">
+                    {{ response }}
+                </div>
+                
+                <div class="mt-3">
+                    <a href="{{ url_for('marketing_analysis') }}" class="btn btn-primary">
+                        🆕 Nouvelle analyse
+                    </a>
+                    <a href="{{ url_for('content_calendar') }}" class="btn btn-success">
+                        📅 Créer un calendrier
+                    </a>
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                        🏠 Retour à l'accueil
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function setQuestion(button) {
+            document.getElementById('question').value = button.textContent;
+        }
+
+        // Auto-focus sur le champ question
+        document.addEventListener('DOMContentLoaded', function() {
+            const questionInput = document.getElementById('question');
+            if (questionInput) {
+                questionInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>

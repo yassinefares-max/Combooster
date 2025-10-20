@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaires Détectés</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .form-card { 
+            border-left: 4px solid #0d6efd; 
+            margin-bottom: 1rem;
+        }
+        .field-mapping {
+            background-color: #f8f9fa;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-left: 3px solid #28a745;
+        }
+        .field-item {
+            padding: 8px;
+            margin: 3px 0;
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+        .badge-type {
+            font-size: 0.75rem;
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">📋 Formulaires Détectés et Mappings</h1>
+
+        <!-- Messages Flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Statistiques Globales -->
+        <div class="stats-card">
+            <div class="row text-center">
+                <div class="col-md-3">
+                    <h2>{{ stats.total_pages }}</h2>
+                    <p class="mb-0">Pages Scrapées</p>
+                </div>
+                <div class="col-md-3">
+                    <h2>{{ stats.pages_with_forms }}</h2>
+                    <p class="mb-0">Pages avec Formulaires</p>
+                </div>
+                <div class="col-md-3">
+                    <h2>{{ stats.total_forms }}</h2>
+                    <p class="mb-0">Formulaires Détectés</p>
+                </div>
+                <div class="col-md-3">
+                    <h2>{{ stats.total_mappings }}</h2>
+                    <p class="mb-0">Mappings Créés</p>
+                </div>
+            </div>
+            
+            {% if stats.forms_by_type %}
+            <div class="mt-3">
+                <small>Types de formulaires:</small>
+                <div class="d-flex gap-2 mt-2">
+                    {% for form_type, count in stats.forms_by_type.items() %}
+                        <span class="badge bg-light text-dark">{{ form_type }}: {{ count }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Boutons d'export -->
+        <div class="mb-4">
+            <a href="/download_form_mappings_csv" class="btn btn-success">
+                📥 Télécharger CSV Mappings
+            </a>
+            <a href="/download_form_mappings_json" class="btn btn-primary">
+                📥 Télécharger JSON Mappings
+            </a>
+            <a href="/" class="btn btn-secondary">← Retour au scraping</a>
+        </div>
+
+        <!-- Liste des formulaires par page -->
+        {% if forms_data %}
+            {% for page_data in forms_data %}
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-1">{{ page_data.page_title or "Sans titre" }}</h5>
+                    <small>
+                        <a href="{{ page_data.page_url }}" target="_blank" class="text-white">
+                            {{ page_data.page_url }}
+                        </a>
+                    </small>
+                    <div class="mt-2">
+                        <span class="badge bg-light text-dark">
+                            {{ page_data.forms|length }} formulaire(s)
+                        </span>
+                        <span class="badge bg-light text-dark">
+                            {{ page_data.form_mappings|length }} mapping(s)
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    
+                    <!-- Formulaires -->
+                    {% for form in page_data.forms %}
+                    <div class="form-card card mb-3">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>Formulaire #{{ form.form_index + 1 }}</strong>
+                                    <span class="badge badge-type bg-info ms-2">{{ form.form_type }}</span>
+                                </div>
+                                <div>
+                                    <span class="badge bg-secondary">{{ form.method }}</span>
+                                    {% if form.form_id %}
+                                        <span class="badge bg-light text-dark">ID: {{ form.form_id }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if form.action %}
+                                <small class="text-muted">Action: {{ form.action }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <h6>Champs détectés ({{ form.fields|length }})</h6>
+                            
+                            {% for field in form.fields %}
+                            <div class="field-item">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <strong>{{ field.name or 'Sans nom' }}</strong>
+                                        {% if field.label %}
+                                            <span class="text-muted">- {{ field.label }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-secondary">{{ field.field_type }}</span>
+                                        <span class="badge bg-info">{{ field.detected_type }}</span>
+                                        {% if field.required %}
+                                            <span class="badge bg-danger">Requis</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% if field.placeholder %}
+                                    <small class="text-muted">Placeholder: {{ field.placeholder }}</small>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <!-- Mappings produits-formulaires -->
+                    {% if page_data.form_mappings %}
+                    <div class="mt-3">
+                        <h6 class="text-success">Mappings Automatiques ({{ page_data.form_mappings|length }})</h6>
+                        
+                        {% for mapping in page_data.form_mappings %}
+                        <div class="field-mapping">
+                            <div class="d-flex justify-content-between mb-2">
+                                <strong>Produit: {{ mapping.product.name }}</strong>
+                                <span class="badge bg-success">
+                                    Formulaire #{{ mapping.form.form_index + 1 }}
+                                </span>
+                            </div>
+                            
+                            <table class="table table-sm table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Champ</th>
+                                        <th>Type Détecté</th>
+                                        <th>Valeur Mappée</th>
+                                        <th>Confiance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for field_name, field_data in mapping.field_mappings.items() %}
+                                    <tr>
+                                        <td><code>{{ field_name }}</code></td>
+                                        <td><span class="badge bg-info">{{ field_data.detected_type }}</span></td>
+                                        <td>{{ field_data.value|truncate(50) }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ 'success' if field_data.confidence == 'high' else 'warning' }}">
+                                                {{ field_data.confidence }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info">
+                Aucun formulaire détecté dans les données scrapées. 
+                Assurez-vous d'avoir effectué un scraping avec l'option de détection des formulaires activée.
+            </div>
+        {% endif %}
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

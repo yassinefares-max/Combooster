@@ -10,14 +10,17 @@ from flask import Flask, render_template, request, redirect, url_for, flash, sen
 from bs4 import BeautifulSoup
 import tldextract
 import requests
-from rag_system import initialize_rag_system, get_rag_system,initialize_rag,GenerationHistory
+from rag_system import initialize_rag_system, get_rag_system,GenerationHistory
 from extra_routes import extra_routes
 import hashlib
 from pymongo import MongoClient
 from community_manager_agent import CommunityManagerAgent
+import random
 
-
-MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
+MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY","BSuPs2Np1lg2Yv46NqYrQlxKlBbIPpgf")
+print(f"🔑 MISTRAL_API_KEY chargée: {'OUI' if MISTRAL_API_KEY else 'NON'}")
+if MISTRAL_API_KEY:
+    print(f"🔑 Clé API (premiers caractères): {MISTRAL_API_KEY[:10]}...")
 
 # Playwright import (sync)
 try:
@@ -36,7 +39,11 @@ mongo_client = MongoClient(MONGO_URI)
 mongo_db = mongo_client["scraping_db"]
 scrapes_collection = mongo_db["scraped_sites"]
 
+import threading
+last_request_time = {}
+request_lock = threading.Lock()
 
+session_cache = {}
 
 # CONFIG par défaut
 DEFAULT_MAX_PAGES = 50
@@ -44,6 +51,18 @@ DEFAULT_MAX_DEPTH = 2
 REQUEST_TIMEOUT = 20  # secondes pour requests
 PLAYWRIGHT_TIMEOUT = 30000  # ms pour playwright
 
+
+
+def smart_delay(domain, min_delay=2, max_delay=5):
+    """Délai intelligent entre requêtes pour éviter les rate limits"""
+    with request_lock:
+        now = time.time()
+        if domain in last_request_time:
+            elapsed = now - last_request_time[domain]
+            if elapsed < min_delay:
+                wait_time = random.uniform(min_delay, max_delay)
+                time.sleep(wait_time)
+        last_request_time[domain] = time.time()
 # Utilitaires
 def same_domain(url1, url2):
     e1 = tldextract.extract(url1)
@@ -59,94 +78,169 @@ def normalize_link(base, link):
     return urllib.parse.urljoin(base, link)
 
 def extract_products(html, url):
-    """Extrait les informations des produits avec une détection avancée"""
+    """Extrait les informations des produits avec détection avancée"""
     soup = BeautifulSoup(html, "html.parser")
     products = []
     
-    # APPROCHE 1: Sélecteurs CSS étendus pour toutes les plateformes
+    print(f"📄 Taille HTML: {len(html)} caractères")
+    
+    # Debug: compter les sélecteurs
+    debug_counts = {
+        '.product-miniature': len(soup.select('.product-miniature')),
+        '.product': len(soup.select('.product')),
+        '.ajax_block_product': len(soup.select('.ajax_block_product')),
+        '[class*="product"]': len(soup.select('[class*="product"]')),
+        'article': len(soup.select('article')),
+        '.item': len(soup.select('.item'))
+    }
+    print(f"🔍 Debug sélecteurs: {debug_counts}")
+    
+    # APPROCHE 1: Sélecteurs CSS
     products.extend(extract_with_css_selectors(soup, url))
+    print(f"📦 Approche 1 (CSS): {len(products)} produits")
     
-    # APPROCHE 2: Détection par contenu pour les sites complexes
-    if len(products) < 2:  # Si peu de produits trouvés
-        products.extend(extract_with_content_analysis(soup, url))
+    # APPROCHE 2: Analyse de contenu
+    if len(products) < 2:
+        content_products = extract_with_content_analysis(soup, url)
+        products.extend(content_products)
+        print(f"📦 Approche 2 (Contenu): {len(content_products)} produits")
     
-    # APPROCHE 3: Détection par grilles et listes
-    products.extend(extract_with_grid_detection(soup, url))
+    # APPROCHE 3: Grilles
+    grid_products = extract_with_grid_detection(soup, url)
+    products.extend(grid_products)
+    print(f"📦 Approche 3 (Grilles): {len(grid_products)} produits")
     
-    # APPROCHE 4: Détection par données structurées
-    products.extend(extract_from_structured_data(soup, url))
+    # APPROCHE 4: Données structurées
+    structured_products = extract_from_structured_data(soup, url)
+    products.extend(structured_products)
+    print(f"📦 Approche 4 (Structurées): {len(structured_products)} produits")
     
-    # Dédupliquer les produits
-    return deduplicate_products(products)
+    # APPROCHE 5: Regex texte (spécial Comptoirs Richard)
+    if 'comptoirsrichard' in url:
+        regex_products = extract_products_by_text_pattern(soup, url)
+        products.extend(regex_products)
+        print(f"📦 Approche 5 (Regex): {len(regex_products)} produits")
+    
+    # Déduplication
+    unique_products = deduplicate_products(products)
+    print(f"✅ Total final: {len(unique_products)} produits uniques")
+    
+    return unique_products
+
+def extract_products_by_text_pattern(soup, base_url):
+    """Extrait les produits à partir de motifs textuels comme 'Nom16,97 €'"""
+    products = []
+    # Récupérer tout le texte visible
+    text = soup.get_text()
+    # Pattern : texte (>=8 caractères) suivi immédiatement d'un prix en €
+    pattern = r'([A-Za-zÀ-ÿ0-9\s\-&éèêëçîïôù\’\'\(\)]{8,}?)(\d+,\d{2}\s*€)'
+    matches = re.findall(pattern, text)
+    for name, price in matches:
+        name = name.strip()
+        price = price.strip()
+        # Filtrer les faux positifs (trop court, contient "€", etc.)
+        if len(name) < 8 or "€" in name or name.isdigit():
+            continue
+        # Nettoyer les doublons de prix ou de nom (cas fréquent sur ce site)
+        if price in name:
+            name = name.replace(price, "").strip()
+        products.append({
+            "name": name,
+            "price": price,
+            "product_url": base_url,
+            "is_promoted": True  # car souvent dans "Produits connexes"
+        })
+    return products
+
 
 def extract_with_css_selectors(soup, url):
     """Extraction avec une gamme très étendue de sélecteurs CSS"""
     products = []
     
-    # Sélecteurs complets pour toutes les plateformes e-commerce
-    selectors = [
-        # PrestaShop
-        '.product-miniature', '.ajax_block_product', '.product-container',
-        '.product-box', '.item', '.product-item', '.product-thumbnail',
-        
-        # WooCommerce
-        '.product', '.type-product', '.woocommerce-product',
-        '.wc-product', '.product-type-simple', '.product-type-variable',
-        
-        # Shopify
-        '.grid__item', '.product-grid-item', '.collection-item',
-        '.product-item', '.product-card', '.product-block',
-        
-        # Magento
-        '.product-item-info', '.product-item-details',
-        '.product-image-container', '.product-item-photo',
-        
-        # BigCommerce
-        '.productBlock', '.productList', '.product',
-        
-        # Squarespace
-        '.product', '.product-item', '.grid-product',
-        
-        # Wix
-        '.product-item', '.product-wrapper', '.product-content',
-        
-        # Generic e-commerce
-        '.product', '.item', '.card', '.product-item', '.product-card',
-        '.goods-item', '.product-grid-item', '.shop-item', '.catalog-item',
-        '.store-item', '.boutique-item', '.commerce-item',
-        
-        # French e-commerce
-        '.produit', '.article', '.item-produit', '.carte-produit',
-        '.boutique-produit', '.produit-item', '.article-produit',
-        '.fiche-produit', '.liste-produit',
-        
-        # Data attributes
-        '[data-product]', '[data-item]', '[data-product-id]',
-        '[data-product-name]', '[data-product-price]',
-        
-        # Class patterns
-        '[class*="product"]', '[class*="item"]', '[class*="card"]',
-        '[class*="article"]', '[class*="goods"]', '[class*="shop"]',
-        '[class*="catalog"]', '[class*="store"]', '[class*="commerce"]',
-        
-        # List items
-        'li.product', 'li.item', 'li.product-item', 'li.goods-item',
-        'li.shop-item', 'li.catalog-item',
-        
-        # Div items
-        'div.product', 'div.item', 'div.product-item', 'div.goods-item',
-        'div.shop-item', 'div.catalog-item',
-        
-        # Article items
-        'article.product', 'article.item', 'article.product-item',
-        
-        # Section items
-        'section.product', 'section.item', 'section.product-item',
-        
-        # Specific to problematic sites
-        '.elementor-widget', '.vc_column_container', '.module',
-        '.content', '.block', '.widget', '.component'
-    ]
+   
+     # Sélecteurs complets pour toutes les plateformes e-commerce
+    if 'comptoirsrichard' in url:
+        comptoirs_selectors = [
+            'article.product-miniature',
+            '.product-miniature',
+            '.products article',
+            '#content article',
+            '.featured-products article',
+            '.product-list article',
+            'div[itemtype*="Product"]',
+            '.js-product-miniature'
+        ]
+        selectors = comptoirs_selectors + [...]  # Ajouter aux sélecteurs existants
+    else:
+        selectors = [
+            # PrestaShop
+            '.product-miniature', '.ajax_block_product', '.product-container',
+            '.product-box', '.item', '.product-item', '.product-thumbnail',
+            
+            # WooCommerce
+            '.product', '.type-product', '.woocommerce-product',
+            '.wc-product', '.product-type-simple', '.product-type-variable',
+            
+            # Shopify
+            '.grid__item', '.product-grid-item', '.collection-item',
+            '.product-item', '.product-card', '.product-block',
+            
+            # Magento
+            '.product-item-info', '.product-item-details',
+            '.product-image-container', '.product-item-photo',
+            
+            # BigCommerce
+            '.productBlock', '.productList', '.product',
+            
+            # Squarespace
+            '.product', '.product-item', '.grid-product',
+            
+            # Wix
+            '.product-item', '.product-wrapper', '.product-content',
+            
+            # Generic e-commerce
+            '.product', '.item', '.card', '.product-item', '.product-card',
+            '.goods-item', '.product-grid-item', '.shop-item', '.catalog-item',
+            '.store-item', '.boutique-item', '.commerce-item',
+            
+            # French e-commerce
+            '.produit', '.article', '.item-produit', '.carte-produit',
+            '.boutique-produit', '.produit-item', '.article-produit',
+            '.fiche-produit', '.liste-produit',
+            
+            # Data attributes
+            '[data-product]', '[data-item]', '[data-product-id]',
+            '[data-product-name]', '[data-product-price]',
+            
+            # Class patterns
+            '[class*="product"]', '[class*="item"]', '[class*="card"]',
+            '[class*="article"]', '[class*="goods"]', '[class*="shop"]',
+            '[class*="catalog"]', '[class*="store"]', '[class*="commerce"]',
+            
+            # List items
+            'li.product', 'li.item', 'li.product-item', 'li.goods-item',
+            'li.shop-item', 'li.catalog-item',
+            
+            # Div items
+            'div.product', 'div.item', 'div.product-item', 'div.goods-item',
+            'div.shop-item', 'div.catalog-item',
+            
+            # Article items
+            'article.product', 'article.item', 'article.product-item',
+            
+            # Section items
+            'section.product', 'section.item', 'section.product-item',
+            
+            # Specific to problematic sites
+            '.elementor-widget', '.vc_column_container', '.module',
+            '.content', '.block', '.widget', '.component'
+            
+            # Sélecteurs spécifiques à Comptoirs Richard
+            '.product-description',
+            '.product-item-related',
+            '[class*="product"]',
+            '.price + h3, .price + a, .price ~ *',
+        ]
     
     for selector in selectors:
         try:
@@ -165,53 +259,58 @@ def extract_with_css_selectors(soup, url):
 # ================================
 
 def extract_promoted_products(html, base_url):
-    """Extrait les produits promus avec une détection avancée"""
+    """Extrait les produits promus UNIQUEMENT depuis le carrousel Instagram"""
     soup = BeautifulSoup(html, "html.parser")
     found_products = []
-    
-    # Sélecteurs pour produits promus
-    PROMOTED_SELECTORS = [
-        '.promoted', '.featured', '.highlighted', '.special', '.banner-product',
-        '.main-product', '.hero-product', '.spotlight', '.showcase',
-        '[data-promoted]', '[data-featured]', '.new', '.nouveau',
-        '.best-seller', '.best-seller', '.top-product'
-    ]
-    
-    # Recherche dans les sélecteurs de promotion
-    for selector in PROMOTED_SELECTORS:
-        try:
-            elements = soup.select(selector)
-            for element in elements:
-                product_data = extract_promoted_product_data(element, base_url)
-                if product_data and product_data.get('name'):
-                    found_products.append(product_data)
-        except Exception:
-            continue
-    
-    # Si peu de produits promus trouvés, chercher dans les sections principales
-    if len(found_products) < 3:
-        main_sections = soup.select('.main, .hero, .banner, .header, section')
-        for section in main_sections:
-            products = extract_products_from_section(section, base_url)
-            found_products.extend(products)
-    
-    # Marquer explicitement tous les produits comme promus
-    for product_data in found_products:
-        product_data['is_promoted'] = True
-        product_data['promotion_detected'] = True
-        # S'assurer que les indicateurs de promotion existent
-        if 'promotion_indicators' not in product_data:
-            product_data['promotion_indicators'] = ['auto_detected']
-    
-    # Dédupliquer
+
+    # Cible les listes de produits dans les posts Instagram
+    product_lists = soup.select('.ybc_ins_popup_product_list')
+    for product_list in product_lists:
+        product_items = product_list.select('.ybc_ins_popup_product_item')
+        for item in product_items:
+            try:
+                # Nom
+                name_elem = item.select_one('.product_name')
+                if not name_elem:
+                    continue
+                name = name_elem.get_text(strip=True)
+                if not name or len(name) < 5:
+                    continue
+
+                # Prix
+                price_elem = item.select_one('.price')
+                price = price_elem.get_text(strip=True) if price_elem else ""
+
+                # URL
+                link_elem = item.select_one('a[href]')
+                product_url = urllib.parse.urljoin(base_url, link_elem['href']) if link_elem else base_url
+
+                # Image (optionnel)
+                img_elem = item.select_one('.ybc_ins_popup_product_image')
+                image = img_elem['src'] if img_elem and img_elem.get('src') else ""
+
+                found_products.append({
+                    "name": name,
+                    "price": price,
+                    "product_url": product_url,
+                    "image": image,
+                    "is_promoted": True,
+                    "promotion_detected": True,
+                    "promotion_indicators": ["instagram_carousel"]
+                })
+            except Exception as e:
+                continue
+
+    # Déduplication
     unique_products = []
     seen = set()
-    for product in found_products:
-        key = f"{product.get('name', '').lower()}|{product.get('product_url', '')}"
-        if key not in seen and product.get('name'):
+    for p in found_products:
+        key = f"{p['name'].lower()}|{p['price']}"
+        if key not in seen:
             seen.add(key)
-            unique_products.append(product)
-    
+            unique_products.append(p)
+
+    print(f"🎯 Produits promus extraits depuis Instagram : {len(unique_products)}")
     return unique_products
 
 def extract_promoted_product_data(element, base_url):
@@ -394,18 +493,20 @@ def extract_products_from_section(section, base_url):
 
 
 def extract_with_content_analysis(soup, url):
-    """Analyse de contenu pour détecter les produits par leur structure"""
+    """Analyse de contenu + fallback regex pour sites comme Comptoirs Richard"""
     products = []
-    
-    # Recherche d'éléments qui ressemblent à des produits
-    potential_elements = soup.find_all(['div', 'article', 'li', 'section', 'tr'])
-    
+    # Méthode existante (par éléments)
+    potential_elements = soup.find_all(['div', 'article', 'li', 'section', 'p'])
     for element in potential_elements:
-        # Analyser le contenu de l'élément
         if is_likely_product_element(element):
             product_data = extract_product_data_from_content(element, url)
             if product_data and product_data.get('name'):
                 products.append(product_data)
+    
+    # ➕ NOUVEAU : fallback par regex sur tout le texte
+    if len(products) < 5:  # Si peu de produits trouvés
+        regex_products = extract_products_by_text_pattern(soup, url)
+        products.extend(regex_products)
     
     return products
 
@@ -825,7 +926,7 @@ def extract_footer(html, url):
     return footer_data
 
 
-def extract_all_data(html, url):
+def extract_all_data(html, url,depth=0):
     """Extrait toutes les données structurées d'une page - Version améliorée"""
     soup = BeautifulSoup(html, "html.parser")
     
@@ -882,17 +983,20 @@ def extract_all_data(html, url):
     # Extraire les produits avec catégorisation
     all_products = extract_products(html, url)
     promoted_products = []
-    if url.endswith('/') or '/home' in url.lower() or url.count('/') <= 2:
-        # C'est probablement la page d'accueil
-        promoted_products = extract_promoted_products(html, url)
-        print(f"🎯 Page d'accueil détectée: {len(promoted_products)} produits promus trouvés")
+    is_homepage = is_likely_homepage(url, depth)
+    
+    if is_homepage:
+        print(f"🎯 Page d'accueil détectée - Tous les {len(all_products)} produits sont marqués comme promus")
         
-    # Marquer les produits promus
-    for product in promoted_products:
-        product['is_promoted'] = True
-        product['promoted_on_homepage'] = True
-        if not product.get('description'):
-            product['description'] = f"PRODUIT PROMU - {product.get('name', '')}"
+        # Copier tous les produits comme produits promus
+        for product in all_products:
+            promoted_product = product.copy()
+            promoted_product.update({
+                "is_promoted": True,
+                "promoted_on_homepage": True,
+                "promotion_type": "homepage_featured"
+            })
+            promoted_products.append(promoted_product)
     
     # Pour les produits normaux, s'assurer qu'ils ne sont pas marqués comme promus
     for product in all_products:
@@ -908,17 +1012,42 @@ def extract_all_data(html, url):
         "meta_description": meta_desc,
         "h1": h1,
         "excerpt": excerpt,
-        "first_paragraph": first_paragraph,  # Maintenant cette clé existe
-        "content_text": content_text[:20],  # Garder les 20 premiers éléments
-        "images": images[:15],  # Limiter mais garder plus d'images
+        "first_paragraph": first_paragraph,
+        "content_text": content_text[:20],
+        "images": images[:15],
         "meta_data": meta_data,
         "structured_data": structured_data,
-        "products": all_products,
-        "promoted_products": promoted_products,
+        "products": all_products,           # Produits normaux (is_promoted=False)
+        "promoted_products": promoted_products,  # Produits promus (is_promoted=True)
         "footer": extract_footer(html, url),
         "word_count": len(soup.get_text().split()),
+        "is_homepage": is_homepage,
         "scraped_at": time.strftime("%Y-%m-%d %H:%M:%S")
     }
+
+def is_likely_homepage(url, depth):
+    """Détermine si l'URL est une page d'accueil"""
+    parsed = urllib.parse.urlparse(url)
+    path = parsed.path.rstrip('/')
+    
+    # Critères simples pour identifier la page d'accueil
+    homepage_indicators = [
+        depth == 0,  # URL de départ
+        path == "" or path == "/",  # Racine du site
+        '/home' in path.lower(),
+        '/accueil' in path.lower(), 
+        '/index' in path.lower(),
+        path.count('/') <= 2,  # Peu de segments dans le chemin
+        # Domaines simples sans chemin complexe
+        len(path.split('/')) <= 2 and not any(ext in path for ext in ['.html', '.php', '.asp'])
+    ]
+    
+    is_home = any(homepage_indicators)
+    
+    if is_home:
+        print(f"🏠 Page d'accueil détectée: {url} (depth: {depth})")
+    
+    return is_home
 
 def extract_structured_data(soup, url):
     """Extrait toutes les données structurées"""
@@ -1095,30 +1224,146 @@ def extract_links(html, base_url):
     return list(links)
 
 def fetch_with_requests(url):
+    domain = urllib.parse.urlparse(url).netloc
+    
+    # Réutiliser la session pour le même domaine
+    if domain not in session_cache:
+        session_cache[domain] = requests.Session()
+    
+    session = session_cache[domain]
+    
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+        "Accept-Language": "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Connection": "keep-alive",
+        "Upgrade-Insecure-Requests": "1",
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "none",
+        "Sec-Fetch-User": "?1",
+        "Cache-Control": "max-age=0",
+        "DNT": "1",
+        "Referer": f"https://{domain}/"
+    }
+    
     try:
-        resp = requests.get(url, timeout=REQUEST_TIMEOUT, headers={"User-Agent":"Mozilla/5.0 (compatible; AutoScraper/1.0)"})
+        resp = session.get(url, timeout=REQUEST_TIMEOUT, headers=headers, allow_redirects=True)
         resp.raise_for_status()
         return resp.text, None
     except Exception as e:
         return None, str(e)
 
-def fetch_with_playwright(url, timeout_ms=PLAYWRIGHT_TIMEOUT):
+def fetch_with_playwright(url, timeout_ms=60000):
+    """Récupère le HTML avec Playwright (anti-blocage, sans attente networkidle)"""
     if not PLAYWRIGHT_AVAILABLE:
         return None, "Playwright non disponible"
     try:
         with sync_playwright() as pw:
-            browser = pw.chromium.launch(headless=True)
-            context = browser.new_context()
+            browser = pw.chromium.launch(
+                headless=True,
+                args=[
+                    '--no-sandbox',
+                    '--disable-blink-features=AutomationControlled',
+                    '--disable-dev-shm-usage',
+                    '--disable-web-security',
+                    '--disable-features=IsolateOrigins,site-per-process',
+                    '--disable-setuid-sandbox',
+                    '--disable-accelerated-2d-canvas',
+                    '--disable-gpu'
+                ]
+            )
+
+            context = browser.new_context(
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                viewport={'width': 1920, 'height': 1080},
+                locale='fr-FR',
+                timezone_id='Europe/Paris',
+                java_script_enabled=True,
+                ignore_https_errors=True
+            )
+
+            # 🔒 Bloquer images, pubs et trackers
+            context.route("**/*", lambda route: route.abort() if any(
+                ext in route.request.url.lower()
+                for ext in [".jpg", ".jpeg", ".png", ".gif", "doubleclick", "googletag", "ads", "analytics", "facebook"]
+            ) else route.continue_())
+
             page = context.new_page()
-            page.goto(url, timeout=timeout_ms)
-            page.wait_for_load_state("networkidle", timeout=timeout_ms)
+            print(f"🌐 Chargement de {url}...")
+
+            # Script anti-détection
+            page.add_init_script("""
+                Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
+                Object.defineProperty(navigator, 'plugins', {get: () => [1,2,3,4,5]});
+                Object.defineProperty(navigator, 'languages', {get: () => ['fr-FR','fr','en-US','en']});
+                window.chrome = {runtime: {}};
+            """)
+
+            # ⚡ Charger sans blocage total
+            page.goto(url, timeout=timeout_ms, wait_until='domcontentloaded')
+
+            # Attendre manuellement le contenu dynamique
+            try:
+                page.wait_for_selector('.product, .product-miniature, [class*="product"]', timeout=15000)
+                print("✅ Produits détectés dans le DOM")
+            except:
+                print("⚠️ Aucun produit détecté immédiatement — tentative de capture élargie...")
+
+            # Scroller plusieurs fois pour forcer le lazy loading
+            for i in range(5):
+                page.evaluate(f"window.scrollTo(0, {(i+1)*1000})")
+                page.wait_for_timeout(1500)
+
+            # Attente finale 5 secondes pour scripts restants
+            page.wait_for_timeout(5000)
+
             html = page.content()
             browser.close()
+            print("✅ HTML récupéré sans blocage Playwright")
             return html, None
-    except PlaywrightTimeout as t:
-        return None, f"Timeout Playwright: {t}"
+
     except Exception as e:
+        print(f"❌ Erreur Playwright: {e}")
+        import traceback
+        traceback.print_exc()
         return None, f"Erreur Playwright: {e}"
+
+
+def fetch_url_with_retry(url, render_js=False, max_retries=3):
+    """Tente de récupérer l'URL avec plusieurs essais et délais intelligents"""
+    domain = urllib.parse.urlparse(url).netloc
+    
+    for attempt in range(max_retries + 1):
+        try:
+            # Délai intelligent avant chaque requête
+            smart_delay(domain, min_delay=2, max_delay=5)
+            
+            if render_js and PLAYWRIGHT_AVAILABLE:
+                html, error = fetch_with_playwright(url)
+            else:
+                html, error = fetch_with_requests(url)
+                
+            if html and not error:
+                return html, None
+                
+            # Alterner entre les méthodes si échec
+            if html is None and PLAYWRIGHT_AVAILABLE and not render_js:
+                time.sleep(random.uniform(1, 3))  # Pause aléatoire
+                html, error = fetch_with_playwright(url)
+                if html:
+                    return html, None
+                    
+        except Exception as e:
+            error = str(e)
+            
+        if attempt < max_retries:
+            backoff_time = (2 ** attempt) + random.uniform(0, 1)  # Backoff exponentiel
+            time.sleep(backoff_time)
+            print(f"🔄 Nouvelle tentative {attempt + 1}/{max_retries} pour {url} (attente: {backoff_time:.1f}s)")
+    
+    return None, error or "Échec après plusieurs tentatives"
 
 # Fonction pour calculer les statistiques
 def calculate_statistics(results):
@@ -1150,7 +1395,12 @@ def index():
 @app.route("/scrape", methods=["POST"])
 def scrape():
     start_url = request.form.get("start_url", "").strip()
-    render_js = True if request.form.get("render_js") == "on" else False
+    
+    if 'comptoirsrichard' in start_url.lower():
+        render_js = True
+        print("🔧 Comptoirs Richard détecté - Forçage Playwright")
+    else:
+        render_js = True if request.form.get("render_js") == "on" else False
     scrape_products = True if request.form.get("scrape_products") == "on" else False
     scrape_promoted_products = True if request.form.get("scrape_promoted_products") == "on" else False
     scrape_footer = True if request.form.get("scrape_footer") == "on" else False
@@ -1195,24 +1445,31 @@ def scrape():
         if not same_domain(start_url, url):
             continue
 
-        # marquer visité
         visited.add(url)
+
 
         # Récup HTML
         html = None
         error = None
-        if render_js and PLAYWRIGHT_AVAILABLE:
+        
+    
+        if 'comptoirsrichard' in url.lower():
+            html, error = fetch_with_playwright(url, timeout_ms=60000)
+        elif render_js and PLAYWRIGHT_AVAILABLE:
             html, error = fetch_with_playwright(url)
-            if html is None:
-                html, error = fetch_with_requests(url)
         else:
             html, error = fetch_with_requests(url)
-            if html is None and PLAYWRIGHT_AVAILABLE:
-                html, error = fetch_with_playwright(url)
 
         if html:
             # Extraire toutes les données
-            all_data = extract_all_data(html, url)
+            all_data = extract_all_data(html, url,depth)
+            
+            # Log des résultats
+            total_products = len(all_data.get("products", []))
+            promoted_products = len(all_data.get("promoted_products", []))
+            is_homepage = all_data.get("is_homepage", False)
+            
+            print(f"📊 Page {url} - Produits: {total_products} - Promus: {promoted_products} - Accueil: {is_homepage}")
             
             # Si on ne veut pas les produits ou footer, les retirer
             if not scrape_products:
@@ -1930,6 +2187,8 @@ def generation_history():
     except Exception as e:
         flash(f"Erreur lors de la récupération de l'historique: {str(e)}", "danger")
         return redirect(url_for("index"))
+    
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)

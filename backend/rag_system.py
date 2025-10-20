@@ -23,7 +23,7 @@ class RAGSystem:
         self.mistral_api_key = mistral_api_key
         self.mistral_api_url = "https://api.mistral.ai/v1/chat/completions"
         self.history_manager = GenerationHistory(mongo_client)
-        
+        self.load_faiss_index()
          # Modèle d'embeddings - chargement différé
         self.embedding_model = None
         self.embedding_dim = 384
@@ -34,7 +34,6 @@ class RAGSystem:
         self.documents = []
         self.metadata = []
         self.raw_data = None
-        
         # Suivi des données
         self.data_hash = None
         self.last_loaded_file = None
@@ -111,6 +110,27 @@ class RAGSystem:
             
         except Exception as e:
             return {'has_changes': True, 'reason': f'error: {str(e)}'}
+       
+       
+    def save_faiss_index(self, path="faiss_index.bin"):
+        """Sauvegarde l'index FAISS et les métadonnées"""
+        if self.index:
+            faiss.write_index(self.index, path)
+            with open("faiss_metadata.json", "w", encoding="utf-8") as f:
+                json.dump(self.metadata, f, ensure_ascii=False, indent=2)
+            print("💾 Index FAISS et métadonnées sauvegardés.")
+
+    def load_faiss_index(self, path="faiss_index.bin"):
+        """Recharge l'index FAISS et les métadonnées s’ils existent"""
+        if os.path.exists(path) and os.path.exists("faiss_metadata.json"):
+            print("📦 Chargement de l’index FAISS existant...")
+            self.index = faiss.read_index(path)
+            with open("faiss_metadata.json", "r", encoding="utf-8") as f:
+                self.metadata = json.load(f)
+            self.is_initialized = True
+            print(f"✅ Index FAISS rechargé ({self.index.ntotal} vecteurs)")
+
+       
         
     def load_scraped_data(self, file_path: str = None):
         """Charge toutes les données depuis MongoDB"""
@@ -175,6 +195,7 @@ class RAGSystem:
         if self.documents:
             self._build_faiss_index()
             self.is_initialized = True
+            self.update_rag_incremental()
         else:
             self.is_initialized = False
 
@@ -433,6 +454,93 @@ class RAGSystem:
             print(f"❌ Erreur recherche: {e}")
             return []
 
+    
+    def update_rag_incremental(self):
+        """Met à jour automatiquement le RAG avec uniquement les nouveaux sites ajoutés dans MongoDB"""
+        print("🔄 Mise à jour incrémentale du RAG...")
+
+        # Charger modèle si nécessaire
+        self._load_embedding_model()
+
+        # Connexion Mongo
+        MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
+        mongo_client = MongoClient(MONGO_URI)
+        db = mongo_client["scraping_db"]
+        collection = db["scraped_sites"]
+
+        # Récupérer tous les sites
+        all_sites = list(collection.find())
+        if not all_sites:
+            print("⚠️ Aucune donnée dans MongoDB.")
+            return False
+
+        # Récupérer les IDs déjà indexés
+        indexed_site_ids = set(m.get("site_id") for m in self.metadata if "site_id" in m)
+        new_sites = [s for s in all_sites if s["site_id"] not in indexed_site_ids]
+
+        if not new_sites:
+            print("✅ Aucun nouveau site à indexer. RAG déjà à jour.")
+            return True
+
+        print(f"🆕 {len(new_sites)} nouveaux sites détectés. Mise à jour de l’index FAISS...")
+
+        # Préparer les nouveaux documents
+        new_documents, new_metadata = [], []
+        new_embeddings_data = []
+
+        for site_doc in new_sites:
+            site_id = site_doc["site_id"]
+            results = site_doc.get("results", [])
+
+            for i, page in enumerate(results):
+                page_documents = self._create_page_documents(page, i, site_id)
+                for doc in page_documents:
+                    new_documents.append(doc['content'])
+                    new_metadata.append(doc['metadata'])
+
+                for j, product in enumerate(page.get("products", [])):
+                    product_data = self._create_product_document(
+                        product, page.get("url", ""), site_id, i, j, "normal"
+                    )
+                    if product_data:
+                        new_documents.append(product_data['content'])
+                        new_metadata.append(product_data['metadata'])
+
+                for j, product in enumerate(page.get("promoted_products", [])):
+                    product_data = self._create_product_document(
+                        product, page.get("url", ""), site_id, i, j, "promoted"
+                    )
+                    if product_data:
+                        new_documents.append(product_data['content'])
+                        new_metadata.append(product_data['metadata'])
+
+        print(f"📄 {len(new_documents)} nouveaux documents à indexer...")
+
+        # Générer les embeddings pour les nouveaux documents
+        new_embeddings = self.embedding_model.encode(
+            new_documents,
+            show_progress_bar=True,
+            batch_size=32,
+            normalize_embeddings=True
+        ).astype('float32')
+
+        # Ajouter les nouveaux embeddings à FAISS
+        if self.index is None:
+            print("⚠️ Index FAISS non trouvé, création initiale...")
+            self.index = faiss.IndexFlatIP(self.embedding_dim)
+
+        self.index.add(new_embeddings)
+        print(f"✅ {self.index.ntotal} vecteurs dans l’index après mise à jour")
+
+        # Étendre les listes locales
+        self.documents.extend(new_documents)
+        self.metadata.extend(new_metadata)
+
+        self.is_initialized = True
+        return True
+
+    
+    
     def _sort_by_relevance(self, results, query):
         """Trie les résultats par pertinence pour la requête"""
         query_lower = query.lower()
@@ -953,7 +1061,7 @@ def get_rag_system(api_key: str = None,mongo_client =None):
     global _rag_instance
     if _rag_instance is None:
         if api_key is None:
-            api_key = os.getenv("MISTRAL_API_KEY")
+            api_key = os.getenv("MISTRAL_API_KEY","BSuPs2Np1lg2Yv46NqYrQlxKlBbIPpgf")
 
         if not api_key:
             print("⚠️ Aucune clé MISTRAL_API_KEY détectée — le RAG fonctionnera en mode local sans LLM.")
@@ -1086,36 +1194,27 @@ def can_answer_questions(self) -> bool:
 
 
 def initialize_rag_system(api_key: str = None, force_reload: bool = False):
-    """Initialise le système RAG seulement si nécessaire"""
-    rag_system = get_rag_system(api_key)
-    
+    """Initialise le système RAG ou met à jour automatiquement avec les nouveaux sites"""
     try:
-        # Vérifier si le RAG est déjà à jour
-        if not force_reload and rag_system.is_up_to_date():
-            stats = rag_system.get_stats()
-            message = (f"✅ RAG déjà à jour - {stats['total_sites']} sites, "
-                      f"{stats['total_pages']} pages, {stats['total_products']} produits, "
-                      f"{stats['total_documents']} documents")
-            return True, message
+        rag_system = get_rag_system(api_key)
         
-        # Charger les données (seulement si nécessaire)
-        data_loaded = rag_system.load_scraped_data()
+        print("🚀 Initialisation du système RAG...")
         
-        stats = rag_system.get_stats()
-        if stats['initialized']:
-            if data_loaded:
-                message = (f"✅ RAG initialisé - {stats['total_sites']} sites, "
-                          f"{stats['total_pages']} pages, {stats['total_products']} produits, "
-                          f"{stats['total_documents']} documents, "
-                          f"Index FAISS: {stats['index_size']} vecteurs")
-            else:
-                message = (f"✅ RAG déjà initialisé - {stats['total_sites']} sites, "
-                          f"{stats['total_pages']} pages, {stats['total_products']} produits")
-            return True, message
-        else:
-            return False, "❌ Échec initialisation du RAG"
+        # Méthode directe : charger toutes les données depuis MongoDB
+        rag_system.load_scraped_data()
+        
+        # Vérifier que le système est bien initialisé
+        if rag_system.is_initialized and rag_system.index is not None:
+            total_docs = len(rag_system.documents) if rag_system.documents else 0
+            total_sites = len(rag_system.raw_data) if rag_system.raw_data else 0
             
-    except FileNotFoundError:
-        return False, "❌ Fichier last_scrape.json non trouvé. Effectuez d'abord un scraping."
+            print(f"✅ RAG initialisé avec succès: {total_sites} sites, {total_docs} documents")
+            return True, f"✅ RAG initialisé avec {total_sites} sites et {total_docs} documents"
+        else:
+            return False, "❌ Échec de l'initialisation du RAG"
+            
     except Exception as e:
+        print(f"❌ Erreur lors de l'initialisation RAG: {str(e)}")
+        import traceback
+        print(f"🔍 Détails: {traceback.format_exc()}")
         return False, f"❌ Erreur lors de l'initialisation: {str(e)}"
