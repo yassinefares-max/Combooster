@@ -10,6 +10,7 @@ import hashlib
 from pymongo import MongoClient
 import time
 from collections import deque
+from customer_profiles import CustomerProfileManager
 
 # Connexion MongoDB
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
@@ -24,6 +25,10 @@ class RAGSystem:
         self.mistral_api_url = "https://api.mistral.ai/v1/chat/completions"
         self.history_manager = GenerationHistory(mongo_client)
         self.load_faiss_index()
+        
+        # Ajouter le gestionnaire de profils
+        self.profile_manager = CustomerProfileManager(mongo_client)
+        
          # Modèle d'embeddings - chargement différé
         self.embedding_model = None
         self.embedding_dim = 384
@@ -717,49 +722,86 @@ RÉPONSE DÉTAILLÉE:"""
         context_parts.append("\n=== FIN DES DONNÉES ===")
         return "\n".join(context_parts)
     
-    def ask_question(self, question: str) -> str:
-        """Pose une question sur TOUTES les données"""
+    def ask_question(self, question: str, site_id: str = None) -> str:
+        """Pose une question sur TOUTES les données avec contexte client optionnel"""
         if not self.documents:
             return "❌ Aucune donnée chargée. Effectuez d'abord un scraping et initialisez le système RAG."
         
         print(f"🔍 Recherche dans les données: '{question}'")
+        
+        # Contexte client si disponible
+        customer_context = ""
+        customer_info = None
+        if site_id:
+            customer_context = self.profile_manager.generate_context_prompt(site_id)
+            customer_info = self.profile_manager.get_profile(site_id)
+            print(f"🎯 Contexte client chargé: {site_id}")
+        
+        # Recherche standard dans les données scrapées
         relevant_docs = self.search(question, k=15)
+        
+        # Enrichir avec le contexte client
+        if customer_context:
+            relevant_docs = self._enhance_with_customer_context(relevant_docs, customer_context)
         
         if not relevant_docs:
             return "❌ Aucune information pertinente trouvée dans les données scrapées."
         
-        # Statistiques détaillées par site
-        sites_stats = {}
-        for doc in relevant_docs:
-            site_id = doc['metadata'].get('site_id', 'unknown')
-            if site_id not in sites_stats:
-                sites_stats[site_id] = {
-                    'products': 0, 
-                    'pages': 0, 
-                    'footers': 0,
-                    'site_info': 0
-                }
-            
-            category = doc['metadata'].get('category')
-            doc_type = doc['metadata'].get('type')
-            
-            if category == 'product' or doc_type == 'product':
-                sites_stats[site_id]['products'] += 1
-            elif category == 'page_metadata' or doc_type == 'page':
-                sites_stats[site_id]['pages'] += 1
-            elif category == 'footer' or doc_type in ['footer', 'footer_links']:
-                sites_stats[site_id]['footers'] += 1
-            elif doc_type == 'site_info':
-                sites_stats[site_id]['site_info'] += 1
-        
-        print(f"📊 {len(relevant_docs)} documents pertinents trouvés sur {len(sites_stats)} sites")
-        for site_id, stats in sites_stats.items():
-            print(f"   - Site {site_id}: {stats['products']} produits, {stats['pages']} pages, {stats['footers']} footers")
-        
+        # Générer la réponse
         print("🤖 Génération de la réponse...")
         response = self.generate_response(question, relevant_docs)
+        
         return response
 
+    def _enhance_with_customer_context(self, search_results: List[Dict], customer_context: str) -> List[Dict]:
+        """Enrichit les résultats de recherche avec le contexte client"""
+        # Créer un document spécial pour le contexte client
+        customer_doc = {
+            'document': customer_context,
+            'metadata': {
+                'type': 'customer_profile',
+                'category': 'customer_context',
+                'relevance_score': 1.0,
+                'priority': 'high'
+            },
+            'score': 1.0
+        }
+        
+        # Ajouter en tête des résultats pour priorité maximale
+        return [customer_doc] + search_results
+    
+    def get_available_sites(self) -> List[Dict]:
+        """Retourne la liste des sites disponibles avec leurs profils"""
+        sites = []
+        
+        # Récupérer tous les sites scrapés
+        scraped_sites = list(mongo_db.scraped_sites.find({}, {
+            "site_id": 1, 
+            "start_url": 1, 
+            "scraped_at": 1,
+            "scraped_count": 1
+        }))
+        
+        for site in scraped_sites:
+            # Générer ou récupérer le profil
+            profile = self.profile_manager.get_profile(site["site_id"])
+            if profile:
+                site_info = {
+                    "site_id": site["site_id"],
+                    "domain": profile.get("domain", ""),
+                    "company_name": profile.get("company_name", ""),
+                    "industry": profile.get("industry", ""),
+                    "business_type": profile.get("business_type", ""),
+                    "scraped_count": site.get("scraped_count", 0),
+                    "scraped_at": site.get("scraped_at", ""),
+                    "profile_completeness": profile.get("profile_completeness", 0)
+                }
+                sites.append(site_info)
+        
+        return sites
+    
+    
+    
     def get_stats(self) -> Dict:
         """Retourne les statistiques complètes"""
         if not self.raw_data:

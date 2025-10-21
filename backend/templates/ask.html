@@ -62,6 +62,50 @@
             padding: 3px 8px;
             border-radius: 10px;
         }
+        .site-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .context-info {
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 5px 5px 0;
+        }
+        .profile-completeness {
+            font-size: 0.8em;
+            color: #6c757d;
+        }
+        .site-card {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .site-card:hover {
+            border-color: #007bff;
+            background-color: #f8f9fa;
+        }
+        .site-card.selected {
+            border-color: #007bff;
+            background-color: #e7f1ff;
+        }
+        .customer-profile-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        color: #495057;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid #dee2e6;
+    }
     </style>
 </head>
 <body>
@@ -82,8 +126,20 @@
                     {% endif %}
                 {% endwith %}
 
+                <!-- Section Profils Clients -->
+                {% if available_sites and available_sites|length > 0 %}
+                <div class="customer-profile-section">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">👥 Sites Clients Disponibles</h5>
+                            <p class="mb-0">Sélectionnez un site pour personnaliser les réponses</p>
+                        </div>
+                        <span class="badge bg-light text-dark">{{ available_sites|length }} sites</span>
+                    </div>
+                </div>
+                {% endif %}
+
                 <!-- Contrôles RAG intelligents -->
-                <!-- Vérification des changements -->
                 <div class="card mb-3">
                     <div class="card-header">
                         <h6>🔍 Contrôle du RAG</h6>
@@ -198,7 +254,38 @@
                         <h5 class="mb-0">💬 Poser une question</h5>
                     </div>
                     <div class="card-body">
-                        <form method="POST" action="/ask">
+                        <form method="POST" action="/ask" id="questionForm">
+                            <!-- Sélection du site client -->
+                            {% if available_sites and available_sites|length > 0 %}
+                            <div class="mb-3">
+                                <label for="site_id" class="form-label">🌐 Site spécifique (optionnel)</label>
+                                <select class="form-select" name="site_id" id="siteSelect">
+                                    <option value="">Tous les sites (réponse générale)</option>
+                                    {% for site in available_sites %}
+                                    <option value="{{ site.site_id }}" 
+                                            {% if site_id == site.site_id %}selected{% endif %}>
+                                        {{ site.company_name }} - {{ site.domain }}
+                                        ({{ site.industry }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <small class="form-text text-muted">
+                                    Sélectionnez un site spécifique pour une réponse personnalisée
+                                </small>
+                            </div>
+
+                            <!-- Aperçu du profil si site sélectionné -->
+                            <div id="profilePreview" class="mb-3" style="display: none;">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6>👤 Profil du site sélectionné</h6>
+                                        <div id="profileContent"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Question -->
                             <div class="mb-3">
                                 <label for="question" class="form-label">Votre question sur les données scrapées:</label>
                                 <textarea class="form-control" id="question" name="question" rows="3" 
@@ -216,14 +303,110 @@
                 </div>
 
                 <!-- Réponse -->
+                <!-- Réponse -->
                 {% if question and answer %}
                 <div class="chat-container mt-4">
                     <div class="question-bubble">
                         <strong>Vous:</strong> {{ question }}
+                        {% if site_info %}
+                        <div class="site-badge mt-2">
+                            🌐 Site: <strong>{{ site_info.company_name|default(site_info.domain, true) }}</strong>
+                        </div>
+                        {% endif %}
                     </div>
                     <div class="answer-bubble">
                         <strong>Assistant RAG:</strong> 
+                        {% if site_info %}
+                        <div class="context-info">
+                            <h6>🎯 Contexte du site appliqué:</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Domaine:</strong> {{ site_info.domain|default('Non spécifié', true) }}</p>
+                                    <p><strong>Industrie:</strong> {{ site_info.industry|default('Non spécifiée', true) }}</p>
+                                    <p><strong>Type:</strong> {{ site_info.business_type|default('Non spécifié', true) }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Position:</strong> {{ site_info.market_position|default('Non spécifiée', true) }}</p>
+                                    <p><strong>Audience:</strong> 
+                                        {% if site_info.target_audience and site_info.target_audience.demographics %}
+                                            {{ site_info.target_audience.demographics|join(', ') }}
+                                        {% else %}
+                                            Non analysée
+                                        {% endif %}
+                                    </p>
+                                    <p><strong>Gamme de prix:</strong> 
+                                        {% if site_info.target_audience and site_info.target_audience.price_range %}
+                                            {{ site_info.target_audience.price_range }}
+                                        {% else %}
+                                            Non spécifiée
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            {% if site_info.brand_voice %}
+                            <p><strong>Voix de marque:</strong> {{ site_info.brand_voice }}</p>
+                            {% endif %}
+                            {% if site_info.brand_values %}
+                            <p><strong>Valeurs:</strong> {{ site_info.brand_values|join(', ') }}</p>
+                            {% endif %}
+                        </div>
+                        {% endif %}
                         <div class="mt-2" style="white-space: pre-wrap;">{{ answer }}</div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Liste des sites disponibles -->
+                <!-- Liste des sites disponibles -->
+                {% if available_sites and available_sites|length > 0 %}
+                <div class="card mt-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">📊 Sites disponibles ({{ available_sites|length }})</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for site in available_sites %}
+                            <div class="col-md-6 mb-3">
+                                <div class="site-card" onclick="selectSite('{{ site.site_id }}')">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">{{ site.company_name|default(site.domain, true) }}</h6>
+                                            <p class="mb-1 text-muted small">{{ site.domain|default('Domaine inconnu', true) }}</p>
+                                            <span class="badge bg-primary">{{ site.industry|default('Non spécifié', true) }}</span>
+                                            <span class="badge bg-secondary">{{ site.business_type|default('Non spécifié', true) }}</span>
+                                            <span class="badge bg-success">{{ site.market_position|default('Non spécifié', true) }}</span>
+                                        </div>
+                                        <div class="text-end">
+                                            <small class="text-muted">{{ site.scraped_count|default(0) }} pages</small>
+                                            <br>
+                                            <span class="profile-completeness">
+                                                {{ "%.0f"|format(site.profile_completeness|default(0)) }}% profil complet
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <small class="text-muted">
+                                            <strong>Audience:</strong> 
+                                            {% if site.target_audience and site.target_audience.demographics %}
+                                                {{ site.target_audience.demographics|join(', ') }}
+                                            {% else %}
+                                                Non analysée
+                                            {% endif %}
+                                        </small>
+                                        <br>
+                                        <small class="text-muted">
+                                            <strong>Gamme:</strong> 
+                                            {% if site.target_audience and site.target_audience.price_range %}
+                                                {{ site.target_audience.price_range }}
+                                            {% else %}
+                                                Non spécifiée
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
                 {% endif %}
@@ -294,6 +477,66 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
+    // Données des profils pour l'aperçu
+    // Données des profils pour l'aperçu
+    const siteProfiles = {
+        {% for site in available_sites %}
+        "{{ site.site_id }}": {
+            company_name: "{{ site.company_name|default(site.domain, true)|replace('"', '\\"') }}",
+            domain: "{{ site.domain|default('Domaine inconnu', true)|replace('"', '\\"') }}",
+            industry: "{{ site.industry|default('Non spécifiée', true)|replace('"', '\\"') }}",
+            business_type: "{{ site.business_type|default('Non spécifié', true)|replace('"', '\\"') }}",
+            market_position: "{{ site.market_position|default('Non spécifiée', true)|replace('"', '\\"') }}",
+            audience: "{% if site.target_audience and site.target_audience.demographics %}{{ site.target_audience.demographics|join(', ')|replace('"', '\\"') }}{% else %}Non analysée{% endif %}",
+            price_range: "{% if site.target_audience and site.target_audience.price_range %}{{ site.target_audience.price_range|replace('"', '\\"') }}{% else %}Non spécifiée{% endif %}",
+            scraped_count: "{{ site.scraped_count|default(0) }}",
+            brand_voice: "{{ site.brand_voice|default('')|replace('"', '\\"') }}",
+            brand_values: "{{ site.brand_values|default([])|join(', ')|replace('"', '\\"') }}"
+        },
+        {% endfor %}
+    };
+
+    function selectSite(siteId) {
+        document.getElementById('siteSelect').value = siteId;
+        updateProfilePreview();
+    }
+
+    function updateProfilePreview() {
+        const siteSelect = document.getElementById('siteSelect');
+        const profilePreview = document.getElementById('profilePreview');
+        const profileContent = document.getElementById('profileContent');
+        
+        const selectedSiteId = siteSelect.value;
+        
+        if (selectedSiteId && siteProfiles[selectedSiteId]) {
+            const profile = siteProfiles[selectedSiteId];
+            
+            profileContent.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Domaine:</strong> ${profile.domain}</p>
+                        <p><strong>Industrie:</strong> ${profile.industry}</p>
+                        <p><strong>Type:</strong> ${profile.business_type}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Position:</strong> ${profile.market_position}</p>
+                        <p><strong>Audience:</strong> ${profile.audience}</p>
+                        <p><strong>Gamme:</strong> ${profile.price_range}</p>
+                    </div>
+                </div>
+                ${profile.brand_voice ? `<p><strong>Voix de marque:</strong> ${profile.brand_voice}</p>` : ''}
+                ${profile.brand_values ? `<p><strong>Valeurs:</strong> ${profile.brand_values}</p>` : ''}
+                <div class="mt-2">
+                    <small class="text-muted">${profile.scraped_count} pages analysées</small>
+                </div>
+            `;
+            
+            profilePreview.style.display = 'block';
+        } else {
+            profilePreview.style.display = 'none';
+        }
+    }
+
     // Mettre à jour le statut du RAG
     function updateRagStatus() {
         fetch('/rag_status')
@@ -328,15 +571,6 @@
                             }
                         </div>
                     `;
-                    // Mettre à jour le texte du bouton
-                    const initButton = document.getElementById('initRagBtn');
-                    if (initButton) {
-                        initButton.innerHTML = data.up_to_date ? 
-                            '✅ RAG Déjà à Jour' : '🔄 Mettre à Jour RAG';
-                        initButton.disabled = data.up_to_date;
-                        initButton.className = data.up_to_date ? 
-                            'btn btn-success w-100' : 'btn btn-warning w-100';
-                    }
                 } else {
                     statusHtml = `
                         <div class="alert alert-warning">
@@ -369,6 +603,13 @@
         const questionField = document.getElementById('question');
         if (questionField) {
             questionField.focus();
+        }
+
+        // Initialiser l'aperçu du profil
+        const siteSelect = document.getElementById('siteSelect');
+        if (siteSelect) {
+            siteSelect.addEventListener('change', updateProfilePreview);
+            updateProfilePreview();
         }
     });
 

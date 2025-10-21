@@ -154,102 +154,49 @@ def extract_products_by_text_pattern(soup, base_url):
 
 
 def extract_with_css_selectors(soup, url):
-    """Extraction avec une gamme très étendue de sélecteurs CSS"""
+    """Extraction avec des sélecteurs spécifiques pour Comptoirs Richard"""
     products = []
     
-   
-     # Sélecteurs complets pour toutes les plateformes e-commerce
+    # Sélecteurs spécifiques pour Comptoirs Richard
     if 'comptoirsrichard' in url:
-        comptoirs_selectors = [
-            'article.product-miniature',
+        selectors = [
+            # Sélecteurs spécifiques au site
             '.product-miniature',
+            '.ajax_block_product',
             '.products article',
             '#content article',
             '.featured-products article',
             '.product-list article',
             'div[itemtype*="Product"]',
-            '.js-product-miniature'
-        ]
-        selectors = comptoirs_selectors + [...]  # Ajouter aux sélecteurs existants
-    else:
-        selectors = [
-            # PrestaShop
-            '.product-miniature', '.ajax_block_product', '.product-container',
-            '.product-box', '.item', '.product-item', '.product-thumbnail',
-            
-            # WooCommerce
-            '.product', '.type-product', '.woocommerce-product',
-            '.wc-product', '.product-type-simple', '.product-type-variable',
-            
-            # Shopify
-            '.grid__item', '.product-grid-item', '.collection-item',
-            '.product-item', '.product-card', '.product-block',
-            
-            # Magento
-            '.product-item-info', '.product-item-details',
-            '.product-image-container', '.product-item-photo',
-            
-            # BigCommerce
-            '.productBlock', '.productList', '.product',
-            
-            # Squarespace
-            '.product', '.product-item', '.grid-product',
-            
-            # Wix
-            '.product-item', '.product-wrapper', '.product-content',
-            
-            # Generic e-commerce
-            '.product', '.item', '.card', '.product-item', '.product-card',
-            '.goods-item', '.product-grid-item', '.shop-item', '.catalog-item',
-            '.store-item', '.boutique-item', '.commerce-item',
-            
-            # French e-commerce
-            '.produit', '.article', '.item-produit', '.carte-produit',
-            '.boutique-produit', '.produit-item', '.article-produit',
-            '.fiche-produit', '.liste-produit',
-            
-            # Data attributes
-            '[data-product]', '[data-item]', '[data-product-id]',
-            '[data-product-name]', '[data-product-price]',
-            
-            # Class patterns
-            '[class*="product"]', '[class*="item"]', '[class*="card"]',
-            '[class*="article"]', '[class*="goods"]', '[class*="shop"]',
-            '[class*="catalog"]', '[class*="store"]', '[class*="commerce"]',
-            
-            # List items
-            'li.product', 'li.item', 'li.product-item', 'li.goods-item',
-            'li.shop-item', 'li.catalog-item',
-            
-            # Div items
-            'div.product', 'div.item', 'div.product-item', 'div.goods-item',
-            'div.shop-item', 'div.catalog-item',
-            
-            # Article items
-            'article.product', 'article.item', 'article.product-item',
-            
-            # Section items
-            'section.product', 'section.item', 'section.product-item',
-            
-            # Specific to problematic sites
-            '.elementor-widget', '.vc_column_container', '.module',
-            '.content', '.block', '.widget', '.component'
-            
-            # Sélecteurs spécifiques à Comptoirs Richard
+            '.js-product-miniature',
+            '.product-container',
+            '.item-product',
+            '.product-item',
+            # Nouveaux sélecteurs observés
+            '[data-id-product]',
+            '.product-thumbnail',
+            '.thumbnail-container',
             '.product-description',
-            '.product-item-related',
-            '[class*="product"]',
-            '.price + h3, .price + a, .price ~ *',
+            '.product-title',
+            # Sélecteurs de grille
+            '.product-grid .item',
+            '.products-grid .item',
+            '.item.product',
+            '.product-element'
         ]
+    else:
+        selectors = [...]  # vos sélecteurs existants
     
     for selector in selectors:
         try:
             elements = soup.select(selector)
+            print(f"🔍 Sélecteur '{selector}': {len(elements)} éléments trouvés")
             for element in elements:
                 product_data = extract_product_data_from_element(element, url)
                 if product_data and product_data.get('name'):
                     products.append(product_data)
-        except Exception:
+        except Exception as e:
+            print(f"❌ Erreur avec sélecteur {selector}: {e}")
             continue
     
     return products
@@ -300,7 +247,7 @@ def extract_promoted_products(html, base_url):
                 })
             except Exception as e:
                 continue
-
+                 
     # Déduplication
     unique_products = []
     seen = set()
@@ -493,20 +440,23 @@ def extract_products_from_section(section, base_url):
 
 
 def extract_with_content_analysis(soup, url):
-    """Analyse de contenu + fallback regex pour sites comme Comptoirs Richard"""
+    """Analyse de contenu renforcée pour sites dynamiques"""
     products = []
-    # Méthode existante (par éléments)
-    potential_elements = soup.find_all(['div', 'article', 'li', 'section', 'p'])
+    
+    # Recherche étendue dans tout le HTML
+    potential_elements = soup.find_all(['div', 'article', 'li', 'section', 'tr', 'td'])
+    
     for element in potential_elements:
-        if is_likely_product_element(element):
+        element_text = element.get_text(strip=True)
+        
+        # Critères pour identifier un produit
+        has_price = bool(re.search(r'\d+[.,]\d{2}\s*€', element_text))
+        has_name = len(element_text) > 10 and len(element_text) < 200
+        
+        if has_price and has_name:
             product_data = extract_product_data_from_content(element, url)
             if product_data and product_data.get('name'):
                 products.append(product_data)
-    
-    # ➕ NOUVEAU : fallback par regex sur tout le texte
-    if len(products) < 5:  # Si peu de produits trouvés
-        regex_products = extract_products_by_text_pattern(soup, url)
-        products.extend(regex_products)
     
     return products
 
@@ -725,31 +675,31 @@ def extract_product_price(element):
     return None
 
 def extract_price_advanced(element):
-    """Extraction avancée du prix par analyse de texte"""
+    """Extraction avancée des prix"""
     element_text = element.get_text()
     
-    # Patterns de prix
+    # Patterns de prix plus robustes
     price_patterns = [
         r'(\d+[.,]\d{1,2})\s*€',
         r'€\s*(\d+[.,]\d{1,2})',
-        r'(\d+[.,]\d{1,2})\s*\$',
-        r'\$\s*(\d+[.,]\d{1,2})',
-        r'(\d+)\s*euros?',
-        r'(\d+)\s*dollars?',
-        r'PRIX\s*:\s*[\'"]?(\d+[.,]\d{1,2})',
+        r'(\d+)\s*EUR',
+        r'Prix\s*:\s*[\'"]?(\d+[.,]\d{1,2})',
         r'price\s*:\s*[\'"]?(\d+[.,]\d{1,2})',
+        r'(\d+)[\s,]*(\d+)[\s,]*(\d+)\s*€',  # Format 16 97 €
     ]
     
     for pattern in price_patterns:
-        match = re.search(pattern, element_text, re.IGNORECASE)
-        if match:
-            return match.group(0).strip()
-    
-    # Recherche de nombres qui pourraient être des prix
-    number_matches = re.findall(r'\b\d+[.,]\d{2}\b', element_text)
-    if number_matches:
-        # Prendre le premier nombre qui ressemble à un prix
-        return number_matches[0]
+        matches = re.findall(pattern, element_text, re.IGNORECASE)
+        for match in matches:
+            if isinstance(match, tuple):
+                # Reconstituer le prix depuis les groupes
+                price = ''.join(match).replace(' ', '')
+            else:
+                price = match
+            # Nettoyer le prix
+            price = price.replace(',', '.').replace(' ', '')
+            if re.match(r'\d+\.\d{2}', price):
+                return f"{price} €"
     
     return None
 
@@ -1255,28 +1205,52 @@ def fetch_with_requests(url):
     except Exception as e:
         return None, str(e)
 
-def fetch_with_playwright(url, timeout_ms=60000):
-    """Récupère le HTML avec Playwright (anti-blocage, sans attente networkidle)"""
+def fetch_with_playwright(url, timeout_ms=90000):
+    """Version UNIVERSELLE qui s'adapte à tous les sites"""
     if not PLAYWRIGHT_AVAILABLE:
         return None, "Playwright non disponible"
+    
     try:
         with sync_playwright() as pw:
+            # 🔧 CONFIGURATION ADAPTATIVE
+            domain = urllib.parse.urlparse(url).netloc.lower()
+            
+            # Détecter le type de site
+            is_complex_site = any(site in domain for site in [
+                'comptoirsrichard', 'leroymerlin', 'darty', 'boulanger', 
+                'cdiscount', 'fnac', 'amazon'
+            ])
+            
+            # Choisir la stratégie
+            if is_complex_site:
+                print(f"🎯 Site complexe détecté: {domain} - Stratégie ROBUSTE")
+                headless = False  # Visible pour debug
+                wait_strategy = 'networkidle'
+                extra_wait = 20000
+                scroll_iterations = 12
+                scroll_delay = 1500
+            else:
+                print(f"🎯 Site standard détecté: {domain} - Stratégie STANDARD")
+                headless = True
+                wait_strategy = 'domcontentloaded'
+                extra_wait = 8000
+                scroll_iterations = 6
+                scroll_delay = 1000
+            
+            # 🚀 CONFIGURATION DU NAVIGATEUR
             browser = pw.chromium.launch(
-                headless=True,
+                headless=headless,
                 args=[
                     '--no-sandbox',
                     '--disable-blink-features=AutomationControlled',
                     '--disable-dev-shm-usage',
                     '--disable-web-security',
                     '--disable-features=IsolateOrigins,site-per-process',
-                    '--disable-setuid-sandbox',
-                    '--disable-accelerated-2d-canvas',
-                    '--disable-gpu'
+                    '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
                 ]
             )
 
             context = browser.new_context(
-                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                 viewport={'width': 1920, 'height': 1080},
                 locale='fr-FR',
                 timezone_id='Europe/Paris',
@@ -1284,51 +1258,100 @@ def fetch_with_playwright(url, timeout_ms=60000):
                 ignore_https_errors=True
             )
 
-            # 🔒 Bloquer images, pubs et trackers
-            context.route("**/*", lambda route: route.abort() if any(
-                ext in route.request.url.lower()
-                for ext in [".jpg", ".jpeg", ".png", ".gif", "doubleclick", "googletag", "ads", "analytics", "facebook"]
-            ) else route.continue_())
-
+            # 🛡️ ANTI-DÉTECTION
             page = context.new_page()
-            print(f"🌐 Chargement de {url}...")
-
-            # Script anti-détection
             page.add_init_script("""
                 Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
                 Object.defineProperty(navigator, 'plugins', {get: () => [1,2,3,4,5]});
                 Object.defineProperty(navigator, 'languages', {get: () => ['fr-FR','fr','en-US','en']});
                 window.chrome = {runtime: {}};
             """)
-
-            # ⚡ Charger sans blocage total
-            page.goto(url, timeout=timeout_ms, wait_until='domcontentloaded')
-
-            # Attendre manuellement le contenu dynamique
+            
+            print(f"🌐 Navigation vers {url}...")
+            
+            # 📥 CHARGEMENT DE LA PAGE
             try:
-                page.wait_for_selector('.product, .product-miniature, [class*="product"]', timeout=15000)
-                print("✅ Produits détectés dans le DOM")
-            except:
-                print("⚠️ Aucun produit détecté immédiatement — tentative de capture élargie...")
-
-            # Scroller plusieurs fois pour forcer le lazy loading
-            for i in range(5):
-                page.evaluate(f"window.scrollTo(0, {(i+1)*1000})")
-                page.wait_for_timeout(1500)
-
-            # Attente finale 5 secondes pour scripts restants
+                page.goto(url, timeout=timeout_ms, wait_until=wait_strategy)
+            except Exception as e:
+                print(f"⚠️ Premier chargement échoué, tentative fallback: {e}")
+                try:
+                    page.goto(url, timeout=timeout_ms, wait_until='load')
+                except:
+                    page.goto(url, timeout=timeout_ms, wait_until='domcontentloaded')
+            
+            # ⏳ ATTENTE INTELLIGENTE
+            print(f"⏳ Attente du chargement ({extra_wait//1000}s)...")
+            page.wait_for_timeout(extra_wait)
+            
+            # 🔍 DÉTECTION DU CONTENU
+            content_info = page.evaluate("""() => {
+                const bodyText = document.body.innerText;
+                return {
+                    bodyLength: bodyText.length,
+                    hasProducts: document.querySelectorAll('.product, [class*="product"], .item, .price, .produit').length > 0,
+                    title: document.title,
+                    totalElements: document.querySelectorAll('*').length
+                };
+            }""")
+            
+            print(f"🔍 Analyse contenu: {content_info}")
+            
+            # 🎯 STRATÉGIE ADAPTATIVE SELON LE CONTENU
+            if content_info['bodyLength'] < 500 and not content_info['hasProducts']:
+                print("🔄 Contenu insuffisant - Activation mode ROBUSTE")
+                # Basculer en mode robuste
+                scroll_iterations = 10
+                extra_wait += 10000
+                
+                # Essayer différents sélecteurs
+                selectors_to_try = [
+                    '.product', '.product-miniature', '.item', '.price',
+                    '[class*="product"]', '[class*="item"]', 'article',
+                    '.product-grid', '.products', '.catalog', '.shop'
+                ]
+                
+                for selector in selectors_to_try:
+                    try:
+                        page.wait_for_selector(selector, timeout=5000)
+                        print(f"✅ Élément trouvé: {selector}")
+                        break
+                    except:
+                        continue
+            
+            # 🖱️ DÉFILEMENT INTELLIGENT
+            print(f"🔄 Défilement ({scroll_iterations} passages)...")
+            for i in range(scroll_iterations):
+                scroll_position = (i + 1) * 800
+                page.evaluate(f"window.scrollTo(0, {scroll_position})")
+                page.wait_for_timeout(scroll_delay)
+                
+                # Vérifier périodiquement le contenu
+                if i % 3 == 0:
+                    current_content = page.evaluate("document.body.innerText.length")
+                    print(f"   📊 Contenu après scroll {i+1}: {current_content} caractères")
+            
+            # ⏳ DERNIÈRE ATTENTE
             page.wait_for_timeout(5000)
-
+            
+            # 💾 RÉCUPÉRATION FINALE
             html = page.content()
             browser.close()
-            print("✅ HTML récupéré sans blocage Playwright")
+            
+            # ✅ VÉRIFICATION FINALE
+            final_length = len(html)
+            print(f"✅ HTML final: {final_length} caractères")
+            
+            if final_length < 1000:
+                print("❌ HTML trop court - Site probablement bloqué")
+                return None, f"Blocage détecté - HTML: {final_length} caractères"
+            
             return html, None
 
     except Exception as e:
-        print(f"❌ Erreur Playwright: {e}")
+        print(f"❌ Erreur Playwright universel: {e}")
         import traceback
         traceback.print_exc()
-        return None, f"Erreur Playwright: {e}"
+        return None, f"Erreur: {e}"
 
 
 def fetch_url_with_retry(url, render_js=False, max_retries=3):
@@ -1453,9 +1476,8 @@ def scrape():
         error = None
         
     
-        if 'comptoirsrichard' in url.lower():
-            html, error = fetch_with_playwright(url, timeout_ms=60000)
-        elif render_js and PLAYWRIGHT_AVAILABLE:
+        if render_js and PLAYWRIGHT_AVAILABLE:
+            print(f"🎯 Utilisation de Playwright UNIVERSEL pour {url}")
             html, error = fetch_with_playwright(url)
         else:
             html, error = fetch_with_requests(url)
@@ -1816,20 +1838,26 @@ def init_rag():
 
 @app.route("/ask", methods=["GET", "POST"])
 def ask_question():
-    """Pose une question au système RAG"""
+    """Pose une question au système RAG avec support des profils clients"""
     rag_initialized = False
     rag_stats = {}
+    available_sites = []
     
     try:
         if MISTRAL_API_KEY:
-            rag_system = get_rag_system(MISTRAL_API_KEY,mongo_client)
+            rag_system = get_rag_system(MISTRAL_API_KEY, mongo_client)
             rag_stats = rag_system.get_stats()
             rag_initialized = rag_stats.get('initialized', False)
+            
+            # Charger la liste des sites disponibles avec leurs profils
+            if hasattr(rag_system, 'get_available_sites'):
+                available_sites = rag_system.get_available_sites()
     except Exception as e:
         print(f"Erreur RAG: {e}")
     
     if request.method == "POST":
         question = request.form.get("question", "").strip()
+        site_id = request.form.get("site_id", "").strip()
         
         if not question:
             flash("Veuillez poser une question.", "warning")
@@ -1844,22 +1872,34 @@ def ask_question():
             return redirect(url_for("ask_question"))
         
         try:
-            rag_system = get_rag_system(MISTRAL_API_KEY)
-            answer = rag_system.ask_question(question)
+            rag_system = get_rag_system(MISTRAL_API_KEY, mongo_client)
+            
+            # Utiliser la méthode ask_question avec contexte client
+            answer = rag_system.ask_question(question, site_id if site_id else None)
+            
+            # Récupérer les infos du site si spécifié
+            site_info = None
+            if site_id and hasattr(rag_system, 'profile_manager'):
+                site_info = rag_system.profile_manager.get_profile(site_id)
             
             return render_template("ask.html", 
                                 question=question, 
                                 answer=answer,
+                                site_id=site_id,
+                                site_info=site_info,
                                 rag_initialized=rag_initialized,
-                                rag_stats=rag_stats)
+                                rag_stats=rag_stats,
+                                available_sites=available_sites)
             
         except Exception as e:
             flash(f"Erreur: {str(e)}", "danger")
             return redirect(url_for("ask_question"))
     
+    # GET - Afficher le formulaire avec les sites disponibles
     return render_template("ask.html", 
                           rag_initialized=rag_initialized,
-                          rag_stats=rag_stats)
+                          rag_stats=rag_stats,
+                          available_sites=available_sites)
     
 @app.route("/rag_search", methods=["POST"])
 def rag_search():
