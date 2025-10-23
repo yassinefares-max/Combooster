@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug RAG</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .debug-card {
+            margin-bottom: 20px;
+        }
+        .site-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .data-section {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .hash-code {
+            font-family: monospace;
+            background-color: #e9ecef;
+            padding: 5px;
+            border-radius: 3px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">🔍 Debug du Système RAG</h1>
+        
+        <!-- Navigation -->
+        <div class="mb-4">
+            <a href="{{ url_for('ask_question') }}" class="btn btn-primary">← Retour aux questions</a>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Accueil</a>
+        </div>
+
+        {% if not rag_initialized %}
+        <div class="alert alert-warning">
+            <strong>⚠️ RAG Non Initialisé</strong>
+            <p>Le système RAG n'est pas initialisé. Veuillez d'abord initialiser le RAG.</p>
+        </div>
+        {% else %}
+        
+        <div class="row">
+            <!-- Statistiques Générales -->
+            <div class="col-md-6">
+                <div class="card debug-card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">📊 Statistiques Générales</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Initialisé:</span>
+                                <strong>{{ stats.initialized }}</strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Sites totaux:</span>
+                                <strong>{{ stats.total_sites }}</strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Pages totales:</span>
+                                <strong>{{ stats.total_pages }}</strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Produits totaux:</span>
+                                <strong>{{ stats.total_products }}</strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Documents totaux:</span>
+                                <strong>{{ stats.total_documents }}</strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Taille index FAISS:</span>
+                                <strong>{{ stats.index_size }}</strong>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documents par Catégorie -->
+            <div class="col-md-6">
+                <div class="card debug-card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">📑 Documents par Catégorie</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Documents produits:</span>
+                                <strong>{{ stats.product_documents }}</strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Documents pages:</span>
+                                <strong>{{ stats.page_documents }}</strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Documents footer:</span>
+                                <strong>{{ stats.footer_documents }}</strong>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sites Détails -->
+        <div class="card debug-card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">🌐 Sites Indexés ({{ stats.sites|length }})</h5>
+            </div>
+            <div class="card-body">
+                <div class="site-list">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Site ID</th>
+                                <th>URL</th>
+                                <th>Pages</th>
+                                <th>Produits</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for site_id in stats.sites %}
+                            <tr>
+                                <td><code>{{ site_id }}</code></td>
+                                <td>
+                                    {% if stats.sites_details and site_id in stats.sites_details %}
+                                        {{ stats.sites_details[site_id].start_url }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if stats.sites_details and site_id in stats.sites_details %}
+                                        {{ stats.sites_details[site_id].pages }}
+                                    {% else %}
+                                        ?
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if stats.sites_details and site_id in stats.sites_details %}
+                                        {{ stats.sites_details[site_id].products }}
+                                    {% else %}
+                                        ?
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-success">✅ Indexé</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informations de Debug Avancées -->
+        <div class="card debug-card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">🐛 Informations de Debug</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Fichiers de données:</h6>
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>last_scrape.json:</span>
+                                <span>
+                                    {% if stats.last_scrape_exists %}
+                                        <span class="badge bg-success">✅ Présent</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">❌ Absent</span>
+                                    {% endif %}
+                                </span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Index FAISS:</span>
+                                <span>
+                                    {% if stats.index_size > 0 %}
+                                        <span class="badge bg-success">✅ Chargé</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">❌ Vide</span>
+                                    {% endif %}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Actions de debug:</h6>
+                        <div class="d-grid gap-2">
+                            <form action="{{ url_for('rebuild_index') }}" method="post">
+                                <button type="submit" class="btn btn-warning w-100">
+                                    🔧 Reconstruire l'Index
+                                </button>
+                            </form>
+                            <form action="{{ url_for('init_rag_force') }}" method="post">
+                                <button type="submit" class="btn btn-danger w-100">
+                                    🗃️ Forcer Réinitialisation
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% endif %}
+
+        <!-- Section pour les données brutes (optionnelle) -->
+        <div class="card debug-card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">📋 Données Brutes (JSON)</h5>
+            </div>
+            <div class="card-body">
+                <details>
+                    <summary>Voir les données brutes du statut</summary>
+                    <pre class="mt-3 p-3 bg-light border rounded" style="max-height: 400px; overflow-y: auto;"><code>{{ stats|tojson(indent=2) }}</code></pre>
+                </details>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

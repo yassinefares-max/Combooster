@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scraper Avancé - Toutes les données</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .card { margin-bottom: 1rem; }
+        .product-item { border-left: 3px solid #0d6efd; padding-left: 10px; margin-bottom: 10px; }
+        .footer-info { background-color: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 10px; }
+        .preview-text { max-height: 100px; overflow-y: auto; }
+        .badge-custom { font-size: 0.8em; }
+        .campaign-box { background:#f9f9f9; border-radius:8px; padding:10px; margin-bottom:10px; }
+        .form-detected { background-color: #e7f3ff; padding: 10px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #0d6efd; }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">🕷️ Combooster scraper</h1>
+
+        <!-- Messages Flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Formulaire de scraping -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Configuration du scraping</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/scrape">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="start_url" class="form-label">URL de départ *</label>
+                                <input type="url" class="form-control" id="start_url" name="start_url" 
+                                       placeholder="https://example.com" required>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="max_pages" class="form-label">Pages maximum</label>
+                                        <input type="number" class="form-control" id="max_pages" name="max_pages" 
+                                               value="50" min="1" max="1000">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="max_depth" class="form-label">Profondeur maximum</label>
+                                        <input type="number" class="form-control" id="max_depth" name="max_depth" 
+                                               value="2" min="1" max="10">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Options de scraping</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="render_js" name="render_js" 
+                                           {% if playwright_available %}checked{% endif %}>
+                                    <label class="form-check-label" for="render_js">
+                                        Rendu JavaScript 
+                                        {% if not playwright_available %}
+                                            <span class="badge bg-warning text-dark">Non disponible</span>
+                                        {% endif %}
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="scrape_products" name="scrape_products" checked>
+                                    <label class="form-check-label" for="scrape_products">
+                                        Scraper les produits et prix
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="scrape_footer" name="scrape_footer" checked>
+                                    <label class="form-check-label" for="scrape_footer">
+                                        Scraper les footers
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="detect_forms" name="detect_forms" checked>
+                                    <label class="form-check-label" for="detect_forms">
+                                        🆕 Détecter et mapper les formulaires
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="scrape_promoted_products" id="scrape_promoted_products" checked>
+                                    <label class="form-check-label" for="scrape_promoted_products">
+                                        Scraper les produits promus/mis en avant
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success btn-lg">
+                        🚀 Lancer le scraping
+                    </button>
+                </form>
+            </div>
+        </div>
+         <!-- AJOUTEZ ICI LA NOUVELLE SECTION MARKETING -->
+        <!-- Section Marketing Digital & Community Management -->
+        <div class="card mt-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">🎯 Marketing Digital & Community Management</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5>📊 Analyse Marketing</h5>
+                                <p class="text-muted">Analyse approfondie des données pour des insights marketing</p>
+                                <a href="/marketing_analysis" class="btn btn-primary">
+                                    🚀 Lancer l'analyse
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5>📅 Calendrier de Contenu</h5>
+                                <p class="text-muted">Génère un calendrier éditorial unique pour les réseaux sociaux</p>
+                                <a href="/content_calendar" class="btn btn-success">
+                                    🗓️ Créer un calendrier
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-4 mb-2">
+                        <a href="/ask" class="btn btn-outline-primary w-100">
+                            🤖 Assistant RAG
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <a href="/rag_debug" class="btn btn-outline-secondary w-100">
+                            🔧 Debug RAG
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <form action="/init_rag_manual" method="POST" class="d-inline w-100">
+                            <button type="submit" class="btn btn-outline-info w-100">
+                                🔄 Initialiser RAG
+                            </button>
+                        </form>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <a href="/generation_history" class="btn btn-outline-dark w-100">
+                            📊 Historique
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Résultats -->
+        {% if results %}
+        <div class="card mt-4">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Résultats du scraping ({{ results|length }} pages)</h5>
+                <div>
+                    <a href="/view_forms" class="btn btn-warning btn-sm me-2">📋 Voir Formulaires</a>
+                    <a href="/download_csv" class="btn btn-light btn-sm me-2">📥 Télécharger CSV</a>
+                    <a href="/download_json" class="btn btn-light btn-sm me-2">📥 Télécharger JSON</a>
+                    <a href="/download_products_csv" class="btn btn-light btn-sm me-2">📥 Produits CSV</a>
+                    <a href="/download_promoted_csv" class="btn btn-warning btn-sm me-2">⭐ Produits Promus</a>
+                    <a href="/download_form_mappings_csv" class="btn btn-info btn-sm">📋 Mappings CSV</a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% for item in results %}
+                <div class="card mb-3 {% if item.error %}border-danger{% endif %}">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">
+                                    <a href="{{ item.url }}" target="_blank" class="text-decoration-none">
+                                        {{ item.title or "Sans titre" }}
+                                    </a>
+                                </h6>
+                                <small class="text-muted">{{ item.url }}</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-primary">Profondeur: {{ item.depth }}</span>
+                                {% if item.word_count %}
+                                <span class="badge bg-info">Mots: {{ item.word_count }}</span>
+                                {% endif %}
+                                {% if item.forms %}
+                                <span class="badge bg-warning text-dark">📋 {{ item.forms|length }} formulaire(s)</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {% if item.error %}
+                        <div class="alert alert-danger py-2">
+                            <strong>Erreur:</strong> {{ item.error }}
+                        </div>
+                        {% endif %}
+
+                        <!-- Formulaires détectés -->
+                        {% if item.forms %}
+                        <div class="form-detected mb-3">
+                            <h6>📋 Formulaires détectés ({{ item.forms|length }})</h6>
+                            <div class="row">
+                                {% for form in item.forms %}
+                                <div class="col-md-6 mb-2">
+                                    <div class="card">
+                                        <div class="card-body py-2">
+                                            <strong>{{ form.form_type }}</strong>
+                                            <span class="badge bg-secondary ms-2">{{ form.fields|length }} champs</span>
+                                            {% if item.form_mappings %}
+                                                {% set mappings_count = item.form_mappings | selectattr('form.form_index', 'equalto', form.form_index) | list | length %}
+                                                {% if mappings_count > 0 %}
+                                                <span class="badge bg-success ms-2">✓ {{ mappings_count }} mapping(s)</span>
+                                                {% endif %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Produits -->
+                        {% if item.products %}
+                        <div class="mb-3">
+                            <h6>📦 Produits ({{ item.products|length }})</h6>
+                            <div class="row">
+                                {% for product in item.products %}
+                                <div class="col-lg-6 mb-2">
+                                    <div class="product-item">
+                                        <div class="d-flex justify-content-between">
+                                            <strong>{{ product.name or "Sans nom" }}</strong>
+                                            {% if product.price %}
+                                            <span class="badge bg-success">{{ product.price }}</span>
+                                            {% endif %}
+                                        </div>
+                                        {% if product.promoted %}
+                                        <div class="mt-1">
+                                            <span class="badge bg-warning text-dark">⭐ Promu</span>
+                                            <span class="badge bg-info">Score: {{ product.promoted_score }}</span>
+                                        </div>
+                                        {% endif %}
+                                        {% if product.promoted_reasons %}
+                                        <small class="text-muted d-block mt-1">Raisons :{{ product.promoted_reasons|join(', ') }}</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        
+
+        <!-- Statistiques -->
+        {% if results %}
+        <div class="card mt-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">📊 Statistiques du scraping</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h4>{{ results|length }}</h4>
+                                <small>Pages scrapées</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h4>{{ stats.total_products if stats else 0 }}</h4>
+                                <small>Produits trouvés</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h4>{{ stats.promoted_products if stats else 0 }}</h4>
+                                <small>⭐ Produits promus</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h4>{{ stats.error_pages if stats else 0 }}</h4>
+                                <small>Pages avec erreurs</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h4>{{ stats.total_images if stats else 0 }}</h4>
+                                <small>Images totales</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Instructions -->
+        <div class="card mt-4">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">💡 Instructions</h5>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li>Le scraper extrait automatiquement les produits, prix, footers et toutes les données structurées</li>
+                    <li><strong>🆕 Détection intelligente des formulaires:</strong> Le système détecte automatiquement les champs de formulaire et les mappe aux données scrapées</li>
+                    <li>Cochez "Rendu JavaScript" pour les sites utilisant React, Angular, Vue.js</li>
+                    <li>Les produits sont détectés automatiquement sur les pages e-commerce</li>
+                    <li>Les footers sont analysés pour les liens et informations de contact</li>
+                    <li>Téléchargez les résultats en CSV, JSON, ou consultez les mappings de formulaires</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-focus sur le champ URL
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlInput = document.getElementById('start_url');
+            if (urlInput) {
+                urlInput.focus();
+            }
+        });
+
+        // 📣 Gestion du formulaire de campagne marketing
+        document.getElementById('campaignForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                product_name: form.product_name.value,
+                platform: form.platform.value,
+                tone: form.tone.value,
+                n_variants: form.n_variants.value
+            };
+
+            const resBox = document.getElementById('campaignResults');
+            resBox.innerHTML = "<div class='alert alert-info'>⏳ Génération en cours...</div>";
+
+            try {
+                const response = await fetch("/generate_campaign", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                if(result.campaigns){
+                    resBox.innerHTML = "";
+                    result.campaigns.forEach(c => {
+                        resBox.innerHTML += `<div class="campaign-box">${c}</div>`;
+                    });
+                } else {
+                    resBox.innerHTML = "<div class='alert alert-danger'>Erreur: " + (result.error || "inconnue") + "</div>";
+                }
+            } catch(error) {
+                resBox.innerHTML = "<div class='alert alert-danger'>Erreur de connexion</div>";
+            }
+        });
+    </script>
+</body>
+</html>
