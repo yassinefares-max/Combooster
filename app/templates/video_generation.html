@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Génération de Vidéo Marketing</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .video-preview {
+            background: linear-gradient(45deg, #f8f9fa 25%, transparent 25%), 
+                        linear-gradient(-45deg, #f8f9fa 25%, transparent 25%), 
+                        linear-gradient(45deg, transparent 75%, #f8f9fa 75%), 
+                        linear-gradient(-45deg, transparent 75%, #f8f9fa 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            min-height: 300px;
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+        }
+        .btn-video {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .btn-video:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="mb-4">🎬 Génération de Vidéo Marketing</h1>
+
+                <!-- Messages Flash -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Formulaire de génération -->
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">📝 Configuration de la vidéo</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('video_generation') }}">
+                            <!-- Sélection du client -->
+                            <div class="mb-3">
+                                <label for="site_id" class="form-label">🏢 Client (optionnel)</label>
+                                <select class="form-select" name="site_id" id="site_id">
+                                    <option value="">Aucun client spécifique</option>
+                                    {% if available_sites %}
+                                        {% for site in available_sites %}
+                                            <option value="{{ site.site_id }}" {% if site_id == site.site_id %}selected{% endif %}>
+                                                {{ site.company_name }} - {{ site.domain }}
+                                            </option>
+                                        {% endfor %}
+                                    {% endif %}
+                                </select>
+                                <small class="form-text text-muted">
+                                    Sélectionnez un client pour personnaliser le contexte
+                                </small>
+                            </div>
+
+                            <!-- URL de l'image produit -->
+                            <div class="mb-3">
+                                <label for="product_image_url" class="form-label">🖼️ URL de l'image produit</label>
+                                <input type="url" class="form-control" id="product_image_url" name="product_image_url" 
+                                       value="{{ request.form.product_image_url }}" 
+                                       placeholder="https://example.com/image.jpg" required>
+                                <small class="form-text text-muted">
+                                    L'image servira de base pour la génération de la vidéo
+                                </small>
+                            </div>
+
+                            <!-- Description du produit -->
+                            <div class="mb-3">
+                                <label for="product_description" class="form-label">📝 Description du produit</label>
+                                <textarea class="form-control" id="product_description" name="product_description" 
+                                          rows="3" placeholder="Décrivez le produit et ses caractéristiques...">{{ request.form.product_description }}</textarea>
+                            </div>
+
+                            <!-- Ton -->
+                            <div class="mb-3">
+                                <label for="tone" class="form-label">🎭 Ton souhaité</label>
+                                <select class="form-select" name="tone" id="tone">
+                                    <option value="professional" {% if tone == 'professional' %}selected{% endif %}>💼 Professionnel</option>
+                                    <option value="casual" {% if tone == 'casual' %}selected{% endif %}>😊 Décontracté</option>
+                                    <option value="luxury" {% if tone == 'luxury' %}selected{% endif %}>💎 Luxe</option>
+                                    <option value="playful" {% if tone == 'playful' %}selected{% endif %}>🎉 Ludique</option>
+                                    <option value="minimalist" {% if tone == 'minimalist' %}selected{% endif %}>✨ Minimaliste</option>
+                                </select>
+                            </div>
+
+                            <!-- Réseau social -->
+                            <div class="mb-3">
+                                <label for="social_media" class="form-label">📱 Réseau social cible</label>
+                                <select class="form-select" name="social_media" id="social_media">
+                                    <option value="instagram" {% if social_media == 'instagram' %}selected{% endif %}>📸 Instagram</option>
+                                    <option value="tiktok" {% if social_media == 'tiktok' %}selected{% endif %}>🎵 TikTok</option>
+                                    <option value="facebook" {% if social_media == 'facebook' %}selected{% endif %}>👥 Facebook</option>
+                                    <option value="youtube" {% if social_media == 'youtube' %}selected{% endif %}>▶️ YouTube</option>
+                                </select>
+                                <small class="form-text text-muted">
+                                    Le format sera adapté à la plateforme sélectionnée
+                                </small>
+                            </div>
+
+                            <button type="submit" class="btn btn-video btn-lg">
+                                🎬 Générer la Vidéo
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Résultat de la génération -->
+                {% if video_result %}
+                <div class="card mt-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">✅ Vidéo Générée avec Succès</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>📊 Informations</h6>
+                                <ul class="list-unstyled">
+                                    <li><strong>Plateforme:</strong> {{ video_result.platform|upper }}</li>
+                                    <li><strong>Statut:</strong> Génération réussie</li>
+                                    <li><strong>URL:</strong> 
+                                        <a href="{{ video_result.video_url }}" target="_blank" class="text-break">
+                                            {{ video_result.video_url[:50] }}...
+                                        </a>
+                                    </li>
+                                </ul>
+                                
+                                <div class="mt-3">
+                                    <a href="{{ video_result.video_url }}" 
+                                       target="_blank" 
+                                       class="btn btn-success">
+                                        📥 Télécharger la vidéo
+                                    </a>
+                                    <button class="btn btn-outline-primary" 
+                                            onclick="copyVideoUrl('{{ video_result.video_url }}')">
+                                        📋 Copier le lien
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>🎬 Aperçu</h6>
+                                <div class="video-preview d-flex align-items-center justify-content-center">
+                                    {% if video_result.video_url %}
+                                        <video controls width="100%" style="max-height: 250px;">
+                                            <source src="{{ video_result.video_url }}" type="video/mp4">
+                                            Votre navigateur ne supporte pas la lecture vidéo.
+                                        </video>
+                                    {% else %}
+                                        <span class="text-muted">Aperçu non disponible</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Prompt utilisé -->
+                        {% if video_result.prompt_used %}
+                        <div class="mt-3">
+                            <h6>📝 Prompt utilisé</h6>
+                            <div class="alert alert-light">
+                                <small>{{ video_result.prompt_used }}</small>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Informations -->
+                <div class="card mt-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">ℹ️ Informations</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>⏱️ Temps de génération</h6>
+                                <p>2-5 minutes selon la complexité</p>
+                                
+                                <h6>🎯 Formats supportés</h6>
+                                <ul>
+                                    <li>Instagram: Carré (512x512)</li>
+                                    <li>TikTok: Vertical (384x672)</li>
+                                    <li>Facebook: Carré (512x512)</li>
+                                    <li>YouTube: Horizontal (768x432)</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>💡 Recommandations</h6>
+                                <ul>
+                                    <li>Utilisez des images haute qualité</li>
+                                    <li>Adaptez le ton à votre audience</li>
+                                    <li>Choisissez le format selon la plateforme</li>
+                                    <li>Testez différents styles</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="mt-4 mb-4">
+                    <a href="{{ url_for('ask_question') }}" class="btn btn-secondary">← Retour aux questions</a>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-primary">🏠 Accueil scraping</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+    function copyVideoUrl(url) {
+        navigator.clipboard.writeText(url).then(function() {
+            alert('✅ Lien vidéo copié dans le presse-papier!');
+        }).catch(function(err) {
+            alert('❌ Erreur lors de la copie');
+        });
+    }
+
+    // Prévisualisation de l'URL d'image
+    document.getElementById('product_image_url').addEventListener('change', function(e) {
+        const url = e.target.value;
+        if (url) {
+            console.log('🖼️ Image URL:', url);
+        }
+    });
+    </script>
+</body>
+</html>

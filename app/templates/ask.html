@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistant RAG - Questions sur les données</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .chat-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .question-bubble {
+            background-color: #e3f2fd;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-purple:hover {
+            background: linear-gradient(135deg, #8e44ad 0%, #7d3c98 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(155, 89, 182, 0.4);
+        }
+
+        .btn-purple:disabled {
+            background: #6c757d;
+            transform: none;
+            box-shadow: none;
+        }
+        .answer-bubble {
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #0d6efd;
+        }
+        .rag-status {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .status-initialized {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+        .status-not-initialized {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+        .btn-group-smart {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .status-badge {
+            font-size: 0.8em;
+            padding: 3px 8px;
+            border-radius: 10px;
+        }
+        .site-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        /* Styles pour les images générées */
+        .generated-image-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 2px solid #e9ecef;
+        }
+
+        .generated-image-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .image-placeholder {
+            background: linear-gradient(45deg, #f8f9fa 25%, transparent 25%), 
+                        linear-gradient(-45deg, #f8f9fa 25%, transparent 25%), 
+                        linear-gradient(45deg, transparent 75%, #f8f9fa 75%), 
+                        linear-gradient(-45deg, transparent 75%, #f8f9fa 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+        .btn-copy {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-copy:after {
+            content: '📋';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .btn-copy.copied:after {
+            opacity: 1;
+        }
+        .context-info {
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 5px 5px 0;
+        }
+        .profile-completeness {
+            font-size: 0.8em;
+            color: #6c757d;
+        }
+        .site-card {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .site-card:hover {
+            border-color: #007bff;
+            background-color: #f8f9fa;
+        }
+        .site-card.selected {
+            border-color: #007bff;
+            background-color: #e7f1ff;
+        }
+        .btn-purple {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .btn-purple:hover {
+            background: linear-gradient(135deg, #8e44ad 0%, #7d3c98 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(155, 89, 182, 0.3);
+        }
+        .customer-profile-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        color: #495057;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid #dee2e6;
+    }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="mb-4">🤖 Assistant RAG - Questions sur les données</h1>
+
+                <!-- Messages Flash -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Section Profils Clients -->
+                {% if available_sites and available_sites|length > 0 %}
+                <div class="customer-profile-section">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">👥 Sites Clients Disponibles</h5>
+                            <p class="mb-0">Sélectionnez un site pour personnaliser les réponses</p>
+                        </div>
+                        <span class="badge bg-light text-dark">{{ available_sites|length }} sites</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Contrôles RAG intelligents -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6>🔍 Contrôle du RAG</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <strong>💡 Initialisation Manuelle</strong>
+                            <p class="mb-2">Initialisez le RAG seulement quand vous voulez poser des questions.</p>
+                        </div>
+                        <div class="mt-2">
+                            <form action="{{ url_for('init_rag_manual') }}" method="post" class="d-inline me-2">
+                                <button type="submit" class="btn btn-success">
+                                    🚀 Initialiser le RAG
+                                </button>
+                            </form>
+                            <form action="{{ url_for('init_rag_force') }}" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-warning">
+                                    🔨 Forcer la Réinit
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statut en temps réel -->
+                <!-- Statut en temps réel -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6>📊 Statut du RAG en temps réel</h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="ragStatus">
+                            <p class="text-muted">Chargement du statut...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statut RAG traditionnel -->
+                <div class="rag-status {% if rag_initialized %}status-initialized{% else %}status-not-initialized{% endif %}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>Statut RAG:</strong>
+                            {% if rag_initialized %}
+                                ✅ Système initialisé et prêt
+                            {% else %}
+                                ❌ Système non initialisé
+                            {% endif %}
+                        </div>
+                        <div class="btn-group-smart">
+                            {% if not rag_initialized %}
+                            <form method="POST" action="{{ url_for('init_rag_manual') }}" class="d-inline">
+                                <button type="submit" class="btn btn-primary btn-sm">Initialiser RAG</button>
+                            </form>
+                            {% else %}
+                            <form method="POST" action="{{ url_for('rebuild_index') }}" class="d-inline">
+                                <button type="submit" class="btn btn-warning btn-sm">Reconstruire Index</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistiques RAG -->
+                {% if rag_initialized and rag_stats %}
+                <div class="stats-card">
+                    <h5 class="mb-3">📊 Statistiques du système RAG</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="stat-item">
+                                <span>Sites indexés:</span>
+                                <strong>{{ rag_stats.total_sites }}</strong>
+                            </div>
+                            <div class="stat-item">
+                                <span>Pages analysées:</span>
+                                <strong>{{ rag_stats.total_pages }}</strong>
+                            </div>
+                            <div class="stat-item">
+                                <span>Produits totaux:</span>
+                                <strong>{{ rag_stats.total_products }}</strong>
+                            </div>
+                            {% if rag_stats.total_promoted_products %}
+                            <div class="stat-item">
+                                <span>Produits promus:</span>
+                                <strong>{{ rag_stats.total_promoted_products }}</strong>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <div class="stat-item">
+                                <span>Documents indexés:</span>
+                                <strong>{{ rag_stats.total_documents }}</strong>
+                            </div>
+                            <div class="stat-item">
+                                <span>Index FAISS:</span>
+                                <strong>{{ rag_stats.index_size }} vecteurs</strong>
+                            </div>
+                            <div class="stat-item">
+                                <span>Documents produits:</span>
+                                <strong>{{ rag_stats.product_documents }}</strong>
+                            </div>
+                            <div class="stat-item">
+                                <span>Documents pages:</span>
+                                <strong>{{ rag_stats.page_documents }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Formulaire de question -->
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">💬 Poser une question</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="/ask" id="questionForm" enctype="multipart/form-data">
+                            <!-- Sélection du site client -->
+                            {% if available_sites and available_sites|length > 0 %}
+                            <div class="mb-3">
+                                <label for="site_id" class="form-label">🌐 Site spécifique (optionnel)</label>
+                                <select class="form-select" name="site_id" id="siteSelect">
+                                    <option value="">Tous les sites (réponse générale)</option>
+                                    {% for site in available_sites %}
+                                    <option value="{{ site.site_id }}" 
+                                            {% if site_id == site.site_id %}selected{% endif %}>
+                                        {{ site.company_name }} - {{ site.domain }}
+                                        ({{ site.industry }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <small class="form-text text-muted">
+                                    Sélectionnez un site spécifique pour une réponse personnalisée
+                                </small>
+                            </div>
+
+                            <!-- Aperçu du profil si site sélectionné -->
+                            <div id="profilePreview" class="mb-3" style="display: none;">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6>👤 Profil du site sélectionné</h6>
+                                        <div id="profileContent"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Question -->
+                            <div class="mb-3">
+                                <label for="question" class="form-label">Votre question sur les données scrapées:</label>
+                                <textarea class="form-control" id="question" name="question" rows="3" 
+                                          placeholder="Exemple: Quels sont les produits les plus chers ? Quels sites ont été scrapés ? Quels sont les prix moyens ? Quels sont les produits promus sur la page d'accueil ?" 
+                                          required>{% if question %}{{ question }}{% endif %}</textarea>
+                            </div>
+                            <button type="submit" class="btn btn-success" {% if not rag_initialized %}disabled{% endif %}>
+                                🚀 Poser la question
+                            </button>
+                            {% if not rag_initialized %}
+                            <small class="text-danger d-block mt-1">⚠️ Le système RAG doit être initialisé pour poser des questions</small>
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Réponse -->
+                <!-- Réponse -->
+                {% if question and answer %}
+                <div class="chat-container mt-4">
+                    <div class="question-bubble">
+                        <strong>Vous:</strong> {{ question }}
+                        {% if site_info %}
+                        <div class="site-badge mt-2">
+                            🌐 Site: <strong>{{ site_info.company_name|default(site_info.domain, true) }}</strong>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="answer-bubble">
+                        <strong>Assistant RAG:</strong> 
+                        {% if site_info %}
+                        <div class="context-info">
+                            <h6>🎯 Contexte du site appliqué:</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Domaine:</strong> {{ site_info.domain|default('Non spécifié', true) }}</p>
+                                    <p><strong>Industrie:</strong> {{ site_info.industry|default('Non spécifiée', true) }}</p>
+                                    <p><strong>Type:</strong> {{ site_info.business_type|default('Non spécifié', true) }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Position:</strong> {{ site_info.market_position|default('Non spécifiée', true) }}</p>
+                                    <p><strong>Audience:</strong> 
+                                        {% if site_info.target_audience and site_info.target_audience.demographics %}
+                                            {{ site_info.target_audience.demographics|join(', ') }}
+                                        {% else %}
+                                            Non analysée
+                                        {% endif %}
+                                    </p>
+                                    <p><strong>Gamme de prix:</strong> 
+                                        {% if site_info.target_audience and site_info.target_audience.price_range %}
+                                            {{ site_info.target_audience.price_range }}
+                                        {% else %}
+                                            Non spécifiée
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            {% if site_info.brand_voice %}
+                            <p><strong>Voix de marque:</strong> {{ site_info.brand_voice }}</p>
+                            {% endif %}
+                            {% if site_info.brand_values %}
+                            <p><strong>Valeurs:</strong> {{ site_info.brand_values|join(', ') }}</p>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        <div class="mt-2" style="white-space: pre-wrap;">{{ answer }}</div>
+                    </div>
+                </div>
+                {% endif %}
+                <!-- Cette section doit être APRÈS le champ question -->
+                <!-- ✅ GÉNÉRATION D'IMAGE - VERSION COMPLÈTE ET TESTÉE -->
+                
+                {% if leonardo_available %}
+                <div class="card mt-3 mb-3" style="border: 2px solid #9b59b6;">
+                    <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        <h6 class="mb-0">🎨 Génération d'Image Marketing</h6>
+                    </div>
+                    <div class="card-body">
+                        <!-- Option référence -->
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" 
+                                    type="checkbox" 
+                                    name="use_reference" 
+                                    id="use_reference" 
+                                    value="true"
+                                    {% if use_reference %}checked{% endif %}>
+                                <label class="form-check-label" for="use_reference">
+                                    <strong>🖼️ Utiliser une image de référence</strong>
+                                </label>
+                            </div>
+                            <small class="form-text text-muted">
+                                Cochez pour utiliser une image existante comme base de génération
+                            </small>
+                        </div>
+
+                        <!-- Section image référence (cachée par défaut) -->
+                        <div id="referenceSection" style="display: {% if use_reference %}block{% else %}none{% endif %};">
+                            <div class="mb-3">
+                                <label for="reference_image_url" class="form-label">
+                                    <strong>🌐 URL de l'image de référence:</strong>
+                                </label>
+                                <input type="url" 
+                                    class="form-control" 
+                                    name="reference_image_url" 
+                                    id="reference_image_url" 
+                                    placeholder="https://example.com/image.jpg"
+                                    value="{{ reference_image_url or '' }}">
+                                <small class="form-text text-muted">
+                                    Entrez l'URL complète d'une image (JPG, PNG, WebP). L'IA s'inspirera de cette image.
+                                </small>
+                                <div id="referencePreview" class="mt-2"></div>
+                            </div>
+
+                            <!-- Contrôle de fidélité -->
+                            <div class="mb-3">
+                                <label for="image_strength" class="form-label">
+                                    <strong>🎚️ Fidélité à l'image référence:</strong>
+                                    <span id="strengthValue" class="badge bg-info">{{ (image_strength * 100)|int if image_strength else 50 }}%</span>
+                                </label>
+                                <input type="range" 
+                                    class="form-range" 
+                                    name="image_strength" 
+                                    id="image_strength" 
+                                    min="0.1" 
+                                    max="0.9" 
+                                    step="0.1" 
+                                    value="{{ image_strength if image_strength else 0.5 }}">
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-muted">⬅️ Plus créatif</small>
+                                    <small class="text-muted">Plus fidèle ➡️</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form method="POST" 
+                            action="{{ url_for('generate_marketing_image') }}" 
+                            id="imageGenerationForm" 
+                            enctype="multipart/form-data">
+                            
+                            <!-- Texte Publicitaire -->
+                            <div class="mb-3">
+                                <label for="ad_copy" class="form-label">
+                                    <strong>📝 Description de l'image (obligatoire):</strong>
+                                </label>
+                                <textarea class="form-control" 
+                                        name="ad_copy" 
+                                        id="ad_copy" 
+                                        rows="3" 
+                                        placeholder="Ex: Créez une image marketing élégante pour notre nouveau café, avec des tons chaleureux et une ambiance cozy..." 
+                                        required>{% if ad_copy %}{{ ad_copy }}{% endif %}</textarea>
+                                <small class="form-text text-muted">
+                                    Décrivez en détail l'image que vous souhaitez créer
+                                </small>
+                            </div>
+                            
+                            <!-- Ton -->
+                            <div class="mb-3">
+                                <label for="tone" class="form-label">
+                                    <strong>🎭 Ton souhaité:</strong>
+                                </label>
+                                <select class="form-select" name="tone" id="tone">
+                                    <option value="professional" {% if tone == 'professional' %}selected{% endif %}>💼 Professionnel</option>
+                                    <option value="casual" {% if tone == 'casual' %}selected{% endif %}>😊 Décontracté</option>
+                                    <option value="luxury" {% if tone == 'luxury' %}selected{% endif %}>💎 Luxe</option>
+                                    <option value="playful" {% if tone == 'playful' %}selected{% endif %}>🎉 Ludique</option>
+                                    <option value="minimalist" {% if tone == 'minimalist' %}selected{% endif %}>✨ Minimaliste</option>
+                                    <option value="bold" {% if tone == 'bold' %}selected{% endif %}>⚡ Audacieux</option>
+                                    <option value="elegant" {% if tone == 'elegant' %}selected{% endif %}>🌹 Élégant</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Style -->
+                            <div class="mb-3">
+                                <label for="style" class="form-label">
+                                    <strong>🎨 Style d'image:</strong>
+                                </label>
+                                <select class="form-select" name="style" id="style">
+                                    <option value="marketing" {% if style == 'marketing' %}selected{% endif %}>📊 Marketing</option>
+                                    <option value="social_media" {% if style == 'social_media' %}selected{% endif %}>📱 Réseaux sociaux</option>
+                                    <option value="banner" {% if style == 'banner' %}selected{% endif %}>🖼️ Bannière web</option>
+                                    <option value="poster" {% if style == 'poster' %}selected{% endif %}>📰 Poster</option>
+                                    <option value="product" {% if style == 'product' %}selected{% endif %}>📦 Photo produit</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Champs cachés pour le contexte -->
+                            <input type="hidden" name="question" id="image_question" value="{{ question or '' }}">
+                            <input type="hidden" name="site_id" id="image_site_id" value="{{ site_id or '' }}">
+                            
+                            <!-- Bouton de soumission -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-purple btn-lg">
+                                    🎨 Générer l'Image Marketing
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <div class="alert alert-warning mt-3">
+                            <strong>⏱️ Temps de génération:</strong> 30-90 secondes
+                            <br><strong>💡 Astuce:</strong> Avec référence = plus fidèle | Sans référence = plus créatif
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                // Gestion de l'affichage de la section référence
+                document.addEventListener('DOMContentLoaded', function() {
+                    const useReference = document.getElementById('use_reference');
+                    const referenceSection = document.getElementById('referenceSection');
+                    
+                    if (useReference && referenceSection) {
+                        useReference.addEventListener('change', function() {
+                            referenceSection.style.display = this.checked ? 'block' : 'none';
+                        });
+                    }
+                    
+                    // Gestion du slider de force
+                    const imageStrengthSlider = document.getElementById('image_strength');
+                    const strengthValue = document.getElementById('strengthValue');
+                    
+                    if (imageStrengthSlider && strengthValue) {
+                        imageStrengthSlider.addEventListener('input', function() {
+                            const percent = Math.round(this.value * 100);
+                            strengthValue.textContent = percent + '%';
+                        });
+                    }
+                    
+                    // Prévisualisation de l'image depuis URL
+                    const referenceImageUrlInput = document.getElementById('reference_image_url');
+                    const referencePreview = document.getElementById('referencePreview');
+                    
+                    if (referenceImageUrlInput && referencePreview) {
+                        let previewTimeout;
+                        
+                        referenceImageUrlInput.addEventListener('input', function(e) {
+                            const url = e.target.value.trim();
+                            
+                            // Clear previous timeout
+                            clearTimeout(previewTimeout);
+                            
+                            if (url && isValidUrl(url)) {
+                                // Debounce pour éviter trop de requêtes
+                                previewTimeout = setTimeout(() => {
+                                    showImagePreview(url);
+                                }, 1000);
+                            } else {
+                                referencePreview.innerHTML = '';
+                            }
+                        });
+                        
+                        function isValidUrl(string) {
+                            try {
+                                new URL(string);
+                                return true;
+                            } catch (_) {
+                                return false;
+                            }
+                        }
+                        
+                        function showImagePreview(imageUrl) {
+                            referencePreview.innerHTML = `
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Chargement...</span>
+                                        </div>
+                                        <p class="mt-2 mb-0">Chargement de l'image...</p>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            // Créer une image pour tester le chargement
+                            const img = new Image();
+                            img.onload = function() {
+                                referencePreview.innerHTML = `
+                                    <div class="card">
+                                        <img src="${imageUrl}" class="card-img-top" 
+                                            style="max-height: 200px; object-fit: contain;" 
+                                            alt="Prévisualisation référence"
+                                            onerror="this.style.display='none'">
+                                        <div class="card-body">
+                                            <small class="text-success">
+                                                ✅ Image chargée avec succès
+                                            </small>
+                                            <br>
+                                            <small class="text-muted">
+                                                ${img.width} × ${img.height} pixels
+                                            </small>
+                                        </div>
+                                    </div>
+                                `;
+                            };
+                            img.onerror = function() {
+                                referencePreview.innerHTML = `
+                                    <div class="alert alert-warning">
+                                        <small>⚠️ Impossible de charger l'image. Vérifiez l'URL.</small>
+                                    </div>
+                                `;
+                            };
+                            img.src = imageUrl;
+                        }
+                    }
+                });
+                </script>
+                {% endif %}
+
+                <!-- ✅ RÉSULTATS DES IMAGES GÉNÉRÉES -->
+                <!-- ✅ RÉSULTATS DES IMAGES GÉNÉRÉES -->
+                {% if generated_images %}
+                <div class="card mt-4" style="border: 2px solid #28a745;">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">🖼️ Images Générées avec Succès !</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-success">
+                            <strong>✅ Génération terminée !</strong>
+                            <p class="mb-0">{{ generated_images|length }} image(s) créée(s) avec succès.</p>
+                        </div>
+                        
+                        {% if image_prompt_used %}
+                        <div class="mb-3">
+                            <strong>📝 Prompt utilisé:</strong>
+                            <p class="text-muted">{{ image_prompt_used }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="row">
+                            {% for image_url in generated_images %}
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header bg-light">
+                                        <strong>Image {{ loop.index }}</strong>
+                                    </div>
+                                    <img src="{{ image_url }}" 
+                                        class="card-img-top" 
+                                        alt="Image marketing générée" 
+                                        style="max-height: 400px; object-fit: contain; background-color: #f8f9fa; padding: 10px;">
+                                    <div class="card-body">
+                                        <div class="d-grid gap-2">
+                                            <a href="{{ image_url }}" 
+                                            target="_blank" 
+                                            class="btn btn-success btn-sm">
+                                                📥 Télécharger
+                                            </a>
+                                            <button type="button" 
+                                                    class="btn btn-outline-primary btn-sm"
+                                                    onclick="copyImageUrl('{{ image_url }}')">
+                                                📋 Copier le lien
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Informations de contexte -->
+                        {% if site_info %}
+                        <div class="mt-3 p-3 bg-light rounded">
+                            <h6>🎯 Contexte appliqué:</h6>
+                            <p><strong>Site:</strong> {{ site_info.company_name|default(site_info.domain, true) }}</p>
+                            {% if site_info.industry %}
+                            <p><strong>Industrie:</strong> {{ site_info.industry }}</p>
+                            {% endif %}
+                            {% if site_info.brand_voice %}
+                            <p><strong>Voix de marque:</strong> {{ site_info.brand_voice }}</p>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                <!-- Liste des sites disponibles -->
+                <!-- Liste des sites disponibles -->
+                {% if available_sites and available_sites|length > 0 %}
+                <div class="card mt-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">📊 Sites disponibles ({{ available_sites|length }})</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for site in available_sites %}
+                            <div class="col-md-6 mb-3">
+                                <div class="site-card" onclick="selectSite('{{ site.site_id }}')">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">{{ site.company_name|default(site.domain, true) }}</h6>
+                                            <p class="mb-1 text-muted small">{{ site.domain|default('Domaine inconnu', true) }}</p>
+                                            <span class="badge bg-primary">{{ site.industry|default('Non spécifié', true) }}</span>
+                                            <span class="badge bg-secondary">{{ site.business_type|default('Non spécifié', true) }}</span>
+                                            <span class="badge bg-success">{{ site.market_position|default('Non spécifié', true) }}</span>
+                                        </div>
+                                        <div class="text-end">
+                                            <small class="text-muted">{{ site.scraped_count|default(0) }} pages</small>
+                                            <br>
+                                            <span class="profile-completeness">
+                                                {{ "%.0f"|format(site.profile_completeness|default(0)) }}% profil complet
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <small class="text-muted">
+                                            <strong>Audience:</strong> 
+                                            {% if site.target_audience and site.target_audience.demographics %}
+                                                {{ site.target_audience.demographics|join(', ') }}
+                                            {% else %}
+                                                Non analysée
+                                            {% endif %}
+                                        </small>
+                                        <br>
+                                        <small class="text-muted">
+                                            <strong>Gamme:</strong> 
+                                            {% if site.target_audience and site.target_audience.price_range %}
+                                                {{ site.target_audience.price_range }}
+                                            {% else %}
+                                                Non spécifiée
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Exemples de questions -->
+                <div class="card mt-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">💡 Exemples de questions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>📦 Questions sur les produits:</h6>
+                                <ul class="small">
+                                    <li>Quels sont les produits les plus chers ?</li>
+                                    <li>Liste tous les produits avec leurs prix</li>
+                                    <li>Quels produits ont des descriptions ?</li>
+                                    <li>Y a-t-il des produits en promotion ?</li>
+                                    <li>Analyse les produits promus sur les pages d'accueil</li>
+                                    <li>Compare les prix entre les sites</li>
+                                    <li>Quels produits ont des images ?</li>
+                                    <li>Liste les produits par catégorie de prix</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>🌐 Questions sur les sites:</h6>
+                                <ul class="small">
+                                    <li>Quels sites ont été scrapés ?</li>
+                                    <li>Quels sont les titres des pages ?</li>
+                                    <li>Quelles sont les descriptions meta ?</li>
+                                    <li>Combien de pages ont été analysées ?</li>
+                                    <li>Quelle est la stratégie marketing du site X ?</li>
+                                    <li>Recommandations pour optimiser le site</li>
+                                    <li>Analyse le contenu des footers</li>
+                                    <li>Quels sites ont le plus de produits ?</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h6>🎯 Questions marketing avancées:</h6>
+                                <ul class="small">
+                                    <li>Fais-moi une analyse concurrentielle des sites</li>
+                                    <li>Quelle stratégie de prix est utilisée ?</li>
+                                    <li>Recommandations pour améliorer le SEO</li>
+                                    <li>Analyse la présence des produits promus</li>
+                                    <li>Crée un post pour les réseaux sociaux pour un produit</li>
+                                    <li>Quels sont les points forts de chaque site ?</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="mt-4 mb-4">
+                    <a href="/" class="btn btn-secondary">← Retour au scraping</a>
+                    <a href="/video_generation" class="btn btn-info">🎬 Générer Vidéo</a>
+                    {% if rag_initialized %}
+                    <a href="/download_json" class="btn btn-outline-primary">📥 Télécharger JSON</a>
+                    <a href="/download_products_csv" class="btn btn-outline-success">📊 Télécharger Produits CSV</a>
+                    <a href="/download_csv" class="btn btn-outline-info">📈 Télécharger Données CSV</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+    // Données des profils pour l'aperçu
+    // Données des profils pour l'aperçu
+    const siteProfiles = {
+        {% for site in available_sites %}
+        "{{ site.site_id }}": {
+            company_name: "{{ site.company_name|default(site.domain, true)|replace('"', '\\"') }}",
+            domain: "{{ site.domain|default('Domaine inconnu', true)|replace('"', '\\"') }}",
+            industry: "{{ site.industry|default('Non spécifiée', true)|replace('"', '\\"') }}",
+            business_type: "{{ site.business_type|default('Non spécifié', true)|replace('"', '\\"') }}",
+            market_position: "{{ site.market_position|default('Non spécifiée', true)|replace('"', '\\"') }}",
+            audience: "{% if site.target_audience and site.target_audience.demographics %}{{ site.target_audience.demographics|join(', ')|replace('"', '\\"') }}{% else %}Non analysée{% endif %}",
+            price_range: "{% if site.target_audience and site.target_audience.price_range %}{{ site.target_audience.price_range|replace('"', '\\"') }}{% else %}Non spécifiée{% endif %}",
+            scraped_count: "{{ site.scraped_count|default(0) }}",
+            brand_voice: "{{ site.brand_voice|default('')|replace('"', '\\"') }}",
+            brand_values: "{{ site.brand_values|default([])|join(', ')|replace('"', '\\"') }}"
+        },
+        {% endfor %}
+    };
+
+    function selectSite(siteId) {
+        document.getElementById('siteSelect').value = siteId;
+        updateProfilePreview();
+    }
+
+    function updateProfilePreview() {
+        const siteSelect = document.getElementById('siteSelect');
+        const profilePreview = document.getElementById('profilePreview');
+        const profileContent = document.getElementById('profileContent');
+        
+        const selectedSiteId = siteSelect.value;
+        
+        if (selectedSiteId && siteProfiles[selectedSiteId]) {
+            const profile = siteProfiles[selectedSiteId];
+            
+            profileContent.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Domaine:</strong> ${profile.domain}</p>
+                        <p><strong>Industrie:</strong> ${profile.industry}</p>
+                        <p><strong>Type:</strong> ${profile.business_type}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Position:</strong> ${profile.market_position}</p>
+                        <p><strong>Audience:</strong> ${profile.audience}</p>
+                        <p><strong>Gamme:</strong> ${profile.price_range}</p>
+                    </div>
+                </div>
+                ${profile.brand_voice ? `<p><strong>Voix de marque:</strong> ${profile.brand_voice}</p>` : ''}
+                ${profile.brand_values ? `<p><strong>Valeurs:</strong> ${profile.brand_values}</p>` : ''}
+                <div class="mt-2">
+                    <small class="text-muted">${profile.scraped_count} pages analysées</small>
+                </div>
+            `;
+            
+            profilePreview.style.display = 'block';
+        } else {
+            profilePreview.style.display = 'none';
+        }
+    }
+
+    // Mettre à jour le statut du RAG
+    function updateRagStatus() {
+    fetch('/rag_status')
+        .then(response => response.json())
+        .then(data => {
+            let statusHtml = '';
+            
+            if (data.status === 'initialized') {
+                statusHtml = `
+                    <div class="alert alert-success">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>✅ RAG Initialisé et Opérationnel</strong>
+                                <div class="mt-2">
+                                    <span class="badge bg-primary">${data.total_documents} documents</span>
+                                    <span class="badge bg-success">${data.total_products} produits</span>
+                                    <span class="badge bg-info">${data.total_pages} pages</span>
+                                    <span class="badge bg-warning">${data.total_sites} sites</span>
+                                    <span class="badge bg-dark">${data.index_size} vecteurs FAISS</span>
+                                </div>
+                            </div>
+                            <div>
+                                ${data.has_new_data ? 
+                                    '<span class="badge bg-warning status-badge">🆕 Nouvelles données</span>' : 
+                                    '<span class="badge bg-success status-badge">✅ À jour</span>'
+                                }
+                            </div>
+                        </div>
+                        ${data.has_new_data ? 
+                            `<small class="text-warning">🆕 ${data.new_sites_count} nouveau(x) site(s) détecté(s). Cliquez sur "🚀 Initialiser le RAG" pour les charger.</small>` : 
+                            '<small class="text-success">✅ Toutes les données sont chargées et indexées</small>'
+                        }
+                    </div>
+                `;
+            } else {
+                statusHtml = `
+                    <div class="alert alert-warning">
+                        <strong>⚠️ RAG Non Initialisé</strong>
+                        <p class="mb-0">Le système RAG n'est pas encore initialisé. Cliquez sur "🚀 Initialiser le RAG" pour charger les données.</p>
+                        ${data.has_new_data ? 
+                            `<small class="text-info">📥 ${data.new_sites_count} site(s) disponible(s) pour chargement</small>` : 
+                            ''
+                        }
+                    </div>
+                `;
+            }
+            
+            document.getElementById('ragStatus').innerHTML = statusHtml;
+        })
+        .catch(error => {
+            document.getElementById('ragStatus').innerHTML = `
+                <div class="alert alert-danger">
+                    <strong>❌ Erreur de chargement</strong>
+                    <p class="mb-0">Impossible de récupérer le statut du RAG.</p>
+                </div>
+            `;
+        });
+}
+
+// Mettre à jour le statut au chargement de la page
+document.addEventListener('DOMContentLoaded', function() {
+    updateRagStatus();
+    
+    // Actualiser le statut toutes les 10 secondes
+    setInterval(updateRagStatus, 10000);
+    
+    // Focus sur le champ de question
+    const questionField = document.getElementById('question');
+    if (questionField) {
+        questionField.focus();
+    }
+
+    // Initialiser l'aperçu du profil
+    const siteSelect = document.getElementById('siteSelect');
+    if (siteSelect) {
+        siteSelect.addEventListener('change', updateProfilePreview);
+        updateProfilePreview();
+    }
+});
+
+    // Animation pour les boutons
+    document.addEventListener('DOMContentLoaded', function() {
+        const buttons = document.querySelectorAll('button, a.btn');
+        buttons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.transition = 'transform 0.2s ease';
+            });
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    });
+    
+    // Gestion du formulaire de génération d'image séparé
+    // Gestion du formulaire de génération d'image
+    document.addEventListener('DOMContentLoaded', function() {
+        const imageForm = document.getElementById('imageGenerationForm');
+        
+        if (imageForm) {
+            console.log("✅ Formulaire image trouvé");
+            
+            // Validation avant soumission
+            imageForm.addEventListener('submit', function(e) {
+                console.log("🎨 Validation formulaire image...");
+                
+                const fileInput = document.getElementById('init_image');
+                const adCopy = document.getElementById('ad_copy');
+                
+                // Validation fichier
+                if (!fileInput.files[0]) {
+                    e.preventDefault();
+                    alert("❌ Veuillez sélectionner une image");
+                    fileInput.focus();
+                    return false;
+                }
+                
+                // Validation texte publicitaire
+                if (!adCopy.value.trim()) {
+                    e.preventDefault();
+                    alert("❌ Veuillez entrer un texte publicitaire");
+                    adCopy.focus();
+                    return false;
+                }
+                
+                console.log("✅ Validation image passée - soumission...");
+                
+                // Afficher un indicateur de chargement
+                const submitBtn = imageForm.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = '⏳ Génération en cours...';
+                submitBtn.disabled = true;
+                
+                return true;
+            });
+        }
+        
+        // Gestion du slider de force d'image
+        const imageStrengthSlider = document.getElementById('image_strength');
+        const strengthValue = document.getElementById('strengthValue');
+        
+        if (imageStrengthSlider && strengthValue) {
+            imageStrengthSlider.addEventListener('input', function() {
+                const percent = Math.round(this.value * 100);
+                strengthValue.textContent = percent + '%';
+            });
+            
+            // Initialiser la valeur
+            const initialPercent = Math.round(imageStrengthSlider.value * 100);
+            strengthValue.textContent = initialPercent + '%';
+        }
+        
+        // Prévisualisation de l'image
+        const initImageInput = document.getElementById('init_image');
+        const imagePreview = document.getElementById('imagePreview');
+        
+        if (initImageInput && imagePreview) {
+            initImageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    console.log(`📸 Fichier sélectionné: ${file.name}`);
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.innerHTML = `
+                            <div class="card">
+                                <img src="${e.target.result}" class="card-img-top" 
+                                    style="max-height: 200px; object-fit: contain;" 
+                                    alt="Prévisualisation">
+                                <div class="card-body">
+                                    <small class="text-success">
+                                        ✅ ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)
+                                    </small>
+                                </div>
+                            </div>
+                        `;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    imagePreview.innerHTML = '';
+                }
+            });
+        }
+    });
+
+    // Fonction pour copier l'URL de l'image
+    function copyImageUrl(imageUrl) {
+        navigator.clipboard.writeText(imageUrl).then(function() {
+            // Afficher une notification
+            showTempAlert('✅ Lien copié dans le presse-papier !', 'success');
+        }).catch(function(err) {
+            console.error('Erreur copie:', err);
+            showTempAlert('❌ Erreur lors de la copie', 'danger');
+        });
+    }
+
+    // Fonction pour afficher des alertes temporaires
+    function showTempAlert(message, type) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        // Ajouter en haut de la page
+        const container = document.querySelector('.container');
+        container.insertBefore(alertDiv, container.firstChild);
+        
+        // Supprimer après 3 secondes
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 3000);
+    }
+
+    // Vérifier si des images sont affichées au chargement
+    document.addEventListener('DOMContentLoaded', function() {
+        const generatedImages = document.querySelectorAll('img[alt="Image marketing générée"]');
+        if (generatedImages.length > 0) {
+            console.log(`🎨 ${generatedImages.length} image(s) générée(s) détectée(s)`);
+            
+            // Faire défiler jusqu'aux images
+            generatedImages[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    });
+    
+    </script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistiques des Promotions</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 20px;
+        }
+        .stats-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .stats-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stats-label {
+            color: #666;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="text-center mb-4">
+            <h1 class="text-white display-4">
+                <i class="fas fa-chart-bar"></i> Statistiques des Promotions
+            </h1>
+            <p class="text-white-50">Analyse complète des données de promotion collectées</p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="mb-3">
+            <a href="/" class="btn btn-light">
+                <i class="fas fa-arrow-left"></i> Retour au scraping
+            </a>
+        </div>
+
+        <!-- Messages Flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- Statistiques principales -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number">{{ stats.total_sites }}</div>
+                    <div class="stats-label">Sites Scrapés</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number">{{ stats.total_promos }}</div>
+                    <div class="stats-label">Promotions Total</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number">
+                        {% if stats.total_sites > 0 %}
+                            {{ (stats.total_promos / stats.total_sites)|round|int }}
+                        {% else %}
+                            0
+                        {% endif %}
+                    </div>
+                    <div class="stats-label">Promos/Site</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number">
+                        {% if stats.top_promos %}
+                            {{ stats.top_promos[0].discount_percentage or 'N/A' }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                    <div class="stats-label">Meilleure Réduction</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Graphiques -->
+        <div class="row">
+            <!-- Types de promotion -->
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4><i class="fas fa-tags"></i> Types de Promotion</h4>
+                    <canvas id="promoTypesChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Plages de réduction -->
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4><i class="fas fa-percentage"></i> Plages de Réduction</h4>
+                    <canvas id="discountRangesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top promotions -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="fas fa-trophy"></i> Top 10 des Meilleures Promotions</h3>
+            </div>
+            <div class="card-body">
+                {% if stats.top_promos %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Produit</th>
+                                <th>Site</th>
+                                <th>Prix Original</th>
+                                <th>Prix Promo</th>
+                                <th>Réduction</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in stats.top_promos %}
+                            <tr>
+                                <td>
+                                    <strong>{{ product.name }}</strong>
+                                    {% if product.badges %}
+                                    <div>
+                                        {% for badge in product.badges %}
+                                        <span class="badge bg-secondary">{{ badge }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% for site in stats.sites %}
+                                        {% if site.site_id in product.site_id %}
+                                        <a href="{{ site.url }}" target="_blank">{{ site.title[:30] }}...</a>
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>{{ product.original_price or 'N/A' }}</td>
+                                <td class="text-danger fw-bold">{{ product.promo_price or 'N/A' }}</td>
+                                <td>
+                                    {% if product.discount_percentage %}
+                                    <span class="badge bg-success">{{ product.discount_percentage }}</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ product.promo_type or 'N/A' }}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Aucune donnée de promotion disponible</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sites scrapés -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="fas fa-globe"></i> Sites Scrapés</h3>
+            </div>
+            <div class="card-body">
+                {% if stats.sites %}
+                <div class="row">
+                    {% for site in stats.sites %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card border">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="{{ site.url }}" target="_blank">{{ site.title }}</a>
+                                </h5>
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-link"></i> {{ site.url }}<br>
+                                        <i class="fas fa-gift"></i> {{ site.total_promos }} promotions<br>
+                                        <i class="fas fa-clock"></i> {{ site.scraped_at }}
+                                    </small>
+                                </p>
+                                {% if site.promo_sections %}
+                                <div>
+                                    <strong>Sections promo:</strong>
+                                    {% for section in site.promo_sections %}
+                                    <span class="badge bg-primary">{{ section }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-globe fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Aucun site scrapé</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Graphique des types de promotion
+        const promoTypesCtx = document.getElementById('promoTypesChart').getContext('2d');
+        const promoTypesChart = new Chart(promoTypesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: {{ stats.promo_types.keys()|list|tojson }},
+                datasets: [{
+                    data: {{ stats.promo_types.values()|list|tojson }},
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
+                        '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Graphique des plages de réduction
+        const discountRangesCtx = document.getElementById('discountRangesChart').getContext('2d');
+        const discountRangesChart = new Chart(discountRangesCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ stats.discount_ranges.keys()|list|tojson }},
+                datasets: [{
+                    label: 'Nombre de produits',
+                    data: {{ stats.discount_ranges.values()|list|tojson }},
+                    backgroundColor: '#667eea'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

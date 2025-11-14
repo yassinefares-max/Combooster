@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendrier de Contenu Généré</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .calendar-day {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            background: white;
+        }
+        .day-header {
+            background: #f8f9fa;
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+            border-radius: 8px 8px 0 0;
+        }
+        .post-item {
+            padding: 12px;
+            border-bottom: 1px solid #f1f1f1;
+            margin-bottom: 8px;
+        }
+        .post-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .platform-badge {
+            font-size: 0.7em;
+            padding: 4px 8px;
+        }
+        .type-badge {
+            font-size: 0.7em;
+            padding: 4px 8px;
+        }
+        .goal-badge {
+            font-size: 0.7em;
+            padding: 4px 8px;
+        }
+        .theme-badge {
+            background: #6f42c1;
+            color: white;
+        }
+        .strategy-box {
+            background: #e7f3ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        .ideas-box {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .hashtag-box {
+            background: #d1ecf1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">📅 Calendrier de Contenu - {{ duration }} jours</h1>
+
+        <!-- Messages Flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Stratégie globale -->
+        {% if calendar.strategy_overview %}
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">🎯 Stratégie de Contenu</h5>
+            </div>
+            <div class="card-body">
+                <div class="strategy-box">
+                    {{ calendar.strategy_overview }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Planning quotidien -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">🗓️ Planning Quotidien</h5>
+            </div>
+            <div class="card-body">
+                {% for date, day_schedule in calendar.daily_schedule.items() %}
+                <div class="calendar-day">
+                    <div class="day-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">{{ date }} - {{ day_schedule.weekday }}</h6>
+                                <span class="badge theme-badge">{{ day_schedule.theme }}</span>
+                            </div>
+                            <div>
+                                <span class="badge bg-secondary">{{ day_schedule.posts|length }} posts</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        {% for post in day_schedule.posts %}
+                        <div class="post-item">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <span class="badge platform-badge bg-info">{{ post.platform|upper }}</span>
+                                    <span class="badge type-badge {% if post.type == 'PROMOTION' %}bg-warning text-dark{% elif post.type == 'EDUCATION' %}bg-primary{% else %}bg-success{% endif %}">
+                                        {{ post.type }}
+                                    </span>
+                                    <span class="badge goal-badge bg-dark">{{ post.goal }}</span>
+                                </div>
+                                <small class="text-muted">{{ post.time }}</small>
+                            </div>
+                            <div class="post-content">
+                                {{ post.content }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Idées de contenu -->
+        {% if calendar.content_ideas %}
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">💡 Idées de Contenu Supplémentaires</h5>
+            </div>
+            <div class="card-body">
+                <div class="ideas-box">
+                    <ul class="mb-0">
+                        {% for idea in calendar.content_ideas %}
+                        <li>{{ idea }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Stratégie de hashtags -->
+        {% if calendar.hashtag_strategy %}
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">🏷️ Stratégie de Hashtags</h5>
+            </div>
+            <div class="card-body">
+                <div class="hashtag-box">
+                    {% for category, hashtags in calendar.hashtag_strategy.items() %}
+                    <div class="mb-3">
+                        <strong>{{ category|upper }}:</strong>
+                        <div class="mt-1">
+                            {% for hashtag in hashtags %}
+                            <span class="badge bg-secondary me-1">{{ hashtag }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Métriques de performance -->
+        {% if calendar.performance_metrics %}
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">📊 Métriques de Performance</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for metric, value in calendar.performance_metrics.items() %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ metric|replace('_', ' ')|title }}</h6>
+                                <p class="card-text">
+                                    {% if value is iterable and value is not string %}
+                                        {% for item in value %}
+                                        <span class="badge bg-primary me-1">{{ item }}</span>
+                                        {% endfor %}
+                                    {% else %}
+                                        {{ value }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Actions -->
+        <div class="card">
+            <div class="card-body text-center">
+                <a href="{{ url_for('content_calendar') }}" class="btn btn-success btn-lg me-2">
+                    🗓️ Générer un nouveau calendrier
+                </a>
+                <a href="{{ url_for('marketing_analysis') }}" class="btn btn-primary btn-lg me-2">
+                    📊 Analyse Marketing
+                </a>
+                <a href="{{ url_for('index') }}" class="btn btn-secondary btn-lg">
+                    🏠 Retour à l'accueil
+                </a>
+            </div>
+        </div>
+
+        <!-- Informations d'export -->
+        <div class="alert alert-info mt-4">
+            <h6>💡 Conseils d'utilisation :</h6>
+            <ul class="mb-0">
+                <li>Ce calendrier est généré automatiquement et unique à chaque fois</li>
+                <li>Adaptez les horaires selon votre fuseau horaire et audience</li>
+                <li>Personnalisez le contenu selon votre ton de marque</li>
+                <li>Utilisez les idées de contenu pour enrichir votre stratégie</li>
+                <li>Testez différentes approches et analysez les performances</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Ajouter un effet de hover sur les jours
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarDays = document.querySelectorAll('.calendar-day');
+            calendarDays.forEach(day => {
+                day.addEventListener('mouseenter', function() {
+                    this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+                });
+                day.addEventListener('mouseleave', function() {
+                    this.style.boxShadow = 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

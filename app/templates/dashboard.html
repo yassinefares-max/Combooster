@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Test - Backend Marketing</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px 0;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .status-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .card-header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .card-body {
+            padding: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: var(--gray);
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-success {
+            background: var(--success);
+        }
+        
+        .btn-success:hover {
+            background: #3aa8d0;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+        }
+        
+        .btn-warning:hover {
+            background: #e01a6f;
+        }
+        
+        .btn-info {
+            background: #17a2b8;
+        }
+        
+        .btn-info:hover {
+            background: #138496;
+        }
+        
+        .results-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 30px;
+            margin-top: 30px;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .results-content {
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .calendar-post {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f9f9f9;
+        }
+        
+        .calendar-post h4 {
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+        
+        .post-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .post-content {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .post-image {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 2px solid #4361ee;
+        }
+        
+        .tab-container {
+            margin-top: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .image-preview {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 10px 0;
+            border: 2px solid #4361ee;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .image-result {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .fallback-image {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px dashed #dee2e6;
+        }
+        
+        .ad-copy-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .ad-copy-options .btn {
+            width: auto;
+            flex: 1;
+        }
+        
+        .calendar-with-images {
+            margin-top: 20px;
+        }
+        
+        .calendar-day {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .calendar-day h4 {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .prompt-group {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #17a2b8;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .status-badge {
+                margin-top: 15px;
+            }
+            
+            .ad-copy-options {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div>
+                    <h1>Dashboard de Test Backend</h1>
+                    <p class="subtitle">Marketing Digital & Community Management</p>
+                </div>
+                <div class="status-badge" id="status-badge">
+                    Chargement...
+                </div>
+            </div>
+        </header>
+        
+        <div class="stats-grid" id="stats-grid">
+            <!-- Les statistiques seront chargées dynamiquement -->
+        </div>
+        
+        <div class="card-grid">
+            <!-- Carte Scraping & RAG -->
+            <div class="card">
+                <div class="card-header">
+                    Scraping & RAG
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="site-url">URL du site à scraper</label>
+                        <input type="text" id="site-url" placeholder="https://example.com" value="">
+                    </div>
+                    <div class="form-group">
+                        <label for="max-pages">Nombre maximum de pages</label>
+                        <input type="number" id="max-pages" value="10" min="1" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="max-depth">Profondeur maximum</label>
+                        <input type="number" id="max-depth" value="2" min="1" max="5">
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" id="render-js" checked>
+                        <label for="render-js" style="display: inline;">Utiliser JavaScript (Playwright)</label>
+                    </div>
+                    <button class="btn" id="scrape-btn">Lancer le Scraping</button>
+                    <button class="btn btn-secondary" id="init-rag-btn" style="margin-top: 10px;">Initialiser RAG</button>
+                </div>
+            </div>
+            
+            <!-- Carte Calendrier de Contenu -->
+            <div class="card">
+                <div class="card-header">
+                    Calendrier de Contenu
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="site-select">Site cible</label>
+                        <select id="site-select">
+                            <option value="">Chargement des sites...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="calendar-duration">Durée (semaines)</label>
+                        <input type="number" id="calendar-duration" value="2" min="1" max="4">
+                    </div>
+                    <div class="form-group">
+                        <label for="posts-per-week">Posts par semaine</label>
+                        <input type="number" id="posts-per-week" value="3" min="1" max="7">
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" id="include-images" checked>
+                        <label for="include-images" style="display: inline;">Générer des images IA avec ad-copy</label>
+                    </div>
+                    <button class="btn btn-success" id="generate-calendar-btn">Générer le Calendrier</button>
+                    <button class="btn btn-warning" id="generate-complete-calendar-btn" style="margin-top: 10px;">
+                        🚀 Génération Automatique Complète
+                </div>
+            </div>
+            
+            <!-- Carte Génération d'Images -->
+            <div class="card">
+                <div class="card-header">
+                    Génération d'Images IA
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="image-site">Site (pour contexte)</label>
+                        <select id="image-site">
+                            <option value="">Aucun (générique)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="image-prompt">Prompt pour l'image IA</label>
+                        <textarea id="image-prompt" rows="3" placeholder="Décrivez l'image que vous voulez générer..."></textarea>
+                        <small style="color: #666;">Ex: "Photo professionnelle d'un produit high-tech sur fond blanc, éclairage studio"</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ad-copy">Ad-copy (texte accompagnant l'image)</label>
+                        <textarea id="ad-copy" rows="2" placeholder="Texte pour les réseaux sociaux qui accompagnera l'image..."></textarea>
+                        <small style="color: #666;">Ex: "Découvrez notre nouveau produit révolutionnaire ! 🚀"</small>
+                    </div>
+                    
+                    <div class="ad-copy-options">
+                        <button class="btn btn-info" id="generate-ad-copy-btn">Générer Ad-Copy</button>
+                        <button class="btn btn-secondary" id="clear-ad-copy-btn">Effacer</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tone-select">Ton</label>
+                        <select id="tone-select">
+                            <option value="professional">Professionnel</option>
+                            <option value="casual">Décontracté</option>
+                            <option value="luxury">Luxe</option>
+                            <option value="playful">Joueur</option>
+                            <option value="minimalist">Minimaliste</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="style-select">Style</label>
+                        <select id="style-select">
+                            <option value="marketing">Marketing</option>
+                            <option value="social_media">Réseaux sociaux</option>
+                            <option value="banner">Bannière</option>
+                            <option value="poster">Poster</option>
+                            <option value="product">Produit</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="checkbox" id="use-reference">
+                        <label for="use-reference" style="display: inline;">Utiliser une image de référence</label>
+                    </div>
+                    
+                    <div class="form-group" id="reference-url-group" style="display: none;">
+                        <label for="reference-url">URL de l'image de référence</label>
+                        <input type="text" id="reference-url" placeholder="https://example.com/image.jpg">
+                    </div>
+                    
+                    <button class="btn btn-warning" id="generate-image-btn">Générer l'Image</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p id="loading-text">Traitement en cours...</p>
+        </div>
+        
+        <div class="results-section">
+            <div class="results-header">
+                <h2>Résultats</h2>
+                <button class="btn btn-secondary" id="clear-results">Effacer tout</button>
+            </div>
+            <div class="tab-container">
+                <div class="tabs">
+                    <div class="tab active" data-tab="scraping">Scraping & RAG</div>
+                    <div class="tab" data-tab="calendar">Calendrier</div>
+                    <div class="tab" data-tab="images">Images & Ad-Copy</div>
+                </div>
+                
+                <div class="tab-content active" id="scraping-tab">
+                    <div id="scraping-results"></div>
+                </div>
+                
+                <div class="tab-content" id="calendar-tab">
+                    <div id="calendar-results"></div>
+                </div>
+                
+                <div class="tab-content" id="images-tab">
+                    <div id="images-results"></div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Dashboard de Test Backend - Marketing & Community Management</p>
+        </footer>
+    </div>
+
+    <script>
+        // Stockage des images générées pour le calendrier
+        let generatedImagesForCalendar = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Éléments DOM
+            const statusBadge = document.getElementById('status-badge');
+            const statsGrid = document.getElementById('stats-grid');
+            const siteSelect = document.getElementById('site-select');
+            const imageSite = document.getElementById('image-site');
+            const loading = document.getElementById('loading');
+            const loadingText = document.getElementById('loading-text');
+            const scrapingResults = document.getElementById('scraping-results');
+            const calendarResults = document.getElementById('calendar-results');
+            const imagesResults = document.getElementById('images-results');
+            const useReference = document.getElementById('use-reference');
+            const referenceUrlGroup = document.getElementById('reference-url-group');
+            const generateAdCopyBtn = document.getElementById('generate-ad-copy-btn');
+            const clearAdCopyBtn = document.getElementById('clear-ad-copy-btn');
+            const adCopyTextarea = document.getElementById('ad-copy');
+            const imagePromptTextarea = document.getElementById('image-prompt');
+            
+            // Vérifier l'état du backend
+            checkBackendStatus();
+            
+            // Charger la liste des sites
+            loadSites();
+            
+            // Gestion des onglets
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Désactiver tous les onglets
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Activer l'onglet cliqué
+                    this.classList.add('active');
+                    const tabId = this.getAttribute('data-tab') + '-tab';
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Afficher/masquer le champ URL de référence
+            useReference.addEventListener('change', function() {
+                referenceUrlGroup.style.display = this.checked ? 'block' : 'none';
+            });
+            
+            // Bouton de génération d'ad-copy
+            generateAdCopyBtn.addEventListener('click', function() {
+                const siteId = imageSite.value;
+                
+                if (!siteId) {
+                    showAlert('Veuillez sélectionner un site pour générer l\'ad-copy', 'error', imagesResults);
+                    return;
+                }
+                
+                startLoading('Génération de l\'ad-copy en cours...');
+                
+                // Appel API pour générer l'ad-copy avec Gemini
+                fetch('/generate_ad_copy', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        'site_id': siteId,
+                        'product_context': imagePromptTextarea.value || 'Contenu marketing pour réseaux sociaux',
+                        'tone': document.getElementById('tone-select').value,
+                        'style': document.getElementById('style-select').value
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erreur HTTP: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    stopLoading();
+                    if (data.success) {
+                        adCopyTextarea.value = data.ad_copy;
+                        showAlert('Ad-copy généré avec succès!', 'success', imagesResults);
+                    } else {
+                        showAlert('Erreur lors de la génération: ' + data.error, 'error', imagesResults);
+                    }
+                })
+                .catch(error => {
+                    stopLoading();
+                    showAlert('Erreur lors de la génération d\'ad-copy: ' + error, 'error', imagesResults);
+                });
+            });
+            
+            // Bouton d'effacement
+            clearAdCopyBtn.addEventListener('click', function() {
+                adCopyTextarea.value = '';
+                imagePromptTextarea.value = '';
+            });
+            
+            // Bouton de scraping
+            document.getElementById('scrape-btn').addEventListener('click', function() {
+                const url = document.getElementById('site-url').value;
+                const maxPages = document.getElementById('max-pages').value;
+                const maxDepth = document.getElementById('max-depth').value;
+                const renderJs = document.getElementById('render-js').checked;
+                
+                if (!url) {
+                    showAlert('Veuillez entrer une URL', 'error', scrapingResults);
+                    return;
+                }
+                
+                startLoading('Scraping du site en cours...');
+                
+                fetch('/scrape', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        'start_url': url,
+                        'max_pages': maxPages,
+                        'max_depth': maxDepth,
+                        'render_js': renderJs ? 'on' : 'off',
+                        'scrape_products': 'on',
+                        'scrape_promoted_products': 'on',
+                        'scrape_footer': 'on'
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erreur HTTP: ' + response.status);
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    stopLoading();
+                    showAlert('Scraping terminé avec succès!', 'success', scrapingResults);
+                    showScrapingResults(url, maxPages, maxDepth);
+                    
+                    setTimeout(() => {
+                        loadSites();
+                        checkBackendStatus();
+                    }, 1000);
+                })
+                .catch(error => {
+                    stopLoading();
+                    showAlert('Erreur lors du scraping: ' + error, 'error', scrapingResults);
+                });
+            });
+            
+            // Bouton d'initialisation RAG
+            document.getElementById('init-rag-btn').addEventListener('click', function() {
+                startLoading('Initialisation du RAG en cours...');
+                
+                fetch('/init_rag_manual', {
+                    method: 'POST'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erreur HTTP: ' + response.status);
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    stopLoading();
+                    showAlert('RAG initialisé avec succès!', 'success', scrapingResults);
+                    checkBackendStatus();
+                    loadSites();
+                })
+                .catch(error => {
+                    stopLoading();
+                    showAlert('Erreur lors de l\'initialisation RAG: ' + error, 'error', scrapingResults);
+                });
+            });
+            
+            // Bouton de génération de calendrier
+            document.getElementById('generate-calendar-btn').addEventListener('click', function() {
+                const siteId = siteSelect.value;
+                const duration = document.getElementById('calendar-duration').value;
+                const postsPerWeek = document.getElementById('posts-per-week').value;
+                const includeImages = document.getElementById('include-images').checked;
+                
+                if (!siteId) {
+                    showAlert('Veuillez sélectionner un site', 'error', calendarResults);
+                    return;
+                }
+                
+                startLoading('Génération du calendrier en cours...');
+                
+                // Générer le contenu du calendrier
+                generateCalendarContent(siteId, duration, postsPerWeek, includeImages);
+            });
+            
+            // Bouton de génération d'image
+            document.getElementById('generate-image-btn').addEventListener('click', function() {
+                const siteId = imageSite.value;
+                const imagePrompt = imagePromptTextarea.value;
+                const adCopy = adCopyTextarea.value;
+                const tone = document.getElementById('tone-select').value;
+                const style = document.getElementById('style-select').value;
+                const useRef = document.getElementById('use-reference').checked;
+                const referenceUrl = document.getElementById('reference-url').value;
+                
+                if (!imagePrompt) {
+                    showAlert('Veuillez saisir un prompt pour l\'image IA', 'error', imagesResults);
+                    return;
+                }
+                
+                if (useRef && !referenceUrl) {
+                    showAlert('Veuillez entrer une URL de référence', 'error', imagesResults);
+                    return;
+                }
+                
+                startLoading('Génération de l\'image IA en cours...');
+                
+                // Utiliser le prompt image pour générer l'image
+                fetch('/generate_marketing_image', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        'question': 'Génération d\'image marketing',
+                        'site_id': siteId,
+                        'ad_copy': imagePrompt, // Le prompt image est utilisé pour générer l'image
+                        'tone': tone,
+                        'style': style,
+                        'use_reference': useRef ? 'true' : 'false',
+                        'reference_image_url': referenceUrl,
+                        'image_strength': '0.5'
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erreur HTTP: ' + response.status);
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    localStorage.setItem('lastImageResponse', html);
+                    console.log("Réponse API Image:", html);
+                    
+                    stopLoading();
+                    const imageData = showImageResults(imagePrompt, adCopy, tone, style, useRef, referenceUrl, html);
+                    
+                    // Stocker l'image générée pour utilisation dans le calendrier
+                    if (imageData && imageData.images && imageData.images.length > 0) {
+                        generatedImagesForCalendar.push({
+                            imageUrl: imageData.images[0],
+                            imagePrompt: imagePrompt,
+                            adCopy: adCopy,
+                            tone: tone,
+                            style: style
+                        });
+                        showAlert('Image IA sauvegardée pour utilisation dans le calendrier!', 'success', imagesResults);
+                    }
+                })
+                .catch(error => {
+                    stopLoading();
+                    showAlert('Erreur lors de la génération d\'image: ' + error, 'error', imagesResults);
+                });
+            });
+            
+            // Bouton d'effacement des résultats
+            document.getElementById('clear-results').addEventListener('click', function() {
+                scrapingResults.innerHTML = '';
+                calendarResults.innerHTML = '';
+                imagesResults.innerHTML = '';
+                generatedImagesForCalendar = [];
+            });
+            
+            // Fonction pour générer le contenu du calendrier
+            function generateCalendarContent(siteId, duration, postsPerWeek, includeImages) {
+                const totalPosts = duration * postsPerWeek;
+                
+                // Générer les ad-copies et prompts pour le calendrier
+                generateCalendarPosts(siteId, totalPosts, function(calendarPosts) {
+                    if (includeImages && generatedImagesForCalendar.length > 0) {
+                        // Utiliser les images déjà générées
+                        showCalendarWithContent(duration, postsPerWeek, calendarPosts, generatedImagesForCalendar);
+                    } else {
+                        // Calendrier sans images ou générer de nouvelles images
+                        showCalendarWithContent(duration, postsPerWeek, calendarPosts, []);
+                    }
+                });
+            }
+            
+            // Fonction pour générer les posts du calendrier
+            function generateCalendarPosts(siteId, totalPosts, callback) {
+                const calendarPosts = [];
+                let completed = 0;
+                
+                for (let i = 0; i < totalPosts; i++) {
+                    // Générer un ad-copy unique pour chaque post
+                    fetch('/generate_ad_copy', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            'site_id': siteId,
+                            'product_context': `Post ${i + 1} pour le calendrier de contenu - Thème unique et engageant`,
+                            'tone': ['professional', 'casual', 'playful', 'luxury'][i % 4],
+                            'style': 'social_media'
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            calendarPosts.push({
+                                adCopy: data.ad_copy,
+                                tone: data.tone,
+                                index: i,
+                                // Générer un prompt image basé sur l'ad-copy
+                                imagePrompt: generateImagePromptFromAdCopy(data.ad_copy, data.tone)
+                            });
+                        } else {
+                            // Fallback
+                            calendarPosts.push({
+                                adCopy: `🌟 Post ${i + 1} - Découvrez notre contenu exclusif ! Ne manquez pas cette opportunité. ✨`,
+                                tone: 'professional',
+                                index: i,
+                                imagePrompt: `Image marketing professionnelle pour post ${i + 1}, style moderne et engageant`
+                            });
+                        }
+                        
+                        completed++;
+                        if (completed === totalPosts) {
+                            // Trier par index
+                            const sortedPosts = calendarPosts.sort((a, b) => a.index - b.index);
+                            callback(sortedPosts);
+                        }
+                    })
+                    .catch(error => {
+                        // Fallback en cas d'erreur
+                        calendarPosts.push({
+                            adCopy: `🎯 Post ${i + 1} - Contenu unique et engageant pour vos réseaux sociaux !`,
+                            tone: 'professional',
+                            index: i,
+                            imagePrompt: `Image créative pour post réseaux sociaux ${i + 1}, style attractif`
+                        });
+                        
+                        completed++;
+                        if (completed === totalPosts) {
+                            const sortedPosts = calendarPosts.sort((a, b) => a.index - b.index);
+                            callback(sortedPosts);
+                        }
+                    });
+                }
+            }
+            
+            // Fonction pour générer un prompt image basé sur l'ad-copy
+            function generateImagePromptFromAdCopy(adCopy, tone) {
+                const toneKeywords = {
+                    'professional': 'professionnel, élégant, corporate, business',
+                    'casual': 'décontracté, amical, approachable, moderne',
+                    'playful': 'joueur, fun, coloré, énergique, créatif',
+                    'luxury': 'luxueux, premium, sophistiqué, exclusif'
+                };
+                
+                const basePrompt = `Image marketing pour réseaux sociaux, ${toneKeywords[tone] || 'professionnel'}, haute qualité, composition équilibrée`;
+                return `${basePrompt} - Thème: ${adCopy.substring(0, 50)}...`;
+            }
+            
+            // Fonction pour afficher le calendrier avec contenu
+            function showCalendarWithContent(duration, postsPerWeek, calendarPosts, imagesData) {
+                let calendarHTML = `
+                    <div class="alert alert-success">
+                        Calendrier généré avec succès! ${duration} semaines, ${duration * postsPerWeek} posts uniques.
+                    </div>
+                    <h3>Calendrier de Contenu - ${duration} Semaines</h3>
+                    <div class="calendar-with-images">
+                `;
+                
+                let postIndex = 0;
+                const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+                const platforms = ['Instagram', 'Facebook', 'Twitter', 'LinkedIn', 'TikTok'];
+                const times = ['9:00', '12:00', '15:00', '18:00', '21:00'];
+                
+                for (let week = 1; week <= duration; week++) {
+                    calendarHTML += `<div class="calendar-day"><h4>Semaine ${week}</h4>`;
+                    
+                    for (let day = 0; day < postsPerWeek && postIndex < calendarPosts.length; day++) {
+                        const currentDay = days[day % days.length];
+                        const platform = platforms[postIndex % platforms.length];
+                        const time = times[postIndex % times.length];
+                        const post = calendarPosts[postIndex];
+                        const imageData = imagesData[postIndex % imagesData.length];
+                        
+                        calendarHTML += `
+                            <div class="calendar-post">
+                                <h4>${currentDay} - Post ${postIndex + 1}</h4>
+                                <div class="post-details">
+                                    <span>⏰ ${time}</span>
+                                    <span>📱 ${platform}</span>
+                                    <span>🎨 ${post.tone}</span>
+                                </div>
+                                
+                                <div class="prompt-group">
+                                    <strong>Prompt Image IA:</strong>
+                                    <p>${post.imagePrompt}</p>
+                                </div>
+                                
+                                <div class="post-content">
+                                    <strong>Ad-copy (texte):</strong>
+                                    <p>${post.adCopy}</p>
+                                </div>
+                                
+                                ${imageData && imageData.imageUrl ? 
+                                    `<div>
+                                        <strong>Image IA générée:</strong>
+                                        <img src="${imageData.imageUrl}" alt="Image générée IA" class="post-image">
+                                    </div>` : 
+                                    `<div class="fallback-image">
+                                        <p><em>💡 Utilisez l'onglet "Images & Ad-Copy" pour générer des images IA</em></p>
+                                     </div>`
+                                }
+                                
+                                <div style="margin-top: 10px; font-size: 0.9rem; color: #666;">
+                                    <strong>Platform:</strong> ${platform} | 
+                                    <strong>Heure:</strong> ${time} | 
+                                    <strong>Ton:</strong> ${post.tone}
+                                </div>
+                            </div>
+                        `;
+                        
+                        postIndex++;
+                    }
+                    
+                    calendarHTML += `</div>`;
+                }
+                
+                calendarHTML += `</div>`;
+                calendarResults.innerHTML = calendarHTML;
+                stopLoading();
+                
+                document.querySelector('.tab[data-tab="calendar"]').click();
+            }
+            
+            // [Les fonctions utilitaires restantes restent identiques...]
+            function checkBackendStatus() {
+                fetch('/rag_status')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erreur HTTP: ' + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.status === 'initialized') {
+                            statusBadge.textContent = 'Backend Opérationnel';
+                            statusBadge.style.background = 'rgba(76, 201, 240, 0.3)';
+                            displayStats({
+                                sites: data.total_sites || 0,
+                                products: data.total_products || 0,
+                                documents: data.total_documents || 0,
+                                index_size: data.index_size || 0
+                            });
+                        } else {
+                            statusBadge.textContent = 'Backend Non Initialisé';
+                            statusBadge.style.background = 'rgba(247, 37, 133, 0.3)';
+                            displayStats({
+                                sites: 0,
+                                products: 0,
+                                documents: 0,
+                                index_size: 0
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        statusBadge.textContent = 'Erreur de Connexion';
+                        statusBadge.style.background = 'rgba(247, 37, 133, 0.3)';
+                    });
+            }
+            
+            function displayStats(stats) {
+                statsGrid.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.sites}</div>
+                        <div class="stat-label">Sites</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.products}</div>
+                        <div class="stat-label">Produits</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.documents}</div>
+                        <div class="stat-label">Documents</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.index_size}</div>
+                        <div class="stat-label">Vecteurs Indexés</div>
+                    </div>
+                `;
+            }
+            
+            function loadSites() {
+                fetch('/rag_status')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erreur HTTP: ' + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        siteSelect.innerHTML = '<option value="">Sélectionnez un site...</option>';
+                        imageSite.innerHTML = '<option value="">Aucun (générique)</option>';
+                        
+                        if (data.total_sites > 0) {
+                            fetch('/ask')
+                                .then(response => response.text())
+                                .then(html => {
+                                    const tempSites = extractSitesFromPage(html);
+                                    populateSiteSelectors(tempSites);
+                                })
+                                .catch(error => {
+                                    const ragSites = [];
+                                    for (let i = 1; i <= data.total_sites; i++) {
+                                        ragSites.push({
+                                            id: `site${i}`,
+                                            name: `Site ${i}`,
+                                            domain: `site${i}.com`
+                                        });
+                                    }
+                                    populateSiteSelectors(ragSites);
+                                });
+                        }
+                    })
+                    .catch(error => {
+                        siteSelect.innerHTML = '<option value="">Erreur de chargement</option>';
+                        imageSite.innerHTML = '<option value="">Erreur de chargement</option>';
+                    });
+            }
+            
+            function extractSitesFromPage(html) {
+                const sites = [];
+                try {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const siteOptions = doc.querySelectorAll('select[name="site_id"] option');
+                    
+                    siteOptions.forEach(option => {
+                        if (option.value) {
+                            sites.push({
+                                id: option.value,
+                                name: option.textContent,
+                                domain: option.value
+                            });
+                        }
+                    });
+                } catch (e) {
+                    console.error('Erreur extraction sites:', e);
+                }
+                
+                return sites.length > 0 ? sites : [
+                    { id: 'default', name: 'Site par défaut', domain: 'example.com' }
+                ];
+            }
+            
+            function populateSiteSelectors(sites) {
+                sites.forEach(site => {
+                    const option1 = document.createElement('option');
+                    option1.value = site.id;
+                    option1.textContent = `${site.name} (${site.domain})`;
+                    siteSelect.appendChild(option1);
+                    
+                    const option2 = document.createElement('option');
+                    option2.value = site.id;
+                    option2.textContent = `${site.name} (${site.domain})`;
+                    imageSite.appendChild(option2);
+                });
+            }
+            
+            function startLoading(message) {
+                loadingText.textContent = message;
+                loading.style.display = 'block';
+            }
+            
+            function stopLoading() {
+                loading.style.display = 'none';
+            }
+            
+            function showAlert(message, type, container) {
+                const alert = document.createElement('div');
+                alert.className = `alert alert-${type}`;
+                alert.textContent = message;
+                container.appendChild(alert);
+                
+                setTimeout(() => {
+                    if (alert.parentNode) {
+                        alert.remove();
+                    }
+                }, 5000);
+            }
+            
+            function showScrapingResults(url, maxPages, maxDepth) {
+                const results = `
+                    <div class="alert alert-success">
+                        Scraping terminé avec succès!
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">${maxPages}</div>
+                            <div class="stat-label">Pages configurées</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${maxDepth}</div>
+                            <div class="stat-label">Profondeur</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">Produits trouvés</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">Images</div>
+                        </div>
+                    </div>
+                    <h3>Détails du scraping</h3>
+                    <p>Le site a été analysé avec succès. Les données ont été extraites et sont prêtes pour le traitement RAG.</p>
+                    <ul>
+                        <li>URL de départ: ${url}</li>
+                        <li>Profondeur maximale: ${maxDepth}</li>
+                        <li>Pages maximum: ${maxPages}</li>
+                        <li>JavaScript: ${document.getElementById('render-js').checked ? 'Activé' : 'Désactivé'}</li>
+                    </ul>
+                `;
+                
+                scrapingResults.innerHTML = results;
+                document.querySelector('.tab[data-tab="scraping"]').click();
+            }
+            
+            function showImageResults(imagePrompt, adCopy, tone, style, useRef, referenceUrl, html) {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                
+                let generatedImages = doc.querySelectorAll('img.generated-image, .generated-image img, img[src*="leonardo"], .image-preview, img[src*="cloud.leonardo"]');
+                if (generatedImages.length === 0) {
+                    generatedImages = doc.querySelectorAll('img');
+                }
+                
+                const imageUrls = extractImageUrlsFromText(html);
+                
+                let imagesHTML = '';
+                const extractedImages = [];
+                
+                if (generatedImages.length > 0) {
+                    generatedImages.forEach((img, index) => {
+                        const src = img.src || img.getAttribute('src');
+                        if (src && !src.includes('picsum.photos')) {
+                            extractedImages.push(src);
+                            imagesHTML += `
+                                <div class="image-result">
+                                    <img src="${src}" alt="Image générée ${index + 1}" class="image-preview">
+                                    <div style="text-align: center; margin-bottom: 15px;">
+                                        <a href="${src}" download="image_generee_${index + 1}.jpg" class="btn" style="display: inline-block; width: auto; padding: 8px 15px; margin: 5px;">
+                                            📥 Télécharger
+                                        </a>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    });
+                }
+                
+                if (imageUrls.length > 0 && imagesHTML === '') {
+                    imageUrls.forEach((url, index) => {
+                        extractedImages.push(url);
+                        imagesHTML += `
+                            <div class="image-result">
+                                <img src="${url}" alt="Image générée ${index + 1}" class="image-preview">
+                                <div style="text-align: center; margin-bottom: 15px;">
+                                    <a href="${url}" download="image_generee_${index + 1}.jpg" class="btn" style="display: inline-block; width: auto; padding: 8px 15px; margin: 5px;">
+                                        📥 Télécharger
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                if (imagesHTML === '') {
+                    imagesHTML = `
+                        <div class="alert alert-info">
+                            <p>L'image a été générée mais n'a pas pu être affichée automatiquement.</p>
+                        </div>
+                    `;
+                }
+                
+                const imageHTML = `
+                    <div class="alert alert-success">
+                        Image IA générée avec succès!
+                    </div>
+                    <h3>Résultat de la génération</h3>
+                    
+                    <div class="prompt-group">
+                        <label>Prompt Image IA utilisé:</label>
+                        <p>${imagePrompt}</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Ad-copy (texte accompagnant):</label>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                            ${adCopy || '<em>Aucun ad-copy fourni</em>'}
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Paramètres:</label>
+                        <ul style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                            <li><strong>Ton:</strong> ${tone}</li>
+                            <li><strong>Style:</strong> ${style}</li>
+                            <li><strong>Référence:</strong> ${useRef ? 'Oui' : 'Non'}</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Image(s) générée(s):</label>
+                        ${imagesHTML}
+                    </div>
+                `;
+                
+                imagesResults.innerHTML = imageHTML;
+                document.querySelector('.tab[data-tab="images"]').click();
+                
+                return {
+                    images: extractedImages,
+                    imagePrompt: imagePrompt,
+                    adCopy: adCopy
+                };
+            }
+            
+            function extractImageUrlsFromText(html) {
+                const imageUrls = [];
+                const imageRegex = /(https?:\/\/[^"'\s<>]+\.(jpg|jpeg|png|gif|webp))[^"'\s<>]*/gi;
+                const matches = html.match(imageRegex);
+                
+                if (matches) {
+                    matches.forEach(url => {
+                        const cleanUrl = url.replace(/[^a-zA-Z0-9:/._-]+$/, '');
+                        if (cleanUrl && !cleanUrl.includes('picsum.photos')) {
+                            imageUrls.push(cleanUrl);
+                        }
+                    });
+                }
+                
+                const jsonRegex = /"image_url":\s*"([^"]+)"/g;
+                let jsonMatch;
+                while ((jsonMatch = jsonRegex.exec(html)) !== null) {
+                    if (jsonMatch[1] && !jsonMatch[1].includes('picsum.photos')) {
+                        imageUrls.push(jsonMatch[1]);
+                    }
+                }
+                
+                return [...new Set(imageUrls)];
+            }
+
+            // Nouveau bouton pour la génération automatique complète
+            document.getElementById('generate-complete-calendar-btn').addEventListener('click', function() {
+                const siteId = document.getElementById('site-select').value;
+                const duration = document.getElementById('calendar-duration').value;
+                const postsPerWeek = document.getElementById('posts-per-week').value;
+                
+                if (!siteId) {
+                    showAlert('Veuillez sélectionner un site', 'error', calendarResults);
+                    return;
+                }
+                
+                startLoading('Génération automatique du calendrier complet...');
+                
+                fetch('/generate_complete_calendar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        'site_id': siteId,
+                        'duration_weeks': parseInt(duration),
+                        'posts_per_week': parseInt(postsPerWeek)
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    stopLoading();
+                    if (data.success) {
+                        showCompleteCalendar(data.calendar, data.stats);
+                    } else {
+                        showAlert('Erreur: ' + data.error, 'error', calendarResults);
+                    }
+                })
+                .catch(error => {
+                    stopLoading();
+                    showAlert('Erreur: ' + error, 'error', calendarResults);
+                });
+            });
+
+            // Fonction pour afficher le calendrier complet
+            function showCompleteCalendar(calendarData, stats) {
+                let calendarHTML = `
+                    <div class="alert alert-success">
+                        🎉 Calendrier complet généré automatiquement !
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">${stats.duration_weeks}</div>
+                            <div class="stat-label">Semaines</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${stats.posts_per_week}</div>
+                            <div class="stat-label">Posts/semaine</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${stats.total_posts_generated}</div>
+                            <div class="stat-label">Posts générés</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${calendarData.company_info.company_name}</div>
+                            <div class="stat-label">Client</div>
+                        </div>
+                    </div>
+                    
+                    <h3>Calendrier de Contenu - ${stats.duration_weeks} Semaines</h3>
+                    <div class="calendar-with-images">
+                `;
+                
+                // Organiser les posts par semaine
+                const postsByWeek = {};
+                calendarData.generated_posts.forEach(post => {
+                    if (!postsByWeek[post.week]) {
+                        postsByWeek[post.week] = [];
+                    }
+                    postsByWeek[post.week].push(post);
+                });
+                
+                // Afficher chaque semaine
+                Object.keys(postsByWeek).forEach(weekNum => {
+                    calendarHTML += `<div class="calendar-day"><h4>Semaine ${weekNum}</h4>`;
+                    
+                    postsByWeek[weekNum].forEach(post => {
+                        calendarHTML += `
+                            <div class="calendar-post">
+                                <h4>${post.day} - Post ${post.post_number}</h4>
+                                <div class="post-details">
+                                    <span>⏰ ${post.best_time}</span>
+                                    <span>🎯 ${post.content_type}</span>
+                                    <span>🏷️ ${post.theme}</span>
+                                </div>
+                                
+                                <div class="prompt-group">
+                                    <strong>Prompt Image IA Généré:</strong>
+                                    <p>${post.image_prompt}</p>
+                                </div>
+                                
+                                <div class="post-content">
+                                    <strong>Ad-Copy Automatique:</strong>
+                                    <p><strong>Court:</strong> ${post.ad_copy.short_copy}</p>
+                                    <p><strong>Long:</strong> ${post.ad_copy.long_copy}</p>
+                                    <p><strong>CTA:</strong> ${post.ad_copy.cta}</p>
+                                    <p><strong>Hashtags:</strong> ${post.ad_copy.hashtags.join(' ')}</p>
+                                </div>
+                                
+                                ${post.generated_image ? 
+                                    `<div>
+                                        <strong>Image IA Générée:</strong>
+                                        <img src="${post.generated_image}" alt="Image générée IA" class="post-image">
+                                        <div style="text-align: center; margin-top: 10px;">
+                                            <a href="${post.generated_image}" download="image_${post.week}_${post.post_number}.jpg" class="btn" style="display: inline-block; width: auto; padding: 8px 15px;">
+                                                📥 Télécharger l'image
+                                            </a>
+                                        </div>
+                                    </div>` : 
+                                    `<div class="fallback-image">
+                                        <p><em>❌ Image non générée (API Leonardo non disponible)</em></p>
+                                    </div>`
+                                }
+                            </div>
+                        `;
+                    });
+                    
+                    calendarHTML += `</div>`;
+                });
+                
+                calendarHTML += `</div>`;
+                calendarResults.innerHTML = calendarHTML;
+                
+                // Activer l'onglet calendrier
+                document.querySelector('.tab[data-tab="calendar"]').click();
+            }
+
+            // Fonctions pour générer prompt image et ad-copy individuellement
+            function generateImagePrompt(siteId, context) {
+                return fetch('/generate_automated_image_prompt', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        'site_id': siteId,
+                        'product_context': context
+                    })
+                })
+                .then(response => response.json());
+            }
+
+            function generateAdCopy(siteId, imagePrompt, postType) {
+                return fetch('/generate_contextual_ad_copy', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        'site_id': siteId,
+                        'image_prompt': imagePrompt,
+                        'post_type': postType
+                    })
+                })
+                .then(response => response.json());
+            }
+        });
+    </script>
+</body>
+</html>

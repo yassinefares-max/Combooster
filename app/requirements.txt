@@ -1,0 +1,18 @@
+# Dépendances ML
+torch
+transformers
+huggingface-hub
+sentence-transformers
+numpy
+faiss-cpu
+
+# Dépendances de base
+flask
+beautifulsoup4
+requests
+tldextract
+pymongo
+playwright
+python-dotenv
+urllib3
+gunicorn
