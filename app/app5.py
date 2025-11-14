@@ -21,12 +21,12 @@ load_dotenv()
 from leonardo_ai import LeonardoAIGenerator
 from typing import Dict
 
-LEONARDO_API_KEY = os.getenv("LEONARDO_API_KEY","1c895e8a-aad0-4a9a-bf84-9f802d729319")
+LEONARDO_API_KEY = os.getenv("LEONARDO_API_KEY")
 print(f"🎨 LEONARDO_API_KEY chargée: {'OUI' if LEONARDO_API_KEY else 'NON'}")
 if LEONARDO_API_KEY:
     print(f"🎨 Clé API Leonardo (premiers caractères): {LEONARDO_API_KEY[:10]}...")
     
-REPLICATE_API_KEY = os.getenv("REPLICATE_API_KEY","r8_XoMP3zM0mo4DQoXBMNkQCKTR2W0JS1D4FRoAb")
+REPLICATE_API_KEY = os.getenv("REPLICATE_API_KEY")
 print(f"🎬 REPLICATE_API_KEY chargée: {'OUI' if REPLICATE_API_KEY else 'NON'}")
 
 
