@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse en Cours</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --light: #f8f9fa;
+            --dark: #212529;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .loading-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            overflow: hidden;
+            text-align: center;
+            padding: 50px 30px;
+        }
+        
+        .loading-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        .loading-title {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+        
+        .loading-text {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .progress-container {
+            background: #f0f0f0;
+            border-radius: 10px;
+            height: 10px;
+            margin: 30px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+        
+        .loading-steps {
+            text-align: left;
+            margin: 30px 0;
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+        
+        .step.active {
+            background: #f8f9fa;
+        }
+        
+        .step-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .step.active .step-icon {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .step.completed .step-icon {
+            background: #4cc9f0;
+            color: white;
+        }
+        
+        .step-text {
+            flex: 1;
+            text-align: left;
+        }
+        
+        .step-name {
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+        
+        .step-status {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .redirect-notice {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <div class="loading-icon">🔍</div>
+        <h1 class="loading-title">Analyse en Cours</h1>
+        <p class="loading-text">
+            Notre système analyse votre site web et prépare votre stratégie 
+            marketing personnalisée. Cette opération peut prendre quelques minutes.
+        </p>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        
+        <div class="loading-steps">
+            <div class="step active" id="step1">
+                <div class="step-icon">1</div>
+                <div class="step-text">
+                    <div class="step-name">Scraping du site web</div>
+                    <div class="step-status">Extraction des produits et contenu</div>
+                </div>
+            </div>
+            
+            <div class="step" id="step2">
+                <div class="step-icon">2</div>
+                <div class="step-text">
+                    <div class="step-name">Analyse du contenu</div>
+                    <div class="step-status">Compréhension de votre positionnement</div>
+                </div>
+            </div>
+            
+            <div class="step" id="step3">
+                <div class="step-icon">3</div>
+                <div class="step-text">
+                    <div class="step-name">Génération de la stratégie</div>
+                    <div class="step-status">Création du calendrier de contenu</div>
+                </div>
+            </div>
+            
+            <div class="step" id="step4">
+                <div class="step-icon">4</div>
+                <div class="step-text">
+                    <div class="step-name">Préparation du dashboard</div>
+                    <div class="step-status">Finalisation de votre espace personnel</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="redirect-notice">
+            Vous serez redirigé automatiquement vers votre dashboard une fois l'analyse terminée.
+        </div>
+    </div>
+    
+    <script>
+        let currentStep = 1;
+        const totalSteps = 4;
+        
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+            
+            // Mettre à jour les étapes
+            document.querySelectorAll('.step').forEach((step, index) => {
+                if (index + 1 < currentStep) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+            
+            currentStep++;
+            
+            if (currentStep <= totalSteps) {
+                setTimeout(updateProgress, 2000);
+            } else {
+                // Vérifier le statut final
+                checkFinalStatus();
+            }
+        }
+        
+        function checkFinalStatus() {
+            fetch('/onboarding/status')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'completed') {
+                        // Mettre à jour la session avec les données complètes
+                        if (data.onboarding_data) {
+                             sessionStorage.setItem('onboarding_data', JSON.stringify(data.onboarding_data));
+                        }
+                        // Rediriger vers la page de récapitulatif
+                        window.location.href = '/onboarding/summary';
+                    } else if (data.status === 'error') {
+                        document.querySelector('.loading-text').textContent = 
+                            'Une erreur est survenue lors de l\'analyse. Veuillez réessayer.';
+                    } else {
+                        setTimeout(checkFinalStatus, 2000);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    setTimeout(checkFinalStatus, 2000);
+                });
+        }
+        
+        // Démarrer l'animation de progression
+        setTimeout(updateProgress, 1000);
+        
+        // Vérifier périodiquement le statut
+        setInterval(checkFinalStatus, 3000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Étape 1: Votre Secteur</title>
+    <style>
+        /* Styles similaires à onboarding.html */
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --light: #f8f9fa;
+            --dark: #212529;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .onboarding-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        .onboarding-header {
+            background: var(--primary);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .onboarding-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .onboarding-header p {
+            opacity: 0.9;
+        }
+        
+        .onboarding-content {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+        
+        select:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: var(--dark);
+            border: 2px solid #ddd;
+        }
+        
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 25%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="onboarding-container">
+        <div class="onboarding-header">
+            <h1>🏢 Étape 1: Votre Secteur</h1>
+            <p>Choisissez votre domaine d'activité</p>
+        </div>
+        
+        <div class="onboarding-content">
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            
+            <form method="POST">
+                <div class="form-group">
+                    <label for="sector">Dans quel secteur exercez-vous ?</label>
+                    <select id="sector" name="sector" required>
+                        <option value="">Sélectionnez votre secteur...</option>
+                        <option value="artisanat">Artisanat</option>
+                        <option value="restauration">Restauration</option>
+                        <option value="commerce">Commerce de détail</option>
+                        <option value="services">Services aux professionnels</option>
+                        <option value="sante">Santé & Bien-être</option>
+                        <option value="immobilier">Immobilier</option>
+                        <option value="mode">Mode & Beauté</option>
+                        <option value="technologie">Technologie</option>
+                        <option value="education">Éducation</option>
+                        <option value="autre">Autre</option>
+                    </select>
+                </div>
+                
+                <div class="btn-container">
+                    <a href="{{ url_for('onboarding') }}" class="btn btn-secondary">
+                        Retour
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        Continuer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

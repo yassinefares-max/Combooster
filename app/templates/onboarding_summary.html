@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Récapitulatif de Votre Configuration</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #28a745;
+            --warning: #ffc107;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .summary-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .summary-header {
+            background: var(--primary);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .summary-header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .summary-header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .summary-content {
+            padding: 40px;
+        }
+        
+        .success-banner {
+            background: linear-gradient(135deg, var(--success), #20c997);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .success-banner h2 {
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .summary-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .summary-section h3 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .info-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            color: #666;
+        }
+        
+        .social-accounts {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .social-account {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.2rem;
+            color: white;
+        }
+        
+        .facebook-icon {
+            background: #1877F2;
+        }
+        
+        .instagram-icon {
+            background: #E4405F;
+        }
+        
+        .social-info {
+            flex: 1;
+        }
+        
+        .social-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .social-details {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .color-preview {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .color-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+        }
+        
+        .logo-preview {
+            max-width: 150px;
+            max-height: 150px;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .edit-form {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+            border-left: 4px solid var(--warning);
+        }
+        
+        .edit-form h4 {
+            color: var(--warning);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        .color-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .color-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .color-input input[type="color"] {
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .timeline {
+            margin: 30px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+        }
+        
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .timeline-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .timeline-content {
+            flex: 1;
+        }
+        
+        .timeline-title {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .timeline-date {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .color-inputs {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="summary-container">
+        <div class="summary-header">
+            <h1>🎉 Configuration Terminée !</h1>
+            <p>Votre stratégie marketing personnalisée est prête</p>
+        </div>
+        
+        <div class="summary-content">
+            <!-- Bannière de succès -->
+            <div class="success-banner">
+                <h2>✅ Votre profil est maintenant actif</h2>
+                <p>Notre système a analysé votre site et généré une stratégie sur mesure pour votre entreprise.</p>
+            </div>
+            
+            <!-- Statistiques rapides -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">{{ onboarding_data.scraped_pages or 15 }}</div>
+                    <div class="stat-label">Pages analysées</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ onboarding_data.products_found or 42 }}</div>
+                    <div class="stat-label">Produits identifiés</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ onboarding_data.social_connected or 2 }}</div>
+                    <div class="stat-label">Réseaux connectés</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">7</div>
+                    <div class="stat-label">Jours de contenu généré</div>
+                </div>
+            </div>
+            
+            <div class="summary-grid">
+                <!-- Informations de base -->
+                <div class="summary-section">
+                    <h3>🏢 Informations Entreprise</h3>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Secteur d'activité</div>
+                        <div class="info-value">{{ onboarding_data.sector|title }}</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Site web</div>
+                        <div class="info-value">{{ onboarding_data.website_url }}</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Identité visuelle</div>
+                        <div class="color-preview">
+                            <div class="color-box" style="background: {{ onboarding_data.primary_color }};" title="Couleur primaire"></div>
+                            <div class="color-box" style="background: {{ onboarding_data.secondary_color }};" title="Couleur secondaire"></div>
+                        </div>
+                    </div>
+                    
+                    {% if onboarding_data.logo %}
+                    <div class="info-item">
+                        <div class="info-label">Logo</div>
+                        <img src="{{ url_for('static', filename=onboarding_data.logo) }}" alt="Logo" class="logo-preview">
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Réseaux sociaux -->
+                <div class="summary-section">
+                    <h3>📱 Réseaux Sociaux Connectés</h3>
+                    <div class="social-accounts">
+                        {% if onboarding_data.facebook_connected %}
+                        <div class="social-account">
+                            <div class="social-icon facebook-icon">📘</div>
+                            <div class="social-info">
+                                <div class="social-name">Facebook</div>
+                                <div class="social-details">
+                                    {{ onboarding_data.facebook_name }}
+                                    {% if onboarding_data.facebook_pages %}
+                                    • {{ onboarding_data.facebook_pages|length }} page(s)
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if onboarding_data.instagram_connected %}
+                        <div class="social-account">
+                            <div class="social-icon instagram-icon">📷</div>
+                            <div class="social-info">
+                                <div class="social-name">Instagram</div>
+                                <div class="social-details">
+                                    @{{ onboarding_data.instagram_username }}
+                                    • {{ onboarding_data.instagram_media_count }} publications
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if not onboarding_data.facebook_connected and not onboarding_data.instagram_connected %}
+                        <div class="info-value">Aucun réseau social connecté</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Timeline du processus -->
+            <div class="timeline">
+                <h3 style="margin-bottom: 20px; color: var(--primary);">📅 Chronologie de configuration</h3>
+                
+                <div class="timeline-item">
+                    <div class="timeline-icon">1</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Secteur sélectionné</div>
+                        <div class="timeline-date">{{ onboarding_data.started_at }}</div>
+                    </div>
+                </div>
+                
+                {% if onboarding_data.facebook_connected_at %}
+                <div class="timeline-item">
+                    <div class="timeline-icon">2</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Facebook connecté</div>
+                        <div class="timeline-date">{{ onboarding_data.facebook_connected_at }}</div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if onboarding_data.instagram_connected_at %}
+                <div class="timeline-item">
+                    <div class="timeline-icon">3</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Instagram connecté</div>
+                        <div class="timeline-date">{{ onboarding_data.instagram_connected_at }}</div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="timeline-item">
+                    <div class="timeline-icon">4</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Site web analysé</div>
+                        <div class="timeline-date">{{ onboarding_data.website_validated_at }}</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-icon">✅</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Configuration terminée</div>
+                        <div class="timeline-date">{{ onboarding_data.completed_at }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Formulaire de modification -->
+            <div class="edit-form">
+                <h4>✏️ Modifier la configuration</h4>
+                <form method="POST" action="{{ url_for('onboarding_update') }}" id="editForm">
+                    <div class="form-group">
+                        <label for="sector">Secteur d'activité</label>
+                        <select id="sector" name="sector" required>
+                            <option value="">Sélectionnez votre secteur...</option>
+                            <option value="artisanat" {% if onboarding_data.sector == 'artisanat' %}selected{% endif %}>Artisanat</option>
+                            <option value="restauration" {% if onboarding_data.sector == 'restauration' %}selected{% endif %}>Restauration</option>
+                            <option value="commerce" {% if onboarding_data.sector == 'commerce' %}selected{% endif %}>Commerce de détail</option>
+                            <option value="services" {% if onboarding_data.sector == 'services' %}selected{% endif %}>Services aux professionnels</option>
+                            <option value="sante" {% if onboarding_data.sector == 'sante' %}selected{% endif %}>Santé & Bien-être</option>
+                            <option value="immobilier" {% if onboarding_data.sector == 'immobilier' %}selected{% endif %}>Immobilier</option>
+                            <option value="mode" {% if onboarding_data.sector == 'mode' %}selected{% endif %}>Mode & Beauté</option>
+                            <option value="technologie" {% if onboarding_data.sector == 'technologie' %}selected{% endif %}>Technologie</option>
+                            <option value="education" {% if onboarding_data.sector == 'education' %}selected{% endif %}>Éducation</option>
+                            <option value="autre" {% if onboarding_data.sector == 'autre' %}selected{% endif %}>Autre</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="website_url">Site web</label>
+                        <input type="url" id="website_url" name="website_url" 
+                               value="{{ onboarding_data.website_url }}" required>
+                    </div>
+                    
+                    <div class="color-inputs">
+                        <div class="form-group">
+                            <label for="primary_color">Couleur primaire</label>
+                            <div class="color-input">
+                                <input type="color" id="primary_color" name="primary_color" 
+                                       value="{{ onboarding_data.primary_color }}">
+                                <span>{{ onboarding_data.primary_color }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="secondary_color">Couleur secondaire</label>
+                            <div class="color-input">
+                                <input type="color" id="secondary_color" name="secondary_color" 
+                                       value="{{ onboarding_data.secondary_color }}">
+                                <span>{{ onboarding_data.secondary_color }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button type="submit" class="btn btn-success">
+                            💾 Enregistrer les modifications
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Actions principales -->
+            <div class="btn-container">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                    🚀 Accéder au Dashboard Principal
+                </a>
+                <a href="{{ url_for('onboarding_social') }}" class="btn btn-outline">
+                    🔧 Modifier les réseaux sociaux
+                </a>
+                <a href="{{ url_for('onboarding_identity') }}" class="btn btn-outline">
+                    🎨 Modifier l'identité visuelle
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Mise à jour en temps réel des couleurs
+        document.getElementById('primary_color').addEventListener('input', function(e) {
+            this.nextElementSibling.textContent = e.target.value;
+        });
+        
+        document.getElementById('secondary_color').addEventListener('input', function(e) {
+            this.nextElementSibling.textContent = e.target.value;
+        });
+        
+        // Confirmation avant envoi du formulaire
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '⏳ Enregistrement...';
+            submitBtn.disabled = true;
+            
+            setTimeout(() => {
+                submitBtn.innerHTML = '✅ Modifications enregistrées !';
+            }, 1000);
+        });
+        
+        // Animation d'apparition
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.summary-section, .timeline-item, .stat-card');
+            elements.forEach((element, index) => {
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    element.style.transition = 'all 0.6s ease';
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

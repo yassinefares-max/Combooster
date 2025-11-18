@@ -1,4 +1,4 @@
-# Dépendances ML
+# Machine Learning / NLP
 torch
 transformers
 huggingface-hub
@@ -6,13 +6,28 @@ sentence-transformers
 numpy
 faiss-cpu
 
-# Dépendances de base
-flask
-beautifulsoup4
+# Génération vidéo et IA
+replicate
+google-generativeai
+google-genai
+# Web scraping & HTTP
 requests
+beautifulsoup4
 tldextract
-pymongo
-playwright
-python-dotenv
+requests-file
 urllib3
+
+# Flask / API
+flask
+flask-cors
 gunicorn
+
+# Base de données
+pymongo
+
+# Utilitaires
+python-dotenv
+Pillow
+
+# Playwright
+playwright

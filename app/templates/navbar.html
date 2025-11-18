@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .navbar {
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .navbar-brand:hover {
+            opacity: 0.9;
+        }
+        
+        .navbar-logo {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .navbar-spacer {
+            flex: 1;
+        }
+        
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .user-profile:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: transparent;
+            border: 2px solid white;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .user-email {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            color: #212529;
+            border-radius: 8px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            z-index: 2000;
+        }
+        
+        .user-profile.active .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-item {
+            padding: 12px 20px;
+            border: none;
+            background: none;
+            color: #212529;
+            text-align: left;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        
+        .dropdown-item:first-child {
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        
+        .dropdown-item:last-child {
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        
+        .dropdown-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background: #e9ecef;
+            margin: 5px 0;
+        }
+        
+        .dropdown-item.logout {
+            color: #dc3545;
+        }
+        
+        .dropdown-item.logout:hover {
+            background: #ffe9e9;
+        }
+        
+        .nav-badge {
+            background: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 15px;
+            }
+            
+            .navbar-brand {
+                font-size: 1.2rem;
+                gap: 10px;
+            }
+            
+            .navbar-logo {
+                width: 32px;
+                height: 32px;
+                font-size: 1.2rem;
+            }
+            
+            .user-info {
+                display: none;
+            }
+            
+            .user-avatar {
+                width: 32px;
+                height: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('dashboard') }}" class="navbar-brand">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" 
+                alt="Logo" 
+                class="navbar-logo"
+                style="width:40px; height:40px; border-radius:50%;">
+            <span>Combooster</span>
+        </a>
+        
+        <div class="navbar-spacer"></div>
+        
+        <div class="navbar-user">
+            {% if session.get('user_id') %}
+                <div class="user-profile" id="userProfile" onclick="toggleDropdown(event)">
+                    {% if session.get('user_picture') %}
+                        <div class="user-avatar" style="background-image: url('{{ session.get('user_picture') }}')"></div>
+                    {% else %}
+                        <div class="user-avatar" style="background: linear-gradient(135deg, #4361ee, #3a0ca3); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                            {{ session.get('user_name', 'U')[0].upper() }}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="user-info">
+                        <div class="user-name">{{ session.get('user_name', 'Utilisateur') }}</div>
+                        <div class="user-email">{{ session.get('user_email', '') }}</div>
+                    </div>
+                    
+                    <div class="dropdown-menu">
+                        <a href="{{ url_for('dashboard') }}" class="dropdown-item">
+                            <span>📊</span> Tableau de bord
+                        </a>
+                        
+                        <a href="{{ url_for('ask_question') }}" class="dropdown-item">
+                            <span>💬</span> Questions
+                        </a>
+                        
+                        <a href="{{ url_for('onboarding_summary') }}" class="dropdown-item">
+                            <span>⚙️</span> Configuration
+                        </a>
+                        
+                        <div class="dropdown-divider"></div>
+                        
+                        <a href="{{ url_for('logout') }}" class="dropdown-item logout">
+                            <span>🚪</span> Déconnexion
+                        </a>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{{ url_for('login') }}" style="color: white; text-decoration: none; padding: 8px 16px; background: rgba(255,255,255,0.2); border-radius: 6px;">
+                    Connexion
+                </a>
+            {% endif %}
+        </div>
+    </nav>
+    
+    <script>
+        function toggleDropdown(event) {
+            event.stopPropagation();
+            const profile = document.getElementById('userProfile');
+            profile.classList.toggle('active');
+        }
+        
+        // Fermer le dropdown quand on clique ailleurs
+        document.addEventListener('click', function(event) {
+            const profile = document.getElementById('userProfile');
+            if (profile && !profile.contains(event.target)) {
+                profile.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

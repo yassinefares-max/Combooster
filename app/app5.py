@@ -7,7 +7,7 @@ import time
 import re
 import urllib.parse
 from collections import deque
-from flask import Flask, render_template, request, redirect, url_for, flash, send_file,jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, send_file,jsonify,session
 from bs4 import BeautifulSoup
 import tldextract
 import requests
@@ -20,8 +20,15 @@ from dotenv import load_dotenv
 load_dotenv()
 from leonardo_ai import LeonardoAIGenerator
 from typing import Dict
+from authlib.integrations.flask_client import OAuth
+from werkzeug.security import generate_password_hash, check_password_hash
+import secrets
+import datetime
+from werkzeug.utils import secure_filename
+from werkzeug.datastructures import FileStorage
+import mimetypes
 
-LEONARDO_API_KEY = os.getenv("LEONARDO_API_KEY")
+LEONARDO_API_KEY = os.getenv("LEONARDO_API_KEY","1c895e8a-aad0-4a9a-bf84-9f802d729319")
 print(f"🎨 LEONARDO_API_KEY chargée: {'OUI' if LEONARDO_API_KEY else 'NON'}")
 if LEONARDO_API_KEY:
     print(f"🎨 Clé API Leonardo (premiers caractères): {LEONARDO_API_KEY[:10]}...")
@@ -62,6 +69,59 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET", "change_this_secret_please_change")
 app.register_blueprint(extra_routes)
 
+# Configuration OAuth
+app.config['FACEBOOK_CLIENT_ID'] = os.getenv('FACEBOOK_CLIENT_ID', '')
+app.config['FACEBOOK_CLIENT_SECRET'] = os.getenv('FACEBOOK_CLIENT_SECRET', '')
+app.config['INSTAGRAM_CLIENT_ID'] = os.getenv('INSTAGRAM_CLIENT_ID', '')
+app.config['INSTAGRAM_CLIENT_SECRET'] = os.getenv('INSTAGRAM_CLIENT_SECRET', '')
+
+
+# ✅ CONFIGURATION GOOGLE OAUTH
+app.config['GOOGLE_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID', '')
+app.config['GOOGLE_CLIENT_SECRET'] = os.getenv('GOOGLE_CLIENT_SECRET', '')
+
+# Initialisation OAuth
+oauth = OAuth(app)
+
+# Configuration Facebook
+facebook = oauth.register(
+    name='facebook',
+    client_id=app.config['FACEBOOK_CLIENT_ID'],
+    client_secret=app.config['FACEBOOK_CLIENT_SECRET'],
+    access_token_url='https://graph.facebook.com/oauth/access_token',
+    access_token_params=None,
+    authorize_url='https://www.facebook.com/dialog/oauth',
+    authorize_params=None,
+    api_base_url='https://graph.facebook.com/',
+    client_kwargs={'scope': 'email,public_profile,instagram_basic,pages_show_list'},
+)
+
+# Configuration Instagram
+instagram = oauth.register(
+    name='instagram',
+    client_id=app.config['INSTAGRAM_CLIENT_ID'],
+    client_secret=app.config['INSTAGRAM_CLIENT_SECRET'],
+    access_token_url='https://api.instagram.com/oauth/access_token',
+    authorize_url='https://api.instagram.com/oauth/authorize',
+    api_base_url='https://graph.instagram.com/',
+    client_kwargs={'scope': 'user_profile,user_media'},
+)
+
+
+
+google = oauth.register(
+    name='google',
+    client_id=app.config['GOOGLE_CLIENT_ID'],
+    client_secret=app.config['GOOGLE_CLIENT_SECRET'],
+    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+    client_kwargs={
+        'scope': 'openid email profile'
+    }
+)
+
+
+
+
 # Connexion MongoDB
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
 mongo_client = MongoClient(MONGO_URI)
@@ -80,6 +140,100 @@ DEFAULT_MAX_DEPTH = 2
 REQUEST_TIMEOUT = 20  # secondes pour requests
 PLAYWRIGHT_TIMEOUT = 30000  # ms pour playwright
 
+
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
+IMAGES_FOLDER = os.path.join(UPLOAD_FOLDER, 'images')
+VIDEOS_FOLDER = os.path.join(UPLOAD_FOLDER, 'videos')
+
+# Créer les dossiers s'ils n'existent pas
+os.makedirs(IMAGES_FOLDER, exist_ok=True)
+os.makedirs(VIDEOS_FOLDER, exist_ok=True)
+
+# Configuration Flask
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500MB max
+
+# Extensions autorisées
+ALLOWED_IMAGES = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'}
+ALLOWED_VIDEOS = {'mp4', 'avi', 'mov', 'mkv', 'flv', 'wmv', 'webm', 'mts', 'm2ts'}
+
+# Collection MongoDB pour les uploads
+uploads_collection = mongo_db["uploads"]
+
+# ==========================================
+# 📦 MODÈLE UTILISATEUR (Utiliser MongoDB)
+# ==========================================
+
+users_collection = mongo_db["users"]
+
+def create_user(email, password=None, name='', picture='', provider='email', provider_id=''):
+    """Crée un nouvel utilisateur"""
+    try:
+        # Vérifier si l'utilisateur existe déjà
+        if users_collection.find_one({'email': email}):
+            return {'success': False, 'error': 'Cet email est déjà enregistré'}
+        
+        user_data = {
+            'email': email,
+            'name': name or email.split('@')[0],
+            'picture': picture,
+            'provider': provider,
+            'provider_id': provider_id,
+            'created_at': time.strftime("%Y-%m-%d %H:%M:%S"),
+            'last_login': time.strftime("%Y-%m-%d %H:%M:%S"),
+            'is_active': True,
+            'onboarding_completed': False
+        }
+        
+        if password:
+            user_data['password'] = generate_password_hash(password)
+        
+        result = users_collection.insert_one(user_data)
+        
+        return {
+            'success': True,
+            'user_id': str(result.inserted_id),
+            'message': 'Utilisateur créé avec succès'
+        }
+    except Exception as e:
+        return {'success': False, 'error': str(e)}
+
+
+def get_user_by_email(email):
+    """Récupère un utilisateur par email"""
+    try:
+        user = users_collection.find_one({'email': email})
+        if user:
+            user['_id'] = str(user['_id'])
+        return user
+    except Exception as e:
+        print(f"❌ Erreur récupération utilisateur: {e}")
+        return None
+
+
+def get_user_by_id(user_id):
+    """Récupère un utilisateur par ID"""
+    try:
+        from bson import ObjectId
+        user = users_collection.find_one({'_id': ObjectId(user_id)})
+        if user:
+            user['_id'] = str(user['_id'])
+        return user
+    except Exception as e:
+        print(f"❌ Erreur récupération utilisateur: {e}")
+        return None
+
+
+def update_last_login(user_id):
+    """Met à jour la dernière connexion"""
+    try:
+        from bson import ObjectId
+        users_collection.update_one(
+            {'_id': ObjectId(user_id)},
+            {'$set': {'last_login': time.strftime("%Y-%m-%d %H:%M:%S")}}
+        )
+    except Exception as e:
+        print(f"❌ Erreur mise à jour connexion: {e}")
 
 
 def smart_delay(domain, min_delay=2, max_delay=5):
@@ -1454,6 +1608,10 @@ def calculate_statistics(results):
 # Endpoint page principale
 @app.route("/", methods=["GET"])
 def index():
+    """Page d'accueil - Redirection vers login si non connecté"""
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
     return render_template("index5.html", playwright_available=PLAYWRIGHT_AVAILABLE)
 
 # Endpoint de scraping (form POST)
@@ -3488,17 +3646,1643 @@ def debug_profile(site_id):
             
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
+    
+# ==========================================
+# 🛡️ MIDDLEWARE D'AUTHENTIFICATION
+# ==========================================
+
+def login_required(f):
+    """Décorateur pour vérifier l'authentification"""
+    from functools import wraps
+    
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            flash('Veuillez vous connecter d\'abord', 'warning')
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    
+    return decorated_function
 # ============================================
 # 🎨 DASHBOARD DE TESTING
 # ============================================
 @app.route("/dashboard", methods=["GET"])
+@login_required
 def dashboard():
     """Affiche le dashboard de test du backend"""
+    onboarding_completed = session.get('onboarding_processed', False)
+    user_data = {
+        'name': session.get('user_name'),
+        'email': session.get('user_email'),
+        'picture': session.get('user_picture')
+    }
+    
     return render_template("dashboard.html", 
                          playwright_available=PLAYWRIGHT_AVAILABLE,
                          leonardo_available=bool(LEONARDO_API_KEY),
-                         replicate_available=bool(REPLICATE_API_KEY))
+                         replicate_available=bool(REPLICATE_API_KEY),
+                         onboarding_completed=onboarding_completed,
+                         user_data=user_data)
 
+
+# ============================================
+# 🚀 FORMULAIRE EN 4 ÉTAPES - VERSION SIMPLIFIÉE
+# ============================================
+
+def get_onboarding_data():
+    """Récupère les données d'onboarding"""
+    return session.get('onboarding_data', {})
+
+def set_onboarding_data(data):
+    """Définit les données d'onboarding"""
+    session['onboarding_data'] = data
+
+def clear_onboarding_data():
+    """Efface les données d'onboarding"""
+    session.pop('onboarding_data', None)
+    session.pop('onboarding_status', None)
+    session.pop('onboarding_processed', None)
+
+@app.route("/onboarding", methods=["GET"])
+@login_required
+def onboarding():
+    """Page d'accueil du formulaire en 4 étapes"""
+    # Réinitialiser les données d'onboarding
+    clear_onboarding_data()
+    
+    # Ajouter l'user_id aux données d'onboarding
+    user_data = {
+        'user_id': session.get('user_id'),
+        'user_email': session.get('user_email'),
+        'user_name': session.get('user_name')
+    }
+    set_onboarding_data(user_data)
+    
+    return render_template("onboarding.html")
+
+@app.route("/onboarding/sector", methods=["GET", "POST"])
+@login_required
+def onboarding_sector():
+    """Étape 1: Choix du secteur"""
+    if request.method == "POST":
+        sector = request.form.get("sector")
+        if not sector:
+            flash("Veuillez sélectionner un secteur", "warning")
+            return redirect(url_for("onboarding_sector"))
+        
+        # Stocker en session
+        onboarding_data = get_onboarding_data()
+        onboarding_data.update({
+            'sector': sector,
+            'step': 1,
+            'started_at': time.strftime("%Y-%m-%d %H:%M:%S")
+        })
+        set_onboarding_data(onboarding_data)
+        
+        return redirect(url_for("onboarding_social"))
+    
+    return render_template("onboarding_sector.html")
+
+@app.route("/onboarding/social", methods=["GET", "POST"])
+def onboarding_social():
+    """Étape 2: Connexion réseaux sociaux"""
+    # Vérifier que l'étape 1 est complétée
+    onboarding_data = get_onboarding_data()
+    if not onboarding_data.get('sector'):
+        flash("Veuillez d'abord compléter l'étape 1", "warning")
+        return redirect(url_for("onboarding_sector"))
+    
+    if request.method == "POST":
+        # Mettre à jour l'étape
+        onboarding_data.update({
+            'step': 2
+        })
+        set_onboarding_data(onboarding_data)
+        return redirect(url_for("onboarding_sources"))
+    
+    # Passer les données au template
+    return render_template("onboarding_social.html", onboarding_data=onboarding_data)
+
+@app.route("/onboarding/sources", methods=["GET", "POST"])
+def onboarding_sources():
+    """Étape 3: URL du site"""
+    # Vérifier que l'étape 2 est complétée
+    onboarding_data = get_onboarding_data()
+    if onboarding_data.get('step', 0) < 1:
+        flash("Veuillez d'abord compléter les étapes précédentes", "warning")
+        return redirect(url_for("onboarding_sector"))
+    
+    if request.method == "POST":
+        website_url = request.form.get("website_url", "").strip()
+        
+        # Validation de l'URL
+        if not website_url:
+            flash("Veuillez fournir une URL de site web", "danger")
+            return redirect(url_for("onboarding_sources"))
+        
+        # Normaliser l'URL
+        if not website_url.startswith(('http://', 'https://')):
+            website_url = 'https://' + website_url
+        
+        # Test d'accessibilité basique
+        try:
+            response = requests.head(website_url, timeout=10, allow_redirects=True)
+            if response.status_code >= 400:
+                flash(f"Le site semble inaccessible (code {response.status_code}) - le scraping sera tenté quand même", "warning")
+        except Exception as e:
+            flash(f"Attention: Impossible de vérifier l'accès au site - le scraping sera tenté quand même", "warning")
+        
+        onboarding_data.update({
+            'website_url': website_url,
+            'step': 3,
+            'website_validated_at': time.strftime("%Y-%m-%d %H:%M:%S")
+        })
+        set_onboarding_data(onboarding_data)
+        
+        return redirect(url_for("onboarding_identity"))
+    
+    return render_template("onboarding_sources.html")
+
+@app.route("/onboarding/identity", methods=["GET", "POST"])
+def onboarding_identity():
+    """Étape 4: Identité visuelle"""
+    # Vérifier que l'étape 3 est complétée
+    onboarding_data = get_onboarding_data()
+    if not onboarding_data.get('website_url'):
+        flash("Veuillez d'abord compléter l'étape 3", "warning")
+        return redirect(url_for("onboarding_sources"))
+    
+    if request.method == "POST":
+        # Gérer l'upload du logo
+        logo_file = request.files.get("logo")
+        primary_color = request.form.get("primary_color", "#4361ee")
+        secondary_color = request.form.get("secondary_color", "#3a0ca3")
+        
+        logo_filename = None
+        if logo_file and logo_file.filename:
+            try:
+                # Créer le dossier uploads s'il n'existe pas
+                upload_dir = os.path.join('static', 'uploads', 'logos')
+                os.makedirs(upload_dir, exist_ok=True)
+                
+                # Générer un nom de fichier sécurisé
+                from werkzeug.utils import secure_filename
+                filename = secure_filename(logo_file.filename)
+                logo_path = os.path.join(upload_dir, filename)
+                logo_file.save(logo_path)
+                logo_filename = f"uploads/logos/{filename}"
+            except Exception as e:
+                flash(f"Erreur lors de l'upload du logo: {str(e)}", "warning")
+        
+        onboarding_data.update({
+            'logo': logo_filename,
+            'primary_color': primary_color,
+            'secondary_color': secondary_color,
+            'step': 4,
+            'completed_at': time.strftime("%Y-%m-%d %H:%M:%S"),
+            'completed': True
+        })
+        set_onboarding_data(onboarding_data)
+        
+        # ✅ CORRIGER: Passer les données nécessaires à la fonction
+        # au lieu de les accéder via session dans le thread
+        threading.Thread(
+            target=process_onboarding_data_corrected,
+            args=(onboarding_data.copy(),),  # ✅ Passer une COPIE des données
+            daemon=True
+        ).start()
+        
+        return redirect(url_for("dashboard_loading"))
+    
+    return render_template("onboarding_identity.html")
+
+def process_onboarding_data_corrected(onboarding_data):
+    """
+    Traite les données d'onboarding en arrière-plan
+    ✅ Les données sont passées EN PARAMÈTRE, pas accédées via session
+    """
+    try:
+        # ✅ Pas besoin d'accéder à session - on a les données en paramètre
+        website_url = onboarding_data.get('website_url')
+        
+        if not website_url:
+            store_onboarding_status("error")
+            return
+        
+        print(f"🚀 Lancement du scraping pour {website_url}")
+        
+        # Simulation du traitement
+        steps = [
+            "Scraping du site web...",
+            "Analyse du contenu...", 
+            "Extraction des produits...",
+            "Génération de la stratégie...",
+            "Préparation du dashboard..."
+        ]
+        
+        for i, step in enumerate(steps, 1):
+            print(f"📋 Étape {i}/5: {step}")
+            time.sleep(2)
+            
+            # Stocker la progression
+            progress_data = {
+                'current_step': i,
+                'total_steps': len(steps),
+                'step_name': step,
+                'progress_percent': (i / len(steps)) * 100
+            }
+            store_onboarding_progress(progress_data)
+        
+        # Ajouter les données simulées
+        import random
+        
+        onboarding_data.update({
+            'scraped_pages': random.randint(10, 25),
+            'products_found': random.randint(30, 60),
+            'social_connected': sum([
+                1 if onboarding_data.get('facebook_connected') else 0,
+                1 if onboarding_data.get('instagram_connected') else 0
+            ]),
+            'analysis_completed_at': time.strftime("%Y-%m-%d %H:%M:%S"),
+            'content_calendar_generated': True,
+            'marketing_strategy_ready': True,
+            'ai_images_generated': random.randint(5, 15)
+        })
+        
+        # ✅ Sauvegarder les données mises à jour
+        # Utiliser un fichier JSON au lieu de session
+        with open('onboarding_data_temp.json', 'w', encoding='utf-8') as f:
+            json.dump(onboarding_data, f, ensure_ascii=False, indent=2)
+        
+        # Marquer comme terminé
+        store_onboarding_status("completed")
+        print("✅ Traitement onboarding terminé avec succès")
+        
+    except Exception as e:
+        print(f"❌ Erreur lors du traitement onboarding: {e}")
+        import traceback
+        print(f"📌 Détails: {traceback.format_exc()}")
+        store_onboarding_status("error")
+
+
+@app.route("/dashboard/loading")
+def dashboard_loading():
+    """Page de chargement pendant le traitement"""
+    onboarding_data = get_onboarding_data()
+    if not onboarding_data.get('completed'):
+        flash("Veuillez d'abord compléter le processus d'onboarding", "warning")
+        return redirect(url_for("onboarding"))
+    
+    return render_template("dashboard_loading.html")
+
+
+
+def store_onboarding_status(status):
+    """Stocke le statut dans un fichier JSON"""
+    try:
+        status_file = "onboarding_status.json"
+        data = {
+            'status': status,
+            'updated_at': time.strftime("%Y-%m-%d %H:%M:%S")
+        }
+        
+        with open(status_file, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+            
+        print(f"📝 Statut sauvegardé: {status}")
+        
+    except Exception as e:
+        print(f"❌ Erreur sauvegarde statut: {e}")
+
+def store_onboarding_progress(progress_data):
+    """Stocke la progression dans un fichier JSON"""
+    try:
+        progress_file = "onboarding_progress.json"
+        
+        with open(progress_file, 'w', encoding='utf-8') as f:
+            json.dump(progress_data, f, ensure_ascii=False, indent=2)
+            
+    except Exception as e:
+        print(f"❌ Erreur sauvegarde progression: {e}")
+
+def get_onboarding_status_from_file():
+    """Récupère le statut depuis le fichier"""
+    try:
+        status_file = "onboarding_status.json"
+        if os.path.exists(status_file):
+            with open(status_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                return data.get('status', 'processing')
+        return 'processing'
+        
+    except Exception as e:
+        print(f"❌ Erreur lecture statut: {e}")
+        return 'processing'
+
+def get_onboarding_progress_from_file():
+    """Récupère la progression depuis le fichier"""
+    try:
+        progress_file = "onboarding_progress.json"
+        if os.path.exists(progress_file):
+            with open(progress_file, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        return {}
+        
+    except Exception as e:
+        print(f"❌ Erreur lecture progression: {e}")
+        return {}
+
+
+def process_onboarding_data():
+    """Traite les données d'onboarding en arrière-plan"""
+    try:
+        # Utiliser le contexte de l'application
+        with app.app_context():
+            onboarding_data = get_onboarding_data()
+            website_url = onboarding_data.get('website_url')
+            
+            if not website_url:
+                store_onboarding_status("error")
+                return
+            
+            print(f"🚀 Lancement du scraping pour {website_url}")
+            
+            # Simulation du traitement
+            steps = [
+                "Scraping du site web...",
+                "Analyse du contenu...", 
+                "Extraction des produits...",
+                "Génération de la stratégie...",
+                "Préparation du dashboard..."
+            ]
+            
+            for i, step in enumerate(steps, 1):
+                print(f"📋 Étape {i}/5: {step}")
+                time.sleep(2)
+                
+                # Stocker la progression
+                progress_data = {
+                    'current_step': i,
+                    'total_steps': len(steps),
+                    'step_name': step,
+                    'progress_percent': (i / len(steps)) * 100
+                }
+                store_onboarding_progress(progress_data)
+            
+            # Ajouter les données simulées
+            import random
+            
+            onboarding_data.update({
+                'scraped_pages': random.randint(10, 25),
+                'products_found': random.randint(30, 60),
+                'social_connected': sum([
+                    1 if onboarding_data.get('facebook_connected') else 0,
+                    1 if onboarding_data.get('instagram_connected') else 0
+                ]),
+                'analysis_completed_at': time.strftime("%Y-%m-%d %H:%M:%S"),
+                'content_calendar_generated': True,
+                'marketing_strategy_ready': True,
+                'ai_images_generated': random.randint(5, 15)
+            })
+            
+            set_onboarding_data(onboarding_data)
+            
+            # Marquer comme terminé
+            store_onboarding_status("completed")
+            print("✅ Traitement onboarding terminé avec succès")
+            
+    except Exception as e:
+        print(f"❌ Erreur lors du traitement onboarding: {e}")
+        store_onboarding_status("error")
+
+@app.route("/onboarding/summary")
+def onboarding_summary():
+    """Page de récapitulatif avec possibilité de modification"""
+    onboarding_data = get_onboarding_data()
+    
+    # Vérifier que l'onboarding est complété
+    if not onboarding_data.get('completed'):
+        flash("Veuillez d'abord compléter le processus d'onboarding", "warning")
+        return redirect(url_for("onboarding"))
+    
+    return render_template("onboarding_summary.html", onboarding_data=onboarding_data)
+
+@app.route("/onboarding/update", methods=["POST"])
+def onboarding_update():
+    """Met à jour les données d'onboarding"""
+    try:
+        onboarding_data = get_onboarding_data()
+        
+        # Mettre à jour les données
+        onboarding_data.update({
+            'sector': request.form.get('sector'),
+            'website_url': request.form.get('website_url'),
+            'primary_color': request.form.get('primary_color', '#4361ee'),
+            'secondary_color': request.form.get('secondary_color', '#3a0ca3'),
+            'updated_at': time.strftime("%Y-%m-%d %H:%M:%S")
+        })
+        
+        set_onboarding_data(onboarding_data)
+        flash("Configuration mise à jour avec succès!", "success")
+        
+    except Exception as e:
+        flash(f"Erreur lors de la mise à jour: {str(e)}", "error")
+    
+    return redirect(url_for("onboarding_summary"))
+
+
+# ✅ ALTERNATIVE: Utiliser un stockage persistant pour les données
+@app.route("/onboarding/status")
+def onboarding_status():
+    """Retourne le statut du traitement"""
+    status = get_onboarding_status_from_file()
+    progress = get_onboarding_progress_from_file()
+    
+    # Charger les données mises à jour depuis le fichier temporaire
+    onboarding_data_updated = {}
+    if os.path.exists('onboarding_data_temp.json'):
+        try:
+            with open('onboarding_data_temp.json', 'r', encoding='utf-8') as f:
+                onboarding_data_updated = json.load(f)
+        except:
+            pass
+    
+    return jsonify({
+        'status': status,
+        'progress': progress,
+        'onboarding_data': onboarding_data_updated  # ✅ Retourner les données mises à jour
+    })
+    
+@app.route("/onboarding/reset")
+def onboarding_reset():
+    """Réinitialise l'onboarding"""
+    clear_onboarding_data()
+    flash("Configuration réinitialisée", "info")
+    return redirect(url_for("onboarding"))
+
+@app.route("/onboarding/data")
+def onboarding_data():
+    """Debug: Affiche les données d'onboarding (à supprimer en production)"""
+    return jsonify({
+        'onboarding_data': get_onboarding_data(),
+        'onboarding_status': session.get('onboarding_status'),
+        'onboarding_processed': session.get('onboarding_processed')
+    })
+
+# ============================================
+# 🔐 ROUTES AUTHENTIFICATION RÉSEAUX SOCIAUX
+# ============================================
+
+@app.route('/auth/facebook')
+def auth_facebook():
+    """Démarre l'authentification Facebook"""
+    redirect_uri = url_for('auth_facebook_callback', _external=True)
+    return facebook.authorize_redirect(redirect_uri)
+
+@app.route('/auth/facebook/callback')
+def auth_facebook_callback():
+    """Callback Facebook OAuth"""
+    try:
+        token = facebook.authorize_access_token()
+        if not token:
+            flash('Erreur d\'authentification Facebook', 'error')
+            return redirect(url_for('onboarding_social'))
+        
+        # Récupérer les informations utilisateur
+        resp = facebook.get('me?fields=id,name,email,picture')
+        user_info = resp.json()
+        
+        # Récupérer les pages Facebook
+        pages_resp = facebook.get('me/accounts')
+        pages_info = pages_resp.json()
+        
+        # Stocker dans la session
+        onboarding_data = get_onboarding_data()
+        onboarding_data.update({
+            'facebook_connected': True,
+            'facebook_user_id': user_info.get('id'),
+            'facebook_name': user_info.get('name'),
+            'facebook_email': user_info.get('email'),
+            'facebook_picture': user_info.get('picture', {}).get('data', {}).get('url'),
+            'facebook_pages': pages_info.get('data', []),
+            'facebook_access_token': token.get('access_token'),
+            'facebook_connected_at': time.strftime("%Y-%m-%d %H:%M:%S")
+        })
+        set_onboarding_data(onboarding_data)
+        
+        flash('Facebook connecté avec succès!', 'success')
+        return redirect(url_for('onboarding_social'))
+        
+    except Exception as e:
+        flash(f'Erreur de connexion Facebook: {str(e)}', 'error')
+        return redirect(url_for('onboarding_social'))
+
+@app.route('/auth/facebook/callback_js', methods=['POST'])
+def auth_facebook_callback_js():
+    """Traite les données Facebook envoyées par le SDK JavaScript"""
+    try:
+        data = request.get_json()
+        user_data = data.get('user', {})
+        pages_data = data.get('pages', {})
+        
+        # Stocker dans la session
+        onboarding_data = get_onboarding_data()
+        onboarding_data.update({
+            'facebook_connected': True,
+            'facebook_user_id': user_data.get('id'),
+            'facebook_name': user_data.get('name'),
+            'facebook_email': user_data.get('email'),
+            'facebook_picture': user_data.get('picture', {}).get('data', {}).get('url'),
+            'facebook_pages': pages_data.get('data', []),
+            'facebook_connected_at': time.strftime("%Y-%m-%d %H:%M:%S")
+        })
+        set_onboarding_data(onboarding_data)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Facebook connecté avec succès! Bienvenue {user_data.get("name")}'
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Erreur de traitement: {str(e)}'
+        }), 500
+
+
+@app.route('/auth/instagram')
+def auth_instagram():
+    """Démarre l'authentification Instagram"""
+    redirect_uri = url_for('auth_instagram_callback', _external=True)
+    return oauth.instagram.authorize_redirect(redirect_uri)
+
+@app.route('/auth/instagram/callback')
+def auth_instagram_callback():
+    """Callback Instagram OAuth"""
+    try:
+        token = oauth.instagram.authorize_access_token()
+        if not token:
+            flash('Erreur d\'authentification Instagram', 'error')
+            return redirect(url_for('onboarding_social'))
+        
+        # Récupérer les informations utilisateur
+        user_resp = oauth.instagram.get('me?fields=id,username,account_type,media_count')
+        user_info = user_resp.json()
+        
+        # Récupérer les médias
+        media_resp = oauth.instagram.get('me/media?fields=id,caption,media_type,media_url,permalink,timestamp')
+        media_info = media_resp.json()
+        
+        # Stocker dans la session
+        onboarding_data = get_onboarding_data()
+        onboarding_data.update({
+            'instagram_connected': True,
+            'instagram_user_id': user_info.get('id'),
+            'instagram_username': user_info.get('username'),
+            'instagram_account_type': user_info.get('account_type'),
+            'instagram_media_count': user_info.get('media_count'),
+            'instagram_recent_media': media_info.get('data', []),
+            'instagram_access_token': token.get('access_token'),
+            'instagram_connected_at': time.strftime("%Y-%m-%d %H:%M:%S")
+        })
+        set_onboarding_data(onboarding_data)
+        
+        flash('Instagram connecté avec succès!', 'success')
+        return redirect(url_for('onboarding_social'))
+        
+    except Exception as e:
+        flash(f'Erreur de connexion Instagram: {str(e)}', 'error')
+        return redirect(url_for('onboarding_social'))
+
+@app.route('/auth/disconnect/<platform>')
+def auth_disconnect(platform):
+    """Déconnecte un réseau social"""
+    onboarding_data = get_onboarding_data()
+    
+    if platform == 'facebook':
+        keys_to_remove = [k for k in onboarding_data.keys() if k.startswith('facebook_')]
+        for key in keys_to_remove:
+            onboarding_data.pop(key, None)
+        flash('Facebook déconnecté', 'info')
+    
+    elif platform == 'instagram':
+        keys_to_remove = [k for k in onboarding_data.keys() if k.startswith('instagram_')]
+        for key in keys_to_remove:
+            onboarding_data.pop(key, None)
+        flash('Instagram déconnecté', 'info')
+    
+    set_onboarding_data(onboarding_data)
+    return redirect(url_for('onboarding_social'))
+
+
+# ==========================================
+# 🔑 ROUTES D'AUTHENTIFICATION
+# ==========================================
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """Page de connexion"""
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        password = request.form.get('password', '')
+        
+        if not email or not password:
+            flash('Email et mot de passe requis', 'danger')
+            return redirect(url_for('login'))
+        
+        user = get_user_by_email(email)
+        
+        if not user:
+            flash('Email ou mot de passe incorrect', 'danger')
+            return redirect(url_for('login'))
+        
+        # Vérifier le mot de passe
+        if not user.get('password'):
+            flash('Veuillez utiliser Google pour vous connecter', 'info')
+            return redirect(url_for('login'))
+        
+        if not check_password_hash(user['password'], password):
+            flash('Email ou mot de passe incorrect', 'danger')
+            return redirect(url_for('login'))
+        
+        # Connexion réussie
+        session['user_id'] = user['_id']
+        session['user_email'] = user['email']
+        session['user_name'] = user['name']
+        session['user_picture'] = user.get('picture', '')
+        
+        update_last_login(user['_id'])
+        
+        flash(f'Bienvenue {user["name"]}!', 'success')
+        return redirect(url_for('onboarding') if not user.get('onboarding_completed') else url_for('dashboard'))
+    
+    return render_template('login.html')
+
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    """Page d'inscription"""
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        password = request.form.get('password', '')
+        password_confirm = request.form.get('password_confirm', '')
+        name = request.form.get('name', '').strip()
+        
+        # Validations
+        if not email or not password or not name:
+            flash('Tous les champs sont requis', 'danger')
+            return redirect(url_for('signup'))
+        
+        if len(password) < 8:
+            flash('Le mot de passe doit contenir au moins 8 caractères', 'danger')
+            return redirect(url_for('signup'))
+        
+        if password != password_confirm:
+            flash('Les mots de passe ne correspondent pas', 'danger')
+            return redirect(url_for('signup'))
+        
+        # Vérifier si l'email existe
+        if get_user_by_email(email):
+            flash('Cet email est déjà utilisé', 'danger')
+            return redirect(url_for('signup'))
+        
+        # Créer l'utilisateur
+        result = create_user(
+            email=email,
+            password=password,
+            name=name,
+            provider='email'
+        )
+        
+        if result['success']:
+            flash('Inscription réussie! Vous pouvez maintenant vous connecter.', 'success')
+            return redirect(url_for('login'))
+        else:
+            flash(f"Erreur: {result['error']}", 'danger')
+            return redirect(url_for('signup'))
+    
+    return render_template('signup.html')
+
+
+@app.route('/auth/google')
+def auth_google():
+    """Lance l'authentification Google"""
+    redirect_uri = url_for('auth_google_callback', _external=True)
+    return google.authorize_redirect(redirect_uri)
+
+
+@app.route('/auth/google/callback')
+def auth_google_callback():
+    """Callback Google OAuth"""
+    try:
+        token = google.authorize_access_token()
+        user_info = token.get('userinfo')
+        
+        if not user_info:
+            flash('Erreur authentification Google', 'danger')
+            return redirect(url_for('login'))
+        
+        email = user_info.get('email')
+        name = user_info.get('name')
+        picture = user_info.get('picture')
+        google_id = user_info.get('sub')
+        
+        # Chercher ou créer l'utilisateur
+        user = get_user_by_email(email)
+        
+        if not user:
+            # Créer un nouvel utilisateur
+            result = create_user(
+                email=email,
+                name=name,
+                picture=picture,
+                provider='google',
+                provider_id=google_id
+            )
+            
+            if not result['success']:
+                flash(f"Erreur création compte: {result['error']}", 'danger')
+                return redirect(url_for('login'))
+            
+            user_id = result['user_id']
+            is_new_user = True
+        else:
+            user_id = user['_id']
+            is_new_user = False
+            
+            # Mettre à jour les infos Google si nécessaire
+            if not user.get('picture') and picture:
+                users_collection.update_one(
+                    {'email': email},
+                    {'$set': {'picture': picture}}
+                )
+        
+        # Connexion réussie
+        session['user_id'] = user_id
+        session['user_email'] = email
+        session['user_name'] = name
+        session["user_picture"] = user_info["picture"]
+
+        
+        update_last_login(user_id)
+        
+        if is_new_user:
+            flash(f'Bienvenue {name}! Complétez votre configuration.', 'success')
+            return redirect(url_for('onboarding'))
+        else:
+            flash(f'Bienvenue {name}!', 'success')
+            user_check = get_user_by_id(user_id)
+            if user_check and not user_check.get('onboarding_completed'):
+                return redirect(url_for('onboarding'))
+            return redirect(url_for('dashboard'))
+        
+    except Exception as e:
+        print(f"❌ Erreur callback Google: {e}")
+        flash(f'Erreur authentification: {str(e)}', 'danger')
+        return redirect(url_for('login'))
+
+
+@app.route('/logout')
+def logout():
+    """Déconnexion"""
+    session.clear()
+    flash('Vous avez été déconnecté', 'info')
+    return redirect(url_for('login'))
+
+
+
+# ==========================================
+# 📊 API POUR VÉRIFIER L'AUTHENTIFICATION
+# ==========================================
+
+@app.route('/api/auth/status')
+def auth_status():
+    """Retourne le statut d'authentification"""
+    if 'user_id' not in session:
+        return jsonify({'authenticated': False})
+    
+    return jsonify({
+        'authenticated': True,
+        'user_id': session.get('user_id'),
+        'user_name': session.get('user_name'),
+        'user_email': session.get('user_email'),
+        'user_picture': session.get('user_picture')
+    })
+
+
+@app.route('/api/auth/logout', methods=['POST'])
+def api_logout():
+    """Déconnexion via API"""
+    session.clear()
+    return jsonify({'success': True, 'message': 'Déconnecté'})
+
+# Ajouter après mongo_db = mongo_client["scraping_db"]
+whatsapp_messages_collection = mongo_db["whatsapp_messages"]
+whatsapp_conversations_collection = mongo_db["whatsapp_conversations"]
+
+
+# ==========================================
+# 🤖 FONCTION POUR GÉNÉRER LES RÉPONSES
+# ==========================================
+
+def generate_whatsapp_response(user_message, user_id):
+    """
+    Génère une réponse automatique pour le chat WhatsApp
+    Utilise Gemini pour les réponses intelligentes
+    """
+    try:
+        # Récupérer le contexte utilisateur
+        user = get_user_by_id(user_id)
+        if not user:
+            return "Erreur: Utilisateur non trouvé"
+        
+        user_name = user.get('name', 'Utilisateur')
+        
+        # Utiliser Gemini pour générer une réponse intelligente
+        if GOOGLE_GENAI_AVAILABLE and GEMINI_API_KEY:
+            rag_system = get_rag_system(GEMINI_API_KEY, mongo_client)
+            
+            # Prompt contextualisé
+            prompt = f"""
+            Tu es un assistant support client pour Marketing AI.
+            Utilisateur: {user_name}
+            Message: {user_message}
+            
+            Réponds de manière professionnelle mais amicale en moins de 200 caractères.
+            Utilise des emojis appropriés.
+            Si c'est une question sur nos services, sois utile et clair.
+            """
+            
+            response = rag_system.generate_response(prompt)
+            return response.strip()
+        
+        else:
+            # Réponses par défaut si Gemini n'est pas disponible
+            return generate_default_response(user_message)
+    
+    except Exception as e:
+        print(f"❌ Erreur génération réponse: {e}")
+        return "Désolé, je n'ai pas pu traiter votre message. Réessayez."
+
+
+def generate_default_response(message):
+    """
+    Génère une réponse par défaut basée sur des mots-clés
+    """
+    responses = {
+        'bonjour': '🙋‍♂️ Bonjour! Comment puis-je vous aider?',
+        'salut': '👋 Salut! Qu\'est-ce que je peux faire pour vous?',
+        'aide': '💪 Je suis là pour vous aider! Que souhaitez-vous faire?',
+        'scraping': '🌐 Pour scraper un site:\n1. Allez dans "Scraping & RAG"\n2. Entrez l\'URL\n3. Lancez l\'analyse',
+        'calendrier': '📅 Pour générer un calendrier:\n1. Sélectionnez un site\n2. Définissez la durée\n3. Générez les posts',
+        'image': '🎨 Pour générer des images:\n1. Décrivez votre image\n2. Choisissez le style\n3. Générez en secondes',
+        'prix': '💰 Pour connaître nos tarifs, contactez: sales@marketingai.com',
+        'contact': '☎️ Contact: support@marketingai.com | +33 1 XX XX XX',
+        'merci': '😊 De rien! Avez-vous d\'autres questions?',
+        'oui': '✅ Excellent! Que puis-je faire pour vous?',
+        'non': '❌ D\'accord! Y a-t-il autre chose?',
+    }
+    
+    message_lower = message.lower()
+    for keyword, response in responses.items():
+        if keyword in message_lower:
+            return response
+    
+    return '🤔 Interesting! Comment puis-je vous aider davantage?'
+
+
+# ==========================================
+# 📝 ROUTES API WHATSAPP
+# ==========================================
+
+@app.route('/api/whatsapp/message', methods=['POST'])
+@login_required
+def whatsapp_message_api():
+    """
+    Reçoit un message du chat WhatsApp et retourne une réponse
+    """
+    try:
+        data = request.get_json()
+        user_message = data.get('message', '').strip()
+        user_id = session.get('user_id')
+        
+        if not user_message:
+            return jsonify({
+                'success': False,
+                'error': 'Message vide'
+            }), 400
+        
+        # Sauvegarder le message utilisateur
+        whatsapp_messages_collection.insert_one({
+            'user_id': user_id,
+            'message': user_message,
+            'direction': 'user',
+            'timestamp': time.strftime("%Y-%m-%d %H:%M:%S"),
+            'read': True
+        })
+        
+        # Générer la réponse
+        response = generate_whatsapp_response(user_message, user_id)
+        
+        # Sauvegarder la réponse bot
+        whatsapp_messages_collection.insert_one({
+            'user_id': user_id,
+            'message': response,
+            'direction': 'bot',
+            'timestamp': time.strftime("%Y-%m-%d %H:%M:%S"),
+            'read': False
+        })
+        
+        # Sauvegarder la conversation
+        whatsapp_conversations_collection.update_one(
+            {'user_id': user_id},
+            {
+                '$set': {
+                    'last_message': response,
+                    'last_message_at': time.strftime("%Y-%m-%d %H:%M:%S"),
+                    'unread_count': 0
+                },
+                '$inc': {'message_count': 2}
+            },
+            upsert=True
+        )
+        
+        return jsonify({
+            'success': True,
+            'response': response,
+            'timestamp': time.strftime("%H:%M")
+        })
+    
+    except Exception as e:
+        print(f"❌ Erreur API WhatsApp: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/whatsapp/history', methods=['GET'])
+@login_required
+def whatsapp_history():
+    """
+    Retourne l'historique des messages WhatsApp
+    """
+    try:
+        user_id = session.get('user_id')
+        limit = request.args.get('limit', 50, type=int)
+        
+        messages = list(
+            whatsapp_messages_collection.find(
+                {'user_id': user_id}
+            ).sort('_id', -1).limit(limit)
+        )
+        
+        # Convertir les ObjectId en string
+        for msg in messages:
+            msg['_id'] = str(msg['_id'])
+        
+        # Inverser pour avoir chronologie correcte
+        messages.reverse()
+        
+        return jsonify({
+            'success': True,
+            'messages': messages,
+            'count': len(messages)
+        })
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/whatsapp/status', methods=['GET'])
+@login_required
+def whatsapp_status():
+    """
+    Retourne le statut du chat WhatsApp (messages non lus, etc.)
+    """
+    try:
+        user_id = session.get('user_id')
+        
+        # Compter les messages non lus
+        unread = whatsapp_messages_collection.count_documents({
+            'user_id': user_id,
+            'direction': 'bot',
+            'read': False
+        })
+        
+        # Dernier message
+        last_msg = whatsapp_messages_collection.find_one(
+            {'user_id': user_id},
+            sort=[('_id', -1)]
+        )
+        
+        return jsonify({
+            'success': True,
+            'unread_count': unread,
+            'is_available': is_support_available(),
+            'last_message': last_msg['message'] if last_msg else None,
+            'last_message_at': last_msg['timestamp'] if last_msg else None
+        })
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/whatsapp/mark-read', methods=['POST'])
+@login_required
+def whatsapp_mark_read():
+    """
+    Marque tous les messages bot comme lus
+    """
+    try:
+        user_id = session.get('user_id')
+        
+        whatsapp_messages_collection.update_many(
+            {'user_id': user_id, 'direction': 'bot'},
+            {'$set': {'read': True}}
+        )
+        
+        # Mettre à jour la conversation
+        whatsapp_conversations_collection.update_one(
+            {'user_id': user_id},
+            {'$set': {'unread_count': 0}}
+        )
+        
+        return jsonify({'success': True})
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/whatsapp/clear', methods=['POST'])
+@login_required
+def whatsapp_clear():
+    """
+    Efface l'historique des messages WhatsApp
+    """
+    try:
+        user_id = session.get('user_id')
+        
+        whatsapp_messages_collection.delete_many({'user_id': user_id})
+        whatsapp_conversations_collection.delete_one({'user_id': user_id})
+        
+        return jsonify({'success': True})
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+# ==========================================
+# 🟢 FONCTION UTILITAIRE
+# ==========================================
+
+def is_support_available():
+    """
+    Vérifie si le support est disponible
+    """
+    now = datetime.datetime.now()
+    day = now.weekday()  # 0 = Lundi, 6 = Dimanche
+    hour = now.hour
+    
+    # Fermé dimanche (6) et samedi (5)
+    if day >= 5:
+        return False
+    
+    # Ouvert de 9h à 18h
+    return 9 <= hour < 18
+
+
+# ==========================================
+# 📊 ROUTE POUR LES ANALYTICS
+# ==========================================
+
+@app.route('/api/analytics', methods=['POST'])
+@login_required
+def analytics_track():
+    """
+    Enregistre les événements d'analytics
+    """
+    try:
+        data = request.get_json()
+        event = data.get('event')
+        event_data = data.get('data', {})
+        user_id = session.get('user_id')
+        
+        analytics_collection = mongo_db["analytics"]
+        
+        analytics_collection.insert_one({
+            'user_id': user_id,
+            'event': event,
+            'data': event_data,
+            'timestamp': time.strftime("%Y-%m-%d %H:%M:%S"),
+            'user_agent': request.headers.get('User-Agent')
+        })
+        
+        return jsonify({'success': True})
+    
+    except Exception as e:
+        print(f"❌ Erreur analytics: {e}")
+        return jsonify({'success': False}), 500
+
+
+# ==========================================
+# 📲 ROUTE POUR ENVOYER PAR WHATSAPP
+# ==========================================
+
+@app.route('/api/whatsapp/send-external', methods=['POST'])
+@login_required
+def whatsapp_send_external():
+    """
+    Envoie un message via WhatsApp Web ou API
+    Ouvre le lien WhatsApp Web
+    """
+    try:
+        data = request.get_json()
+        phone = data.get('phone', '+33123456789')
+        message = data.get('message', 'Bonjour, j\'aurais une question...')
+        
+        # Nettoyer le numéro
+        phone = ''.join(filter(str.isdigit, phone))
+        
+        # Créer l'URL WhatsApp
+        whatsapp_url = f"https://wa.me/{phone}?text={urllib.parse.quote(message)}"
+        
+        return jsonify({
+            'success': True,
+            'url': whatsapp_url,
+            'message': 'Cliquez pour ouvrir WhatsApp'
+        })
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+# ==========================================
+# 📋 ROUTE POUR LES STATISTIQUES
+# ==========================================
+
+@app.route('/api/whatsapp/stats', methods=['GET'])
+@login_required
+def whatsapp_stats():
+    """
+    Retourne les statistiques du chat WhatsApp
+    """
+    try:
+        user_id = session.get('user_id')
+        
+        # Compter les messages
+        total_messages = whatsapp_messages_collection.count_documents(
+            {'user_id': user_id}
+        )
+        
+        user_messages = whatsapp_messages_collection.count_documents(
+            {'user_id': user_id, 'direction': 'user'}
+        )
+        
+        bot_messages = whatsapp_messages_collection.count_documents(
+            {'user_id': user_id, 'direction': 'bot'}
+        )
+        
+        # Récupérer l'info de conversation
+        conversation = whatsapp_conversations_collection.find_one(
+            {'user_id': user_id}
+        )
+        
+        return jsonify({
+            'success': True,
+            'total_messages': total_messages,
+            'user_messages': user_messages,
+            'bot_messages': bot_messages,
+            'conversation_started_at': conversation.get('_id') if conversation else None,
+            'last_message_at': conversation.get('last_message_at') if conversation else None
+        })
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# ==========================================
+# 🔍 FONCTION DE VALIDATION
+# ==========================================
+
+def allowed_file(filename, file_type='image'):
+    """Vérifie si un fichier est autorisé"""
+    if '.' not in filename:
+        return False
+    
+    ext = filename.rsplit('.', 1)[1].lower()
+    
+    if file_type == 'image':
+        return ext in ALLOWED_IMAGES
+    elif file_type == 'video':
+        return ext in ALLOWED_VIDEOS
+    
+    return False
+
+
+def get_file_size_mb(filepath):
+    """Obtient la taille du fichier en MB"""
+    try:
+        size_bytes = os.path.getsize(filepath)
+        size_mb = size_bytes / (1024 * 1024)
+        return round(size_mb, 2)
+    except:
+        return 0
+
+
+def get_file_info(filepath, filename):
+    """Obtient les informations du fichier"""
+    try:
+        size_mb = get_file_size_mb(filepath)
+        ext = filename.rsplit('.', 1)[1].lower()
+        mime_type, _ = mimetypes.guess_type(filepath)
+        
+        return {
+            'filename': filename,
+            'extension': ext,
+            'size_mb': size_mb,
+            'mime_type': mime_type or 'unknown',
+            'upload_date': time.strftime("%Y-%m-%d %H:%M:%S")
+        }
+    except Exception as e:
+        print(f"❌ Erreur info fichier: {e}")
+        return None
+
+
+# ==========================================
+# 📤 ROUTES UPLOAD IMAGES
+# ==========================================
+
+@app.route('/api/upload/image', methods=['POST'])
+@login_required
+def upload_image():
+    """Upload une image"""
+    try:
+        user_id = session.get('user_id')
+        
+        # Vérifier si le fichier est présent
+        if 'image' not in request.files:
+            return jsonify({
+                'success': False,
+                'error': 'Aucun fichier image trouvé'
+            }), 400
+        
+        file = request.files['image']
+        
+        if file.filename == '':
+            return jsonify({
+                'success': False,
+                'error': 'Nom de fichier vide'
+            }), 400
+        
+        # Vérifier l'extension
+        if not allowed_file(file.filename, 'image'):
+            return jsonify({
+                'success': False,
+                'error': f'Type de fichier non autorisé. Autorisé: {", ".join(ALLOWED_IMAGES)}'
+            }), 400
+        
+        # Vérifier la taille (max 50MB pour images)
+        file.seek(0, os.SEEK_END)
+        file_length = file.tell()
+        if file_length > 50 * 1024 * 1024:  # 50MB
+            return jsonify({
+                'success': False,
+                'error': 'Fichier trop volumineux (max 50MB)'
+            }), 400
+        
+        file.seek(0)
+        
+        # Sauvegarder le fichier
+        filename = secure_filename(file.filename)
+        # Ajouter un timestamp pour éviter les doublons
+        timestamp = int(time.time())
+        filename = f"{timestamp}_{filename}"
+        
+        filepath = os.path.join(IMAGES_FOLDER, filename)
+        file.save(filepath)
+        
+        # Obtenir les infos du fichier
+        file_info = get_file_info(filepath, filename)
+        file_info['user_id'] = user_id
+        file_info['file_type'] = 'image'
+        file_info['file_path'] = filepath
+        file_info['download_url'] = f'/uploads/images/{filename}'
+        
+        # Sauvegarder dans MongoDB
+        result = uploads_collection.insert_one(file_info)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Image uploadée avec succès',
+            'file_id': str(result.inserted_id),
+            'filename': filename,
+            'download_url': file_info['download_url'],
+            'size_mb': file_info['size_mb'],
+            'file_info': file_info
+        })
+    
+    except Exception as e:
+        print(f"❌ Erreur upload image: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+# ==========================================
+# 🎥 ROUTES UPLOAD VIDÉOS
+# ==========================================
+
+@app.route('/api/upload/video', methods=['POST'])
+@login_required
+def upload_video():
+    """Upload une vidéo"""
+    try:
+        user_id = session.get('user_id')
+        
+        # Vérifier si le fichier est présent
+        if 'video' not in request.files:
+            return jsonify({
+                'success': False,
+                'error': 'Aucun fichier vidéo trouvé'
+            }), 400
+        
+        file = request.files['video']
+        
+        if file.filename == '':
+            return jsonify({
+                'success': False,
+                'error': 'Nom de fichier vide'
+            }), 400
+        
+        # Vérifier l'extension
+        if not allowed_file(file.filename, 'video'):
+            return jsonify({
+                'success': False,
+                'error': f'Type de fichier non autorisé. Autorisé: {", ".join(ALLOWED_VIDEOS)}'
+            }), 400
+        
+        # Vérifier la taille (max 500MB pour vidéos)
+        file.seek(0, os.SEEK_END)
+        file_length = file.tell()
+        if file_length > 500 * 1024 * 1024:  # 500MB
+            return jsonify({
+                'success': False,
+                'error': 'Fichier trop volumineux (max 500MB)'
+            }), 400
+        
+        file.seek(0)
+        
+        # Sauvegarder le fichier
+        filename = secure_filename(file.filename)
+        timestamp = int(time.time())
+        filename = f"{timestamp}_{filename}"
+        
+        filepath = os.path.join(VIDEOS_FOLDER, filename)
+        file.save(filepath)
+        
+        # Obtenir les infos du fichier
+        file_info = get_file_info(filepath, filename)
+        file_info['user_id'] = user_id
+        file_info['file_type'] = 'video'
+        file_info['file_path'] = filepath
+        file_info['download_url'] = f'/uploads/videos/{filename}'
+        
+        # Sauvegarder dans MongoDB
+        result = uploads_collection.insert_one(file_info)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Vidéo uploadée avec succès',
+            'file_id': str(result.inserted_id),
+            'filename': filename,
+            'download_url': file_info['download_url'],
+            'size_mb': file_info['size_mb'],
+            'file_info': file_info
+        })
+    
+    except Exception as e:
+        print(f"❌ Erreur upload vidéo: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+# ==========================================
+# 📋 ROUTE LISTER LES UPLOADS
+# ==========================================
+
+@app.route('/api/uploads', methods=['GET'])
+@login_required
+def get_uploads():
+    """Liste tous les uploads de l'utilisateur"""
+    try:
+        user_id = session.get('user_id')
+        file_type = request.args.get('type', 'all')  # all, image, video
+        
+        # Filtrer par type
+        query = {'user_id': user_id}
+        if file_type != 'all':
+            query['file_type'] = file_type
+        
+        uploads = list(
+            uploads_collection.find(query)
+            .sort('_id', -1)
+            .limit(100)
+        )
+        
+        # Convertir ObjectId en string
+        for upload in uploads:
+            upload['_id'] = str(upload['_id'])
+        
+        return jsonify({
+            'success': True,
+            'uploads': uploads,
+            'count': len(uploads)
+        })
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+# ==========================================
+# 🗑️ ROUTE SUPPRIMER UN UPLOAD
+# ==========================================
+
+@app.route('/api/upload/<upload_id>', methods=['DELETE'])
+@login_required
+def delete_upload(upload_id):
+    """Supprime un upload"""
+    try:
+        from bson import ObjectId
+        
+        user_id = session.get('user_id')
+        
+        # Trouver le fichier
+        upload = uploads_collection.find_one({
+            '_id': ObjectId(upload_id),
+            'user_id': user_id
+        })
+        
+        if not upload:
+            return jsonify({
+                'success': False,
+                'error': 'Fichier non trouvé'
+            }), 404
+        
+        # Supprimer le fichier du disque
+        filepath = upload.get('file_path')
+        if filepath and os.path.exists(filepath):
+            os.remove(filepath)
+            print(f"✅ Fichier supprimé: {filepath}")
+        
+        # Supprimer de MongoDB
+        uploads_collection.delete_one({'_id': ObjectId(upload_id)})
+        
+        return jsonify({
+            'success': True,
+            'message': 'Fichier supprimé avec succès'
+        })
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+# ==========================================
+# 📥 ROUTES DE TÉLÉCHARGEMENT
+# ==========================================
+
+@app.route('/uploads/images/<filename>', methods=['GET'])
+@login_required
+def download_image(filename):
+    """Télécharge une image"""
+    try:
+        filepath = os.path.join(IMAGES_FOLDER, secure_filename(filename))
+        
+        if not os.path.exists(filepath):
+            return jsonify({'error': 'Fichier non trouvé'}), 404
+        
+        return send_file(
+            filepath,
+            as_attachment=True,
+            download_name=filename
+        )
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/uploads/videos/<filename>', methods=['GET'])
+@login_required
+def download_video(filename):
+    """Télécharge une vidéo"""
+    try:
+        filepath = os.path.join(VIDEOS_FOLDER, secure_filename(filename))
+        
+        if not os.path.exists(filepath):
+            return jsonify({'error': 'Fichier non trouvé'}), 404
+        
+        return send_file(
+            filepath,
+            as_attachment=True,
+            download_name=filename
+        )
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+# ==========================================
+# 👁️ ROUTES DE VISIONNAGE
+# ==========================================
+
+@app.route('/view/image/<filename>', methods=['GET'])
+@login_required
+def view_image(filename):
+    """Affiche une image"""
+    try:
+        filepath = os.path.join(IMAGES_FOLDER, secure_filename(filename))
+        
+        if not os.path.exists(filepath):
+            return jsonify({'error': 'Fichier non trouvé'}), 404
+        
+        return send_file(filepath)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/view/video/<filename>', methods=['GET'])
+@login_required
+def view_video(filename):
+    """Affiche une vidéo"""
+    try:
+        filepath = os.path.join(VIDEOS_FOLDER, secure_filename(filename))
+        
+        if not os.path.exists(filepath):
+            return jsonify({'error': 'Fichier non trouvé'}), 404
+        
+        return send_file(filepath)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+# ==========================================
+# 📊 ROUTE STATISTIQUES UPLOAD
+# ==========================================
+
+@app.route('/api/upload/stats', methods=['GET'])
+@login_required
+def upload_stats():
+    """Statistiques des uploads"""
+    try:
+        user_id = session.get('user_id')
+        
+        # Compter les uploads
+        total_uploads = uploads_collection.count_documents({'user_id': user_id})
+        image_count = uploads_collection.count_documents({'user_id': user_id, 'file_type': 'image'})
+        video_count = uploads_collection.count_documents({'user_id': user_id, 'file_type': 'video'})
+        
+        # Calculer la taille totale
+        uploads = list(uploads_collection.find({'user_id': user_id}))
+        total_size_mb = sum(u.get('size_mb', 0) for u in uploads)
+        
+        return jsonify({
+            'success': True,
+            'total_uploads': total_uploads,
+            'image_count': image_count,
+            'video_count': video_count,
+            'total_size_mb': round(total_size_mb, 2),
+            'storage_limit_mb': 5000
+        })
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)

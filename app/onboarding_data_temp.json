@@ -1,0 +1,22 @@
+{
+  "sector": "restauration",
+  "started_at": "2025-11-18 17:44:55",
+  "step": 4,
+  "user_email": "yassine.fares@maydena.fr",
+  "user_id": "691c3f748661312edf2df256",
+  "user_name": "yessine",
+  "website_url": "https://www.maydena.fr",
+  "website_validated_at": "2025-11-18 17:45:00",
+  "logo": "uploads/logos/app-icon-1024x1024.png",
+  "primary_color": "#4361ee",
+  "secondary_color": "#3a0ca3",
+  "completed_at": "2025-11-18 17:45:07",
+  "completed": true,
+  "scraped_pages": 23,
+  "products_found": 50,
+  "social_connected": 0,
+  "analysis_completed_at": "2025-11-18 17:45:17",
+  "content_calendar_generated": true,
+  "marketing_strategy_ready": true,
+  "ai_images_generated": 9
+}

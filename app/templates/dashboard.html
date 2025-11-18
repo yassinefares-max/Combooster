@@ -423,6 +423,7 @@
     </style>
 </head>
 <body>
+    {% include 'navbar.html' %}
     <div class="container">
         <header>
             <div class="header-content">
@@ -435,7 +436,87 @@
                 </div>
             </div>
         </header>
-        
+        <!-- Ajoutez cette section après le header -->
+        <div class="onboarding-banner" id="onboarding-banner" style="display: none;">
+            <div class="banner-content">
+                <div class="banner-icon">🎉</div>
+                <div class="banner-text">
+                    <h3>Bienvenue sur votre Dashboard Personnalisé !</h3>
+                    <p>Votre stratégie marketing a été générée avec succès.</p>
+                </div>
+                <button class="banner-close" onclick="closeBanner()">×</button>
+            </div>
+        </div>
+
+        <style>
+        .onboarding-banner {
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+            color: white;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .banner-content {
+            display: flex;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .banner-icon {
+            font-size: 2rem;
+            margin-right: 20px;
+        }
+
+        .banner-text {
+            flex: 1;
+        }
+
+        .banner-text h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.3rem;
+        }
+
+        .banner-text p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .banner-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .banner-close:hover {
+            opacity: 0.8;
+        }
+        </style>
+
+        <!-- Dans votre template de base ou navigation -->
+        <a href="{{ url_for('onboarding') }}" class="btn btn-primary">
+            🚀 Nouvelle Configuration
+        </a>
+
+        <script>
+        // Vérifier si l'utilisateur vient de terminer l'onboarding
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('onboarding') === 'completed') {
+                document.getElementById('onboarding-banner').style.display = 'block';
+            }
+        });
+
+        function closeBanner() {
+            document.getElementById('onboarding-banner').style.display = 'none';
+        }
+        </script>
+
         <div class="stats-grid" id="stats-grid">
             <!-- Les statistiques seront chargées dynamiquement -->
         </div>
@@ -1521,5 +1602,6 @@
             }
         });
     </script>
+    {% include 'whatsapp_widget.html' %}
 </body>
 </html>

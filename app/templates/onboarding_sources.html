@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Étape 3: Votre Site Web</title>
+    <style>
+        /* Styles similaires aux précédents */
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --light: #f8f9fa;
+            --dark: #212529;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .onboarding-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        .onboarding-header {
+            background: var(--primary);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .onboarding-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .onboarding-header p {
+            opacity: 0.9;
+        }
+        
+        .onboarding-content {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+        
+        input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        .url-example {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: var(--dark);
+            border: 2px solid #ddd;
+        }
+        
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 75%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="onboarding-container">
+        <div class="onboarding-header">
+            <h1>🌐 Étape 3: Votre Site Web</h1>
+            <p>Analysez votre contenu existant</p>
+        </div>
+        
+        <div class="onboarding-content">
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            
+            <form method="POST">
+                <div class="form-group">
+                    <label for="website_url">Quelle est l'URL de votre site web ?</label>
+                    <input type="url" id="website_url" name="website_url" 
+                           placeholder="https://votre-site.com" required>
+                    <div class="url-example">
+                        Exemple: https://mon-commerce.fr ou https://www.mon-restaurant.com
+                    </div>
+                </div>
+                
+                <p style="color: #666; font-size: 0.9rem; text-align: center; margin: 20px 0;">
+                    Notre système va analyser votre site pour comprendre vos produits, 
+                    votre positionnement et votre identité de marque.
+                </p>
+                
+                <div class="btn-container">
+                    <a href="{{ url_for('onboarding_social') }}" class="btn btn-secondary">
+                        Retour
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        Analyser le Site
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
