@@ -33,6 +33,54 @@
         .whatsapp-chat-window.active {
             display: flex;
         }
+
+        .whatsapp-upload-image-btn {
+            background: transparent;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0;
+        }
+
+        .whatsapp-upload-image-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .whatsapp-upload-icon {
+            width: 28px;
+            height: 28px;
+        }
+
+
+        .whatsapp-send-image-btn {
+            background: transparent;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0;
+        }
+
+        .whatsapp-send-image-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .whatsapp-send-icon {
+            width: 45px;
+            height: 45px;
+        }
+
         
         .whatsapp-chat-header {
             background: linear-gradient(135deg, #25D366, #20BA58);
@@ -112,12 +160,49 @@
             border-radius: 4px 18px 18px 18px;
         }
         
+        /* Style pour les images/vidéos dans les messages */
+        .whatsapp-message-media {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+        
+        .whatsapp-message-media:hover {
+            opacity: 0.9;
+        }
+        
         .whatsapp-input-container {
             padding: 15px;
             background: white;
             border-top: 1px solid #e0e0e0;
             display: flex;
             gap: 10px;
+            align-items: center;
+        }
+        
+        /* Bouton d'upload */
+        .whatsapp-upload-btn {
+            background: none;
+            border: none;
+            color: #54656f;
+            cursor: pointer;
+            font-size: 1.3rem;
+            padding: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .whatsapp-upload-btn:hover {
+            color: #25D366;
+            transform: rotate(15deg);
+        }
+        
+        .whatsapp-file-input {
+            display: none;
         }
         
         .whatsapp-input-box {
@@ -167,7 +252,7 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background:transparent;
+            background: transparent;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -236,6 +321,70 @@
             0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
             30% { opacity: 1; transform: translateY(-10px); }
         }
+        
+        /* Prévisualisation du fichier avant envoi */
+        .whatsapp-file-preview {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .whatsapp-file-preview.active {
+            display: flex;
+        }
+        
+        .whatsapp-file-preview img,
+        .whatsapp-file-preview video {
+            max-width: 60px;
+            max-height: 60px;
+            border-radius: 4px;
+        }
+        
+        .whatsapp-file-info {
+            flex: 1;
+            font-size: 0.85rem;
+        }
+        
+        .whatsapp-file-name {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .whatsapp-file-size {
+            color: #666;
+            font-size: 0.8rem;
+        }
+        
+        .whatsapp-file-remove {
+            background: transparent;
+            color: black;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .whatsapp-upload-progress {
+            width: 100%;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+        
+        .whatsapp-upload-progress-bar {
+            height: 100%;
+            background: #25D366;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -246,7 +395,7 @@
             <!-- En-tête -->
             <div class="whatsapp-chat-header">
                 <div>
-                    <h3>WhatsApp business</h3>
+                    <h3>WhatsApp Business</h3>
                 </div>
                 <button class="whatsapp-close-btn" id="whatsapp-close-btn">✕</button>
             </div>
@@ -260,8 +409,33 @@
                 </div>
             </div>
             
+            <!-- Prévisualisation fichier -->
+            <div class="whatsapp-file-preview" id="whatsapp-file-preview">
+                <div id="whatsapp-preview-container"></div>
+                <div class="whatsapp-file-info">
+                    <div class="whatsapp-file-name" id="whatsapp-file-name"></div>
+                    <div class="whatsapp-file-size" id="whatsapp-file-size"></div>
+                    <div class="whatsapp-upload-progress">
+                        <div class="whatsapp-upload-progress-bar" id="whatsapp-upload-progress-bar"></div>
+                    </div>
+                </div>
+                <button class="whatsapp-file-remove" id="whatsapp-file-remove">✕</button>
+            </div>
+            
             <!-- Zone de saisie -->
             <div class="whatsapp-input-container">
+                <!-- Bouton Upload -->
+                <button class="whatsapp-upload-image-btn" id="whatsapp-upload-btn" title="Upload File">
+                    <img src="/static/images/iconUpload.png" 
+                        alt="Upload" class="whatsapp-upload-icon">
+                </button>
+                <input 
+                    type="file" 
+                    id="whatsapp-file-input" 
+                    class="whatsapp-file-input"
+                    accept="image/*,video/*"
+                    multiple>
+                
                 <div class="whatsapp-input-box">
                     <input 
                         type="text" 
@@ -269,26 +443,28 @@
                         placeholder="Message..." 
                         autocomplete="off">
                 </div>
-                <button class="whatsapp-send-btn" id="whatsapp-send-btn">
-                    📤
+                <button class="whatsapp-send-image-btn" id="whatsapp-send-btn">
+                    <img src="/static/images/sendWhatsApp.png" 
+                        alt="Send" class="whatsapp-send-icon">
                 </button>
+
             </div>
         </div>
         
         <!-- Bouton Flottant -->
         <button class="whatsapp-fab" id="whatsapp-fab">
-            <img src="{{ url_for('static', filename='images/logowhatsapp.png') }}" 
-                alt="icon" class="whatsapp-icon">
+            <img src="/static/images/logowhatsapp.png" 
+                alt="WhatsApp" class="whatsapp-icon">
             <span class="whatsapp-badge" id="whatsapp-badge" style="display: none;">1</span>
         </button>
     </div>
 
     <script>
         // ========================================
-        // 🟢 WIDGET WHATSAPP - VERSION BACKEND
+        // 🟢 WIDGET WHATSAPP - VERSION AVEC UPLOAD
         // ========================================
         
-        class WhatsAppWidgetBackend {
+        class WhatsAppWidgetWithUpload {
             constructor() {
                 this.chatWindow = document.getElementById('whatsapp-chat');
                 this.fab = document.getElementById('whatsapp-fab');
@@ -297,16 +473,23 @@
                 this.input = document.getElementById('whatsapp-input');
                 this.messagesContainer = document.getElementById('whatsapp-messages');
                 this.badge = document.getElementById('whatsapp-badge');
-                this.availabilityStatus = document.getElementById('availability-status');
+                
+                // Éléments upload
+                this.uploadBtn = document.getElementById('whatsapp-upload-btn');
+                this.fileInput = document.getElementById('whatsapp-file-input');
+                this.filePreview = document.getElementById('whatsapp-file-preview');
+                this.fileRemoveBtn = document.getElementById('whatsapp-file-remove');
                 
                 this.isOpen = false;
                 this.unreadCount = 0;
                 this.isSending = false;
+                this.currentFile = null;
                 
                 this.init();
             }
             
             init() {
+                // Événements de base
                 this.fab.addEventListener('click', () => this.toggleChat());
                 this.closeBtn.addEventListener('click', () => this.closeChat());
                 this.sendBtn.addEventListener('click', () => this.sendMessage());
@@ -316,6 +499,11 @@
                         this.sendMessage();
                     }
                 });
+                
+                // Événements upload
+                this.uploadBtn.addEventListener('click', () => this.fileInput.click());
+                this.fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
+                this.fileRemoveBtn.addEventListener('click', () => this.removeFile());
                 
                 // Charger l'historique
                 this.loadHistory();
@@ -345,67 +533,198 @@
                 this.chatWindow.classList.remove('active');
             }
             
-            sendMessage() {
+            handleFileSelect(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                // Vérifier le type
+                const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Type de fichier non supporté. Utilisez des images ou vidéos.');
+                    return;
+                }
+                
+                // Vérifier la taille (50MB max)
+                const maxSize = 50 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    alert('Fichier trop volumineux (max 50MB)');
+                    return;
+                }
+                
+                this.currentFile = file;
+                this.showFilePreview(file);
+            }
+            
+            showFilePreview(file) {
+                const previewContainer = document.getElementById('whatsapp-preview-container');
+                const fileName = document.getElementById('whatsapp-file-name');
+                const fileSize = document.getElementById('whatsapp-file-size');
+                
+                // Afficher le nom et la taille
+                fileName.textContent = file.name;
+                fileSize.textContent = this.formatFileSize(file.size);
+                
+                // Créer la prévisualisation
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    if (file.type.startsWith('image/')) {
+                        previewContainer.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                    } else if (file.type.startsWith('video/')) {
+                        previewContainer.innerHTML = `<video src="${e.target.result}"></video>`;
+                    }
+                };
+                reader.readAsDataURL(file);
+                
+                // Afficher la prévisualisation
+                this.filePreview.classList.add('active');
+            }
+            
+            removeFile() {
+                this.currentFile = null;
+                this.fileInput.value = '';
+                this.filePreview.classList.remove('active');
+                document.getElementById('whatsapp-preview-container').innerHTML = '';
+            }
+            
+            formatFileSize(bytes) {
+                if (bytes < 1024) return bytes + ' B';
+                if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+                return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+            }
+            
+            async sendMessage() {
                 const message = this.input.value.trim();
                 
-                if (!message || this.isSending) return;
+                if (!message && !this.currentFile) return;
+                if (this.isSending) return;
                 
                 this.isSending = true;
                 this.sendBtn.disabled = true;
                 
-                // Ajouter le message utilisateur
-                this.addMessage(message, 'user');
+                if (this.currentFile) {
+                    // Upload du fichier
+                    await this.uploadFile(message);
+                } else {
+                    // Message texte simple
+                    this.addMessage(message, 'user');
+                    this.input.value = '';
+                    
+                    this.showTypingIndicator();
+                    
+                    // Envoyer au backend
+                    try {
+                        const response = await fetch('/api/whatsapp/message', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                message: message
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        this.removeTypingIndicator();
+                        
+                        if (data.success) {
+                            this.addMessage(data.response, 'bot');
+                            this.scrollToBottom();
+                        } else {
+                            this.addMessage('Erreur: ' + (data.error || 'Impossible de traiter le message'), 'bot');
+                        }
+                    } catch (error) {
+                        console.error('Erreur:', error);
+                        this.removeTypingIndicator();
+                        this.addMessage('Erreur de connexion. Réessayez plus tard.', 'bot');
+                    }
+                }
+                
+                this.isSending = false;
+                this.sendBtn.disabled = false;
+            }
+            
+            async uploadFile(caption) {
+                const formData = new FormData();
+                const fileType = this.currentFile.type.startsWith('image/') ? 'image' : 'video';
+                formData.append(fileType, this.currentFile);
+                
+                // Afficher le message utilisateur avec prévisualisation
+                this.addFileMessage(this.currentFile, caption, 'user');
                 this.input.value = '';
                 
-                // Afficher l'indicateur de saisie
-                this.showTypingIndicator();
+                // Afficher la progression
+                const progressBar = document.getElementById('whatsapp-upload-progress-bar');
+                progressBar.style.width = '0%';
                 
-                // Envoyer au backend
-                fetch('/api/whatsapp/message', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message: message
-                    })
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Erreur HTTP: ' + response.status);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    this.removeTypingIndicator();
+                try {
+                    // Simuler la progression
+                    let progress = 0;
+                    const progressInterval = setInterval(() => {
+                        progress += 10;
+                        progressBar.style.width = progress + '%';
+                        if (progress >= 90) clearInterval(progressInterval);
+                    }, 100);
+                    
+                    // Upload vers le backend
+                    const endpoint = fileType === 'image' ? '/api/upload/image' : '/api/upload/video';
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    clearInterval(progressInterval);
+                    progressBar.style.width = '100%';
+                    
+                    const data = await response.json();
                     
                     if (data.success) {
-                        // Ajouter la réponse du bot
-                        this.addMessage(data.response, 'bot');
-                        this.scrollToBottom();
+                        // Réponse du bot
+                        setTimeout(() => {
+                            this.removeFile();
+                            this.addMessage(`✅ Fichier reçu avec succès! ${data.filename} (${data.size_mb} MB)`, 'bot');
+                            this.scrollToBottom();
+                        }, 500);
                     } else {
-                        this.addMessage('Erreur: ' + (data.error || 'Impossible de traiter le message'), 'bot');
+                        this.addMessage('❌ Erreur lors de l\'upload: ' + data.error, 'bot');
                     }
-                })
-                .catch(error => {
-                    console.error('Erreur:', error);
-                    this.removeTypingIndicator();
-                    this.addMessage('Erreur de connexion. Réessayez plus tard.', 'bot');
-                })
-                .finally(() => {
-                    this.isSending = false;
-                    this.sendBtn.disabled = false;
-                });
+                } catch (error) {
+                    console.error('Erreur upload:', error);
+                    this.addMessage('❌ Erreur lors de l\'upload du fichier.', 'bot');
+                }
+                
+                this.removeFile();
+            }
+            
+            addFileMessage(file, caption, sender) {
+                const messageEl = document.createElement('div');
+                messageEl.className = `whatsapp-message ${sender}`;
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    let mediaHTML = '';
+                    if (file.type.startsWith('image/')) {
+                        mediaHTML = `<img src="${e.target.result}" class="whatsapp-message-media" alt="Image">`;
+                    } else if (file.type.startsWith('video/')) {
+                        mediaHTML = `<video src="${e.target.result}" class="whatsapp-message-media" controls></video>`;
+                    }
+                    
+                    messageEl.innerHTML = `
+                        <div class="whatsapp-message-content">
+                            ${mediaHTML}
+                            ${caption ? `<div style="margin-top: 8px;">${this.escapeHtml(caption)}</div>` : ''}
+                        </div>
+                    `;
+                };
+                reader.readAsDataURL(file);
+                
+                this.messagesContainer.appendChild(messageEl);
+                this.scrollToBottom();
             }
             
             addMessage(text, sender) {
                 const messageEl = document.createElement('div');
                 messageEl.className = `whatsapp-message ${sender}`;
-                
-                const time = new Date().toLocaleTimeString('fr-FR', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                });
                 
                 messageEl.innerHTML = `
                     <div class="whatsapp-message-content">${this.escapeHtml(text)}</div>
@@ -447,10 +766,7 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success && data.messages.length > 1) {
-                            // Effacer le message initial
                             this.messagesContainer.innerHTML = '';
-                            
-                            // Charger l'historique
                             data.messages.forEach(msg => {
                                 this.addMessage(msg.message, msg.direction);
                             });
@@ -478,14 +794,6 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Mettre à jour le statut de disponibilité
-                            if (data.is_available) {
-                                this.availabilityStatus.textContent = '🟢 Généralement actif maintenant';
-                            } else {
-                                this.availabilityStatus.textContent = '🔴 Hors des heures de bureau';
-                            }
-                            
-                            // Mettre à jour le badge
                             this.unreadCount = data.unread_count;
                             this.updateBadge();
                         }
@@ -511,7 +819,7 @@
         
         // Initialiser le widget au chargement
         document.addEventListener('DOMContentLoaded', () => {
-            window.whatsappWidget = new WhatsAppWidgetBackend();
+            window.whatsappWidget = new WhatsAppWidgetWithUpload();
         });
     </script>
 </body>

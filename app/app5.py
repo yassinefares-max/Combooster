@@ -27,6 +27,10 @@ import datetime
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
 import mimetypes
+from bson import ObjectId
+
+
+
 
 LEONARDO_API_KEY = os.getenv("LEONARDO_API_KEY","1c895e8a-aad0-4a9a-bf84-9f802d729319")
 print(f"🎨 LEONARDO_API_KEY chargée: {'OUI' if LEONARDO_API_KEY else 'NON'}")
@@ -4933,78 +4937,72 @@ def get_file_info(filepath, filename):
 @app.route('/api/upload/image', methods=['POST'])
 @login_required
 def upload_image():
-    """Upload une image"""
+    """Upload an image"""
     try:
         user_id = session.get('user_id')
-        
-        # Vérifier si le fichier est présent
+
+        # Check if file exists
         if 'image' not in request.files:
-            return jsonify({
-                'success': False,
-                'error': 'Aucun fichier image trouvé'
-            }), 400
+            return jsonify({'success': False, 'error': 'No image file found'}), 400
         
         file = request.files['image']
         
         if file.filename == '':
-            return jsonify({
-                'success': False,
-                'error': 'Nom de fichier vide'
-            }), 400
+            return jsonify({'success': False, 'error': 'Empty filename'}), 400
         
-        # Vérifier l'extension
+        # Check extension
         if not allowed_file(file.filename, 'image'):
             return jsonify({
                 'success': False,
-                'error': f'Type de fichier non autorisé. Autorisé: {", ".join(ALLOWED_IMAGES)}'
+                'error': f'Invalid file type. Allowed: {", ".join(ALLOWED_IMAGES)}'
             }), 400
         
-        # Vérifier la taille (max 50MB pour images)
+        # Check size (max 50MB)
         file.seek(0, os.SEEK_END)
         file_length = file.tell()
-        if file_length > 50 * 1024 * 1024:  # 50MB
-            return jsonify({
-                'success': False,
-                'error': 'Fichier trop volumineux (max 50MB)'
-            }), 400
+        if file_length > 50 * 1024 * 1024:
+            return jsonify({'success': False, 'error': 'Image too large (max 50MB)'}), 400
         
         file.seek(0)
         
-        # Sauvegarder le fichier
+        # Save file
         filename = secure_filename(file.filename)
-        # Ajouter un timestamp pour éviter les doublons
         timestamp = int(time.time())
         filename = f"{timestamp}_{filename}"
-        
+
         filepath = os.path.join(IMAGES_FOLDER, filename)
         file.save(filepath)
         
-        # Obtenir les infos du fichier
+        # Build file info
         file_info = get_file_info(filepath, filename)
-        file_info['user_id'] = user_id
+        file_info['user_id'] = str(user_id)          # 🔥 FIX: Convert to string
         file_info['file_type'] = 'image'
         file_info['file_path'] = filepath
         file_info['download_url'] = f'/uploads/images/{filename}'
         
-        # Sauvegarder dans MongoDB
+        # Insert into MongoDB
         result = uploads_collection.insert_one(file_info)
-        
+
+        # 🔥 Make file_info JSON safe
+        serializable_file_info = {
+            k: str(v) if isinstance(v, ObjectId) else v
+            for k, v in file_info.items()
+        }
+
         return jsonify({
             'success': True,
-            'message': 'Image uploadée avec succès',
-            'file_id': str(result.inserted_id),
+            'message': 'Image uploaded successfully',
+            'file_id': str(result.inserted_id),          # 🔥 FIX
             'filename': filename,
             'download_url': file_info['download_url'],
             'size_mb': file_info['size_mb'],
-            'file_info': file_info
+            'file_info': serializable_file_info          # 🔥 FIX
         })
-    
+
     except Exception as e:
-        print(f"❌ Erreur upload image: {e}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        print(f"❌ Image upload error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 
 
 # ==========================================
@@ -5014,77 +5012,70 @@ def upload_image():
 @app.route('/api/upload/video', methods=['POST'])
 @login_required
 def upload_video():
-    """Upload une vidéo"""
+    """Upload a video"""
     try:
         user_id = session.get('user_id')
-        
-        # Vérifier si le fichier est présent
+
         if 'video' not in request.files:
-            return jsonify({
-                'success': False,
-                'error': 'Aucun fichier vidéo trouvé'
-            }), 400
+            return jsonify({'success': False, 'error': 'No video file found'}), 400
         
         file = request.files['video']
         
         if file.filename == '':
-            return jsonify({
-                'success': False,
-                'error': 'Nom de fichier vide'
-            }), 400
-        
-        # Vérifier l'extension
+            return jsonify({'success': False, 'error': 'Empty filename'}), 400
+
+        # Check extension
         if not allowed_file(file.filename, 'video'):
             return jsonify({
                 'success': False,
-                'error': f'Type de fichier non autorisé. Autorisé: {", ".join(ALLOWED_VIDEOS)}'
+                'error': f'Invalid file type. Allowed: {", ".join(ALLOWED_VIDEOS)}'
             }), 400
-        
-        # Vérifier la taille (max 500MB pour vidéos)
+
+        # Check file size
         file.seek(0, os.SEEK_END)
         file_length = file.tell()
-        if file_length > 500 * 1024 * 1024:  # 500MB
-            return jsonify({
-                'success': False,
-                'error': 'Fichier trop volumineux (max 500MB)'
-            }), 400
-        
+        if file_length > 200 * 1024 * 1024:  # 200MB limit
+            return jsonify({'success': False, 'error': 'Video too large (max 200MB)'}), 400
+
         file.seek(0)
-        
-        # Sauvegarder le fichier
+
+        # Save video
         filename = secure_filename(file.filename)
         timestamp = int(time.time())
         filename = f"{timestamp}_{filename}"
-        
+
         filepath = os.path.join(VIDEOS_FOLDER, filename)
         file.save(filepath)
-        
-        # Obtenir les infos du fichier
+
+        # Build info
         file_info = get_file_info(filepath, filename)
-        file_info['user_id'] = user_id
+        file_info['user_id'] = str(user_id)       # 🔥 convert to string
         file_info['file_type'] = 'video'
         file_info['file_path'] = filepath
-        file_info['download_url'] = f'/uploads/videos/{filename}'
-        
-        # Sauvegarder dans MongoDB
+        file_info['download_url'] = f"/uploads/videos/{filename}"
+
+        # Save in MongoDB
         result = uploads_collection.insert_one(file_info)
-        
+
+        # 🔥 Convert all ObjectId inside file_info
+        serializable_file_info = {
+            k: str(v) if isinstance(v, ObjectId) else v
+            for k, v in file_info.items()
+        }
+
         return jsonify({
             'success': True,
-            'message': 'Vidéo uploadée avec succès',
-            'file_id': str(result.inserted_id),
+            'message': 'Video uploaded successfully',
+            'file_id': str(result.inserted_id),         # 🔥 FIX
             'filename': filename,
             'download_url': file_info['download_url'],
-            'size_mb': file_info['size_mb'],
-            'file_info': file_info
+            'size_mb': file_info.get('size_mb', None),
+            'file_info': serializable_file_info         # 🔥 FIX
         })
-    
+
     except Exception as e:
-        print(f"❌ Erreur upload vidéo: {e}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        print(f"❌ Video upload error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 # ==========================================
@@ -5276,6 +5267,133 @@ def upload_stats():
             'video_count': video_count,
             'total_size_mb': round(total_size_mb, 2),
             'storage_limit_mb': 5000
+        })
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/user/profile')
+def get_profile():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"success": False, "error": "Not logged in"}), 401
+
+    user = users_collection.find_one({"_id": ObjectId(user_id)})
+    
+    return jsonify({
+        "success": True,
+        "user": {
+            "name": user.get("name", ""),
+            "email": user.get("email", ""),
+            "picture": user.get("picture", "")
+        }
+    })
+
+@app.route('/api/user/profile/update', methods=['POST'])
+def update_profile():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"success": False, "error": "Not logged in"}), 401
+
+    name = request.form.get("name")
+    email = request.form.get("email")
+    picture_file = request.files.get("picture")
+
+    updates = {
+        "name": name,
+        "email": email
+    }
+
+    # Handle picture upload
+    if picture_file:
+        filename = secure_filename(picture_file.filename)
+        filename = f"{int(time.time())}_{filename}"
+        save_path = os.path.join("static/uploads/profile", filename)
+
+        os.makedirs("static/uploads/profile", exist_ok=True)
+        picture_file.save(save_path)
+
+        picture_url = f"/static/uploads/profile/{filename}"
+        updates["picture"] = picture_url
+
+        # Update session
+        session["user_picture"] = picture_url
+
+    # Update MongoDB
+    users_collection.update_one(
+        {"_id": ObjectId(user_id)},
+        {"$set": updates}
+    )
+
+    session["user_name"] = name
+    session["user_email"] = email
+
+    return jsonify({"success": True})
+
+
+@app.route('/api/user/profile/delete', methods=['POST'])
+def delete_profile():
+    user_id = session.get('user_id')
+
+    users_collection.delete_one({"_id": ObjectId(user_id)})
+
+    session.clear()
+
+    return jsonify({"success": True})
+
+@app.route('/api/users')
+@login_required
+def get_users():
+    """Retourne la liste des utilisateurs (sauf mot de passe)"""
+    try:
+        users = list(users_collection.find(
+            {}, 
+            {'password': 0}  # Exclure le mot de passe
+        ).sort('name', 1))
+        
+        # Convertir ObjectId en string
+        for user in users:
+            user['_id'] = str(user['_id'])
+        
+        return jsonify({
+            'success': True,
+            'users': users
+        })
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/switch_user/<user_id>', methods=['POST'])
+@login_required
+def switch_user(user_id):
+    """Change l'utilisateur connecté"""
+    try:
+        from bson import ObjectId
+        
+        # Vérifier que l'utilisateur existe
+        user = users_collection.find_one({'_id': ObjectId(user_id)})
+        if not user:
+            return jsonify({'success': False, 'error': 'Utilisateur non trouvé'}), 404
+        
+        # Mettre à jour la session
+        session['user_id'] = str(user['_id'])
+        session['user_email'] = user['email']
+        session['user_name'] = user['name']
+        session['user_picture'] = user.get('picture', '')
+        
+        # Mettre à jour le dernier login
+        update_last_login(user['_id'])
+        
+        return jsonify({
+            'success': True,
+            'message': f'Connecté en tant que {user["name"]}',
+            'name': user['name']
         })
     
     except Exception as e:
