@@ -3848,6 +3848,15 @@ def onboarding_identity():
         })
         set_onboarding_data(onboarding_data)
         
+        
+        
+        user_id = session.get('user_id')
+        if user_id:
+            from bson import ObjectId
+            users_collection.update_one(
+                {'_id': ObjectId(user_id)},
+                {'$set': {'onboarding_completed': True}}
+            )
         # ✅ CORRIGER: Passer les données nécessaires à la fonction
         # au lieu de les accéder via session dans le thread
         threading.Thread(
@@ -4318,7 +4327,12 @@ def login():
         update_last_login(user['_id'])
         
         flash(f'Bienvenue {user["name"]}!', 'success')
-        return redirect(url_for('onboarding') if not user.get('onboarding_completed') else url_for('dashboard'))
+        
+        # ✅ CORRECTION : Vérifier si l'onboarding est complété
+        if not user.get('onboarding_completed', False):
+            return redirect(url_for('onboarding'))
+        else:
+            return redirect(url_for('dashboard'))
     
     return render_template('login.html')
 
@@ -4425,19 +4439,22 @@ def auth_google_callback():
         session['user_id'] = user_id
         session['user_email'] = email
         session['user_name'] = name
-        session["user_picture"] = user_info["picture"]
-
+        session["user_picture"] = picture
         
         update_last_login(user_id)
+        
+        # ✅ CORRECTION : Récupérer l'utilisateur complet pour vérifier l'onboarding
+        user_check = get_user_by_id(user_id)
         
         if is_new_user:
             flash(f'Bienvenue {name}! Complétez votre configuration.', 'success')
             return redirect(url_for('onboarding'))
         else:
             flash(f'Bienvenue {name}!', 'success')
-            user_check = get_user_by_id(user_id)
-            if user_check and not user_check.get('onboarding_completed'):
+            # ✅ Si l'onboarding n'est pas complété, rediriger vers onboarding
+            if user_check and not user_check.get('onboarding_completed', False):
                 return redirect(url_for('onboarding'))
+            # ✅ Sinon, vers le dashboard
             return redirect(url_for('dashboard'))
         
     except Exception as e:
