@@ -81,33 +81,40 @@ class RAGSystem:
                 raise e
         
     def check_data_changes(self) -> Dict:
-        """Vérifie s'il y a de nouveaux sites dans MongoDB"""
+        """Vérifie RAPIDEMENT s'il y a de nouveaux sites sans charger les données"""
         try:
-            # Connexion MongoDB
-            MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
-            mongo_client = MongoClient(MONGO_URI)
-            db = mongo_client["scraping_db"]
-            collection = db["scraped_sites"]
-
-            # Récupérer tous les sites
-            all_sites = list(collection.find())
-            
             if not self.is_initialized:
-                return {'has_changes': True, 'new_sites_count': len(all_sites), 'reason': 'not_initialized'}
-
-            # Compter les sites déjà indexés
-            indexed_site_ids = set(m.get("site_id") for m in self.metadata if "site_id" in m)
-            new_sites = [s for s in all_sites if s["site_id"] not in indexed_site_ids]
-
+                # Première initialisation - compter tous les sites
+                all_sites = list(scrapes_collection.find({}, {"site_id": 1}))
+                return {
+                    'has_changes': True,
+                    'new_sites_count': len(all_sites),
+                    'total_sites': len(all_sites),
+                    'indexed_sites': 0,
+                    'reason': 'not_initialized'
+                }
+            
+            # Récupérer UNIQUEMENT les site_id depuis MongoDB 
+            mongo_site_ids = set(
+                site['site_id'] 
+                for site in scrapes_collection.find({}, {"site_id": 1})
+            )
+            
+            # Comparer avec les sites dÃ©jÃ  indexÃ©s
+            indexed_site_ids = self.get_indexed_site_ids()
+            new_sites = mongo_site_ids - indexed_site_ids
+            
             return {
                 'has_changes': len(new_sites) > 0,
                 'new_sites_count': len(new_sites),
-                'total_sites': len(all_sites),
+                'total_sites': len(mongo_site_ids),
                 'indexed_sites': len(indexed_site_ids),
+                'new_site_ids': list(new_sites),
                 'reason': f'{len(new_sites)} nouveaux sites' if new_sites else 'no_changes'
             }
-
+            
         except Exception as e:
+            print(f"Erreur check_data_changes: {e}")
             return {'has_changes': True, 'reason': f'error: {str(e)}'}
        
        
@@ -132,31 +139,187 @@ class RAGSystem:
        
         
     def load_scraped_data(self, file_path: str = None):
-        """Charge uniquement les NOUVELLES données depuis MongoDB"""
-        print("📥 Chargement INCRÉMENTIEL des données depuis MongoDB...")
-
-        # Charger modèle si nécessaire
+        """Charge UNIQUEMENT les nouvelles donnÃ©es (incrémental optimisé"""
+        
+        # Charger le modèle si nÃ©cessaire
         self._load_embedding_model()
+        
+        # Vérifier les changements SANS charger les donnÃ©es
+        changes = self.check_data_changes()
+        
+        if not changes['has_changes'] and self.is_initialized:
+            print("Aucun nouveau site - RAG déja à jour")
+            return True
+        
+        # Première initialisation - tout charger
+        if not self.is_initialized or self.index is None:
+            print("Première initialisation - Chargement complet...")
+            return self._load_all_data_from_mongo()
+        
+        # Chargement incrÃ©mental - UNIQUEMENT les nouveaux sites
+        new_site_ids = changes.get('new_site_ids', [])
+        if not new_site_ids:
+            print("Aucun nouveau site Ã  charger")
+            return True
+        
+        print(f"Chargement de {len(new_site_ids)} NOUVEAUX sites uniquement...")
+        return self._load_incremental_sites(new_site_ids)
 
-        # Connexion Mongo
-        MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
-        mongo_client = MongoClient(MONGO_URI)
-        db = mongo_client["scraping_db"]
-        collection = db["scraped_sites"]
-
-        # Récupérer tous les sites
-        all_sites = list(collection.find())
-        if not all_sites:
-            print("⚠️ Aucune donnée dans MongoDB.")
+    def _load_incremental_sites(self, new_site_ids: list) -> bool:
+        """Charge UNIQUEMENT les sites spécifiés (ultra-rapide)"""
+        try:
+            new_documents = []
+            new_metadata = []
+            
+            # Récupérer UNIQUEMENT les nouveaux sites depuis MongoDB
+            new_sites = list(scrapes_collection.find({"site_id": {"$in": new_site_ids}}))
+            
+            print(f"📝 Traitement de {len(new_sites)} nouveaux sites...")
+            
+            for site_doc in new_sites:
+                site_id = site_doc["site_id"]
+                
+                # Stocker dans raw_data
+                if self.raw_data is None:
+                    self.raw_data = {}
+                self.raw_data[site_id] = site_doc
+                
+                results = site_doc.get("results", [])
+                print(f"📄 Site {site_id}: {len(results)} pages")
+                
+                for i, page in enumerate(results):
+                    # Pages
+                    page_documents = self._create_page_documents(page, i, site_id)
+                    for doc in page_documents:
+                        new_documents.append(doc['content'])
+                        new_metadata.append(doc['metadata'])
+                    
+                    # Produits normaux
+                    for j, product in enumerate(page.get("products", [])):
+                        product_data = self._create_product_document(
+                            product, page.get("url", ""), site_id, i, j, "normal"
+                        )
+                        if product_data:
+                            new_documents.append(product_data['content'])
+                            new_metadata.append(product_data['metadata'])
+                    
+                    # Produits promus
+                    for j, product in enumerate(page.get("promoted_products", [])):
+                        product_data = self._create_product_document(
+                            product, page.get("url", ""), site_id, i, j, "promoted"
+                        )
+                        if product_data:
+                            new_documents.append(product_data['content'])
+                            new_metadata.append(product_data['metadata'])
+            
+            if not new_documents:
+                print("ℹ️ Aucun nouveau document à indexer")
+                return True
+            
+            print(f"🔄 Génération de {len(new_documents)} nouveaux embeddings...")
+            
+            # ✅ CORRECTION : Remplacer show_pize par show_progress_bar
+            new_embeddings = self.embedding_model.encode(
+                new_documents,
+                show_progress_bar=True,  # ✅ CORRECTION ICI
+                batch_size=32,
+                normalize_embeddings=True
+            ).astype('float32')
+            
+            # Ajouter à l'index FAISS existant
+            self.index.add(new_embeddings)
+            
+            # Étendre les listes
+            self.documents.extend(new_documents)
+            self.metadata.extend(new_metadata)
+            
+            print(f"✅ {len(new_documents)} nouveaux documents indexés")
+            print(f"📊 Total index: {self.index.ntotal} vecteurs")
+            
+            return True
+            
+        except Exception as e:
+            print(f"❌ Erreur chargement incrémental: {e}")
+            import traceback
+            traceback.print_exc()
             return False
 
-        # Si c'est la première initialisation, charger tout
-        if not self.is_initialized or self.index is None:
-            print("🔄 Première initialisation - Chargement de toutes les données...")
-            return self._load_all_data(all_sites)
 
-        # Sinon, charger uniquement les nouveaux sites
-        return self._load_incremental_data(all_sites)
+    def _load_all_data_from_mongo(self) -> bool:
+        """Charge TOUTES les données depuis MongoDB (première initialisation)"""
+        try:
+            print("Chargement complet depuis MongoDB...")
+            
+            all_sites = list(scrapes_collection.find())
+            
+            if not all_sites:
+                print("Aucune donnée dans MongoDB")
+                return False
+            
+            self.raw_data = {}
+            self.documents = []
+            self.metadata = []
+            
+            total_products = 0
+            total_promoted = 0
+            
+            for site_doc in all_sites:
+                site_id = site_doc["site_id"]
+                self.raw_data[site_id] = site_doc
+                
+                results = site_doc.get("results", [])
+                for i, page in enumerate(results):
+                    # Pages
+                    page_documents = self._create_page_documents(page, i, site_id)
+                    for doc in page_documents:
+                        self.documents.append(doc['content'])
+                        self.metadata.append(doc['metadata'])
+                    
+                    # Produits
+                    for j, product in enumerate(page.get("products", [])):
+                        product_data = self._create_product_document(
+                            product, page.get("url", ""), site_id, i, j, "normal"
+                        )
+                        if product_data:
+                            self.documents.append(product_data['content'])
+                            self.metadata.append(product_data['metadata'])
+                            total_products += 1
+                    
+                    for j, product in enumerate(page.get("promoted_products", [])):
+                        product_data = self._create_product_document(
+                            product, page.get("url", ""), site_id, i, j, "promoted"
+                        )
+                        if product_data:
+                            self.documents.append(product_data['content'])
+                            self.metadata.append(product_data['metadata'])
+                            total_promoted += 1
+            
+            print(f"{len(self.documents)} documents chargés")
+            print(f"{total_products} normaux, {total_promoted} promus, {len(all_sites)} sites")
+            
+            # Construire l'index
+            if self.documents:
+                self._build_faiss_index()
+                self.is_initialized = True
+                return True
+            
+            return False
+            
+        except Exception as e:
+            print(f"Erreur chargement complet: {e}")
+            return False
+
+    
+    def get_performance_stats(self) -> Dict:
+        """Statistiques de performance du chargement"""
+        return {
+            'total_sites': len(self.raw_data) if self.raw_data else 0,
+            'total_documents': len(self.documents),
+            'index_size': self.index.ntotal if self.index else 0,
+            'indexed_sites': len(self.get_indexed_site_ids()),
+            'memory_usage_mb': len(str(self.documents)) / (1024 * 1024) if self.documents else 0
+        }
+    
 
     def _load_all_data(self, all_sites):
         """Charge toutes les données (première initialisation)"""
@@ -896,6 +1059,17 @@ RÉPONSE DÉTAILLÉE:"""
                 sites.append(site_info)
         
         return sites
+    
+    #Optimisation du process de l'initialisation du RAG
+    
+    def get_indexed_site_ids(self) -> set:
+        """Récupérer les IDs des sites déja  indexés"""
+        indexed_sites = set()
+        for meta in self.metadata:
+            if 'site_id' in meta:
+                indexed_sites.add(meta['site_id'])
+        return indexed_sites
+    
     
     
     
